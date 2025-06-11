@@ -2,7 +2,7 @@
  MUTUALIDAD DOCE DE AGOSTO S.C. DE R.L. DE C.V.             
  RFC: MDA770513NH8                                          
  CALLE 23 No. 100-B ENTRE 18 Y 20 COL. CENTRO               
- FECHA: 10/06/2025                                          
+ FECHA: 11/06/2025                                          
  SOCIO: 100                   FOLIO: 18                     
  NOMBRE: LORENZO LORENZO CETINA UC                          
  No. CUENTA: 0010012100                                     
@@ -15,8 +15,8 @@
  NOMBRE: LORENZO LORENZO CETINA UC                          
  LA NO OBJECION A ESTE COMPROBANTE                          
  IMPLICA SU ACEPTACION                                      
- HORA: 11:09:57 USUARIO: JMEX                               
- AHORRO: $85,529.77 CREDITO PREI: 8600.00                   
+ HORA: 10:43:38 USUARIO: JMEX                               
+ AHORRO: $86,029.77 CREDITO PREI: 8600.00                   
                                                             
                                                             
                                                             

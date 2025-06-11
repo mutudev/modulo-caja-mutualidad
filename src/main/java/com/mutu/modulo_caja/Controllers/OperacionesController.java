@@ -5,7 +5,6 @@ import com.mutu.modulo_caja.Models.ModelEmpresa;
 import com.mutu.modulo_caja.Models.ModelOperaciones;
 import com.mutu.modulo_caja.Models.ModelUsuario;
 import com.mutu.modulo_caja.Services.Servicio;
-import com.mutu.modulo_caja.utils.SesionUsuario;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -26,12 +25,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URL;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -86,7 +82,7 @@ public class OperacionesController implements Initializable {
     cmbOperacion.setItems(operacionesProcesadas);
     cmbOperacion.getSelectionModel().selectFirst();
 
-    List<ModelUsuario> usuarios = servicio.traerCajeros(1);
+    List<ModelUsuario> usuarios = servicio.traerCajero(1);
     ObservableList<String> cajeros = FXCollections.observableArrayList();
     for (ModelUsuario usuario : usuarios) {
       cajeros.add(usuario.getUsuario().toUpperCase());

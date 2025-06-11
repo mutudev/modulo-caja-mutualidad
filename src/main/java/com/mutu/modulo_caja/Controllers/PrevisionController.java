@@ -3,6 +3,7 @@ package com.mutu.modulo_caja.Controllers;
 import br.com.adilson.util.Extenso;
 import br.com.adilson.util.PrinterMatrix;
 import com.mutu.modulo_caja.Services.Servicio;
+import com.mutu.modulo_caja.utils.PrintJob;
 import com.tenpisoft.n2w.MoneyConverters;
 import javafx.application.Platform;
 import javafx.event.Event;
@@ -202,8 +203,9 @@ public class PrevisionController implements Initializable {
         LocalTime hora = fecha.toLocalTime();
         DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm:ss");
         String horaFormateada = hora.format(formatterHora);
+        PrintJob impresion = new PrintJob();
         PrinterMatrix printer =
-            getPrinterMatrix(
+            impresion.imprimirPrevision(
                 nombreEmpresa,
                 rfcEmpresa,
                 direcEmpresa,
@@ -275,50 +277,5 @@ public class PrevisionController implements Initializable {
       alert.setContentText("POR FAVOR, CUMPLA CON LAS VALIDACIONES DEL CAMPO");
       alert.showAndWait();
     }
-  }
-
-  private PrinterMatrix getPrinterMatrix(
-          String empresa,
-          String rfc,
-          String direc,
-          String numsocio,
-          String folio,
-          String nomsocio,
-          String abono,
-          String abonoletras,
-          String fecha,
-          String hora,
-          String montoAsignado, String montoCubierto) {
-    PrinterMatrix printer = new PrinterMatrix();
-    String numSocio = "SOCIO: " + numsocio;
-    String nombre = "NOMBRE: " + nomsocio;
-    String tipoCuenta = "TIPO DE CUENTA: PREVISION SOCIAL - ABONO A PS";
-    String efectivo = "ABONO: " + abono;
-    String descripcion1 = "LA NO OBJECION A ESTE COMPROBANTE";
-    String descripcion2 = "IMPLICA SU ACEPTACION";
-    String cajero = "USUARIO: " + LoginController.usuarioLoggeado;
-    Extenso e = new Extenso();
-    e.setNumber(21.59);
-    printer.setOutSize(30, 60);
-    printer.printTextWrap(1, 2, 1, 60, empresa); // Columna 1
-    printer.printTextWrap(2, 3, 1, 60, "RFC: " + rfc); // Columna 2
-    printer.printTextWrap(3, 4, 1, 60, direc); // Columna 3
-    printer.printTextWrap(4, 5, 1, 60, "FECHA: " + fecha); // Columna 4
-    printer.printTextWrap(5, 6, 1, 60, numSocio);
-    printer.printTextWrap(5, 6, 30, 60, "FOLIO: " + folio); // Columna 5// Columna 6
-    printer.printTextWrap(6, 7, 1, 60, nombre); // Columna 7
-    printer.printTextWrap(7, 8, 1, 60, tipoCuenta);
-    printer.printTextWrap(9, 10, 1, 60, efectivo); // Columna 10
-    printer.printTextWrap(10, 11, 1, 60, abonoletras);
-    printer.printTextWrap(12, 13, 1, 60, "___________________________________");
-    printer.printTextWrap(13, 14, 1, 60, nombre);
-    printer.printTextWrap(14, 15, 1, 60, descripcion1);
-    printer.printTextWrap(15, 16, 1, 60, descripcion2);
-    printer.printTextWrap(16, 17, 1, 60, "HORA: " + hora);
-    printer.printTextWrap(16, 17, 16, 60, cajero);
-    printer.printTextWrap(17, 18, 1, 60, "MONTO CUBIERTO: " +   montoCubierto);
-    printer.printTextWrap(18, 19, 1, 60, "MONTO ASIGNADO: " +   montoAsignado); // Columna 16
-
-    return printer;
   }
 }

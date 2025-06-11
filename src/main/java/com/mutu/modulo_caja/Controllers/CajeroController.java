@@ -34,8 +34,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import com.mutu.modulo_caja.utils.SesionUsuario;
-
 @Component
 public class CajeroController implements Initializable {
 
@@ -274,8 +272,6 @@ public class CajeroController implements Initializable {
           elegir = true;
           tituloEleccion = "ELECCIÓN DE EMPRESA";
           opcion = "CS";
-          SesionUsuario.getInstance().setUsuario(usuario);
-          SesionUsuario.getInstance().setEmpresa("empresa");
         } else if (!txtNombreCargado.isVisible() && lblCapitalSocial.isVisible()) {
           mostrarError("PAGAR A CAPITAL SOCIAL");
         }
@@ -297,8 +293,6 @@ public class CajeroController implements Initializable {
           elegir = true;
           tituloEleccion = "ELECCIÓN DE EMPRESA";
           opcion = "AJSF";
-          SesionUsuario.getInstance().setUsuario(usuario);
-          SesionUsuario.getInstance().setEmpresa("empresa");
         }
         break;
 
@@ -313,8 +307,6 @@ public class CajeroController implements Initializable {
           elegir = true;
           tituloEleccion = "ELECCIÓN DE EMPRESA";
           opcion = "TRAS";
-          SesionUsuario.getInstance().setUsuario(usuario);
-          SesionUsuario.getInstance().setEmpresa("empresa");
         }
         break;
 
@@ -428,8 +420,6 @@ public class CajeroController implements Initializable {
           tituloEleccion = "ELECCIÓN DE EMPRESA";
           opcion = "PRESOC";
 
-          SesionUsuario.getInstance().setUsuario(usuario);
-          SesionUsuario.getInstance().setEmpresa("empresa");
 
         } else if (!txtNombreCargado.isVisible() && lblPrevisionSocial.isVisible()) {
           mostrarError("PAGAR PREVISIÓN SOCIAL");
@@ -548,8 +538,6 @@ public class CajeroController implements Initializable {
         elegir = true;
         tituloEleccion = "ELECCIÓN DE EMPRESA";
         opcion = "CS";
-        SesionUsuario.getInstance().setUsuario(usuario);
-        SesionUsuario.getInstance().setEmpresa("empresa");
       } else mostrarError("ACCEDER A CAPITAL SOCIAL");
 
     } else if (source == imgBusqueda) {
@@ -708,9 +696,6 @@ public class CajeroController implements Initializable {
         elegir = true;
         tituloEleccion = "ELECCIÓN DE EMPRESA";
         opcion = "PRESOC";
-
-        SesionUsuario.getInstance().setUsuario(usuario);
-        SesionUsuario.getInstance().setEmpresa("empresa");
       } else {
         mostrarError("PAGAR PREVISIÓN SOCIAL");
       }

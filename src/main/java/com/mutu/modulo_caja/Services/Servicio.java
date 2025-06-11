@@ -192,7 +192,7 @@ public class Servicio {
     return repoCierre.procesarCierre(cuenta_cajeroMut, cuenta_cajeroNgu, fecha, Resultado);
   }
 
-  public List<ModelUsuario> traerCajeros(int rol) {
+  public List<ModelUsuario> traerCajero(int rol) {
     return repoUsuario.findByRol(rol);
   }
 
@@ -240,5 +240,5 @@ public class Servicio {
     return repoEmpresa.findByCodigo(codigo);
   }
 
-  public String traerCajero (String  usuario){return repoUsuario.traerCajero(usuario);}
+  public String traerCajeroPorUsuario (String  usuario){return repoUsuario.traerCajero(usuario);}
 }

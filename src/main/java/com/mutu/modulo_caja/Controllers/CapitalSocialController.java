@@ -3,6 +3,7 @@ package com.mutu.modulo_caja.Controllers;
 import br.com.adilson.util.Extenso;
 import br.com.adilson.util.PrinterMatrix;
 import com.mutu.modulo_caja.Services.Servicio;
+import com.mutu.modulo_caja.utils.PrintJob;
 import com.tenpisoft.n2w.MoneyConverters;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -162,9 +163,11 @@ public class CapitalSocialController implements Initializable {
       }
 
       double montoP = Double.parseDouble(txtMontoP.getText().trim());
-      Map<String, Object> res = servicio.AbonarCapitalSocial(socio, empresaCod, montoP, usuario, "", 0,0,0);
+      Map<String, Object> res =
+          servicio.AbonarCapitalSocial(socio, empresaCod, montoP, usuario, "", 0, 0, 0);
 
-      if (res.get("Resultado").toString().equals("ACTUALIZADO")|| res.get("Resultado").toString().equals("ABONADO")) {
+      if (res.get("Resultado").toString().equals("ACTUALIZADO")
+          || res.get("Resultado").toString().equals("ABONADO")) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("ABONO A CAPITAL SOCIAL REALIZADO CON ÉXITO");
         alert.setHeaderText("ABONO REALIZADO CON ÉXITO");
@@ -192,9 +195,9 @@ public class CapitalSocialController implements Initializable {
         LocalTime hora = fecha.toLocalTime();
         DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm:ss");
         String horaFormateada = hora.format(formatterHora);
-
+        PrintJob impresion = new PrintJob();
         PrinterMatrix printer =
-            getPrinterMatrix(
+            impresion.imprimirCapSocial(
                 nombreEmpresa,
                 rfcEmpresa,
                 direcEmpresa,
@@ -205,8 +208,8 @@ public class CapitalSocialController implements Initializable {
                 moneyAsWords,
                 fechaTicket,
                 horaFormateada,
-                    parteMUT,
-                    parteNGU);
+                parteMUT,
+                parteNGU);
 
         printer.toFile("impresion_Abono.txt");
 
@@ -259,58 +262,5 @@ public class CapitalSocialController implements Initializable {
         alert.showAndWait();
       }
     }
-  }
-
-  private PrinterMatrix getPrinterMatrix(
-      String empresa,
-      String rfc,
-      String direc,
-      String numsocio,
-      String folio,
-      String nomsocio,
-      String abono,
-      String abonoletras,
-      String fecha,
-      String hora,
-      String parteMUT,
-      String parteNGU) {
-    PrinterMatrix printer = new PrinterMatrix();
-    String numSocio = "SOCIO: " + numsocio;
-    String nombre = "NOMBRE: " + nomsocio;
-    String tipoCuenta = "TIPO DE CUENTA: CAPITAL SOCIAL - ABONO A CS";
-    String efectivo = "ABONO: " + abono;
-    String descripcion1 = "LA NO OBJECION A ESTE COMPROBANTE";
-    String descripcion2 = "IMPLICA SU ACEPTACION";
-    String cajero = "USUARIO: " + LoginController.usuarioLoggeado;
-    String psmut = "PS MUT: " + parteMUT;
-    String psngu = "PS NGU: " +parteNGU;
-    //    String totalAhorro = "AHORRO: " + ahorro;
-    Extenso e = new Extenso();
-    e.setNumber(21.59);
-    printer.setOutSize(30, 60);
-    printer.printTextWrap(1, 2, 1, 60, empresa); // Columna 1
-    printer.printTextWrap(2, 3, 1, 60, "RFC: " + rfc); // Columna 2
-    printer.printTextWrap(3, 4, 1, 60, direc); // Columna 3
-    printer.printTextWrap(4, 5, 1, 60, "FECHA: " + fecha); // Columna 4
-    printer.printTextWrap(5, 6, 1, 60, numSocio);
-    printer.printTextWrap(5, 6, 30, 60, "FOLIO: " + folio); // Columna 5// Columna 6
-    printer.printTextWrap(6, 7, 1, 60, nombre); // Columna 7
-    printer.printTextWrap(7, 8, 1, 60, tipoCuenta);
-    printer.printTextWrap(9, 10, 1, 60, efectivo);
-    printer.printTextWrap(10, 11, 1, 60, abonoletras);
-    printer.printTextWrap(12, 13, 1, 60, "___________________________________");
-    printer.printTextWrap(13, 14, 1, 60, nombre);
-    printer.printTextWrap(14, 15, 1, 60, descripcion1);
-    printer.printTextWrap(15, 16, 1, 60, descripcion2);
-    printer.printTextWrap(16, 17, 1, 60, "HORA: " + hora);
-    printer.printTextWrap(16, 17, 16, 60, cajero);
-    if (socio <= 8543) {
-      printer.printTextWrap(17, 18, 1, 60, psmut);
-      printer.printTextWrap(17, 18, 25, 60, psngu);
-    } else {
-      printer.printTextWrap(17, 18, 1, 60, psngu);
-    }
-
-    return printer;
   }
 }

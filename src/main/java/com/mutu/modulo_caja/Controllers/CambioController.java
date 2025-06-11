@@ -3,6 +3,7 @@ package com.mutu.modulo_caja.Controllers;
 import br.com.adilson.util.Extenso;
 import br.com.adilson.util.PrinterMatrix;
 import com.mutu.modulo_caja.Services.Servicio;
+import com.mutu.modulo_caja.utils.PrintJob;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -133,16 +134,19 @@ public class CambioController implements Initializable {
     LocalTime hora = fecha.toLocalTime();
     DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm:ss");
     String horaFormateada = hora.format(formatterHora);
-    String datosusuario = servicio.traerCajero(LoginController.usuarioLoggeado);
-    System.out.println(datosusuario);
+    String datosusuario = servicio.traerCajeroPorUsuario(LoginController.usuarioLoggeado);
     String nombre = datosusuario;
     String totalop = txtTotal.getText();
     String cambio = txtCambio.getText();
     String recibido = formatoMoneda.format(Double.parseDouble(txtRecibido.getText()));
-    PrintService[] services = PrintServiceLookup.lookupPrintServices(null, null);
-    if (services != null && services.length > 0) {
+
+
+    PrintService services = PrintServiceLookup.lookupDefaultPrintService();
+    if (services != null) {
+      PrintJob impresion = new PrintJob();
+
       PrinterMatrix printer =
-          getPrinterMatrix(nombre, totalop, cambio, recibido, fechaTicket, horaFormateada);
+          impresion.imprimirCambio(nombre, totalop, cambio, recibido, fechaTicket, horaFormateada);
 
       printer.toFile("impresion_Cambio.txt");
 
@@ -166,17 +170,12 @@ public class CambioController implements Initializable {
 
         try {
           printJob.print(document, attributeSet);
-          Alert alert2 = new Alert(Alert.AlertType.INFORMATION);
-          alert2.setTitle("IMPRESIÓN REALIZADA CON ÉXITO");
-          alert2.setHeaderText("IMPRESIÓN REALIZADA CON ÉXITO");
-          alert2.setContentText("IMPRESIÓN REALIZADA CON ÉXITO");
-          alert2.showAndWait();
-        } catch (PrintException b) {
 
+        } catch (PrintException b) {
           Alert alert2 = new Alert(Alert.AlertType.ERROR);
           alert2.setTitle("ERROR IMPRIMIENDO");
           alert2.setHeaderText("ERROR IMPRIMIENDO");
-          alert2.setContentText("ERROR IMPRIMIENDO");
+          alert2.setContentText(b.getMessage());
           alert2.showAndWait();
         }
       } else {
@@ -197,30 +196,5 @@ public class CambioController implements Initializable {
     }
   }
 
-  private PrinterMatrix getPrinterMatrix(
-      String nombre,
-      String totalop,
-      String cambio,
-      String recibido,
-      String fechaTicket,
-      String horaFormateada) {
-    PrinterMatrix printer = new PrinterMatrix();
-    String Cajero = "CAJERO: " + nombre;
-    String descripcion1 = "LA NO OBJECION A ESTE COMPROBANTE";
-    String descripcion2 = "IMPLICA SU ACEPTACION";
-    Extenso e = new Extenso();
-    e.setNumber(21.59);
-    printer.setOutSize(30, 60); // Columna 1
-    printer.printTextWrap(1, 2, 1, 60, "FECHA DE OPERACIONES: " + fechaTicket); // Columna 2
-    printer.printTextWrap(2, 3, 1, 60, "HORA DE OPERACIONES: " + horaFormateada); // Columna 2
-    printer.printTextWrap(3, 4, 1, 60, Cajero);
-    printer.printTextWrap(5, 6, 1, 60, "--LISTADO DE OPERACIONES--");
-    printer.printTextWrap(6, 7, 1, 60, "TOTAL OPERACIONES: " + totalop);
-    printer.printTextWrap(7, 8, 1, 60, "TOTAL RECIBIDO: " + recibido);
-    printer.printTextWrap(8, 9, 1, 60, "CAMBIO: " + cambio);
-    printer.printTextWrap(10, 11, 1, 60, descripcion1);
-    printer.printTextWrap(11, 12, 1, 60, descripcion2);
 
-    return printer;
-  }
 }

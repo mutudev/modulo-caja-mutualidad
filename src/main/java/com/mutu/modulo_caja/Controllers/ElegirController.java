@@ -29,7 +29,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import com.mutu.modulo_caja.utils.SesionUsuario;
 
 @Component
 public class ElegirController implements Initializable {
@@ -41,7 +40,6 @@ public class ElegirController implements Initializable {
   private int socio;
 
   public CajeroController cajeroController;
-  @Autowired private SesionUsuario sesionUsuario;
 
   @FXML private TableView tablePrestamos;
 
@@ -393,8 +391,6 @@ public class ElegirController implements Initializable {
           nuevaVentana.centerOnScreen();
           nuevaVentana.initModality(Modality.APPLICATION_MODAL);
           nuevaVentana.show();
-          SesionUsuario.getInstance().setUsuario(usuario);
-          SesionUsuario.getInstance().setEmpresa("empresa");
           ventanaActual.close();
         } catch (IOException e) {
           e.printStackTrace();
