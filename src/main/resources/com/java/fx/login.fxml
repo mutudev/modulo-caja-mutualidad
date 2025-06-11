@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="525.0" prefWidth="991.0" style="-fx-background-color: #ffffff;" stylesheets="@/assets/css/estilos.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.LoginController">
+   <children>
+      <Button fx:id="btnIngresar" defaultButton="true" focusTraversable="false" layoutX="530.0" layoutY="423.0" mnemonicParsing="false" onAction="#validarLogin" prefHeight="50.0" prefWidth="173.0" style="-fx-background-color: #39577C;" styleClass="boton" text="INICIAR SESIÓN" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <tooltip>
+            <Tooltip text="Iniciar Sesión">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </Tooltip>
+         </tooltip></Button>
+      <Button fx:id="btnCancelar" cacheShape="false" focusTraversable="false" layoutX="743.0" layoutY="423.0" mnemonicParsing="false" onAction="#cerrarConBoton" prefHeight="50.0" prefWidth="173.0" style="-fx-background-color: #D82929;" styleClass="boton" text="CANCELAR" textFill="WHITE">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+         <tooltip>
+            <Tooltip text="Cancelar">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </Tooltip>
+         </tooltip></Button>
+      <TextField fx:id="txtUsuario" layoutX="540.0" layoutY="228.0" prefHeight="39.0" prefWidth="392.0" promptText="Ingrese su usuario..." style="-fx-border-color: #000000; -fx-border-width: 0 0 2 0; -fx-background-insets: 0; -fx-background-color: transparent;" />
+      <PasswordField fx:id="txtPass" layoutX="540.0" layoutY="302.0" prefHeight="39.0" prefWidth="392.0" promptText="******" style="-fx-border-color: #000000; -fx-border-width: 0 0 2 0; -fx-background-insets: 0; -fx-background-color: transparent;" />
+      <Label focusTraversable="false" layoutX="435.0" layoutY="238.0" prefHeight="27.0" prefWidth="90.0" text="USUARIO:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+      <Label focusTraversable="false" layoutX="398.0" layoutY="315.0" text="CONTRASEÑA:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+      <Pane prefHeight="525.0" prefWidth="370.0" style="-fx-background-color: #39577C;">
+         <children>
+            <ImageView fitHeight="206.0" fitWidth="226.0" layoutX="80.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@/assets/images/logobl.png" />
+               </image>
+            </ImageView>
+            <Label focusTraversable="false" layoutX="51.0" layoutY="251.0" prefHeight="66.0" prefWidth="270.0" styleClass="texto-blanco" text="MUTUALIDAD 12 DE AGOSTO S.C. DE R.L. DE C.V." textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" focusTraversable="false" layoutX="33.0" layoutY="324.0" prefHeight="27.0" prefWidth="314.0" styleClass="texto-blanco" text="TODOS LOS DERECHOS RESERVADOS." textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblHora" focusTraversable="false" layoutX="33.0" layoutY="434.0" prefHeight="27.0" prefWidth="173.0" styleClass="texto-blanco" text="HORA: " textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblFecha" layoutX="33.0" layoutY="473.0" prefHeight="27.0" prefWidth="173.0" styleClass="texto-blanco" text="FECHA:" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font></Label>
+         </children></Pane>
+      <ImageView fitHeight="241.0" fitWidth="314.0" layoutX="573.0" layoutY="-26.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@/assets/images/avatar-user.jpg" />
+         </image></ImageView>
+      <Label fx:id="lblValUser" alignment="TOP_LEFT" layoutX="540.0" layoutY="269.0" prefHeight="21.0" prefWidth="392.0" style="-fx-text-fill: red;">
+         <font>
+            <Font size="12.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

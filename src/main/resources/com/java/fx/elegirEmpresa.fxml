@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane onKeyPressed="#cerrarConTecla" prefHeight="250.0" prefWidth="615.0" style="-fx-background-color: #ffffff; -fx-border-color: black; -fx-border-width: 1;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.ElegirController">
+
+    <children>
+
+        <Label fx:id="lblTitulo" alignment="CENTER" layoutX="128.0" layoutY="27.0" prefHeight="27.0" prefWidth="359.0" style="-fx-text-fill: #39577C;" textAlignment="CENTER">
+            <font>
+                <Font name="System Bold" size="18.0" />
+            </font>
+        </Label>
+
+        <Label layoutX="41.0" layoutY="73.0" prefHeight="25.0" prefWidth="228.0" style="-fx-text-fill: #000000;" text="SELECCIONE LA EMPRESA:">
+            <font>
+                <Font name="System Bold" size="16.0" />
+            </font>
+        </Label>
+
+        <ComboBox fx:id="cmbEmpresa" layoutX="41.0" layoutY="106.0" prefHeight="39.0" prefWidth="533.0">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+
+                </FXCollections>
+            </items>
+        </ComboBox>
+
+        <Button fx:id="btnCancelar" layoutX="169.0" layoutY="180.0" onAction="#cerrarConBoton" prefWidth="130.0" style="-fx-background-color: #C0392B; -fx-text-fill: white; -fx-font-weight: bold;" text="Cancelar" />
+
+        <Button fx:id="btnProceder" layoutX="334.0" layoutY="180.0" onAction="#cambiar" prefWidth="130.0" style="-fx-background-color: #39577C; -fx-text-fill: white; -fx-font-weight: bold;" text="Proceder" />
+
+    </children>
+</AnchorPane>

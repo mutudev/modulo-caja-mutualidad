@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane onKeyPressed="#cerrarConTecla" prefHeight="550.0" prefWidth="913.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.RetiroController">
+   <children>
+      <Label layoutX="338.0" layoutY="28.0" style="-fx-text-fill: #39577C;" text="RETIRO EN EFECTIVO">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <TableView fx:id="tableRetiros" layoutX="37.0" layoutY="78.0" prefHeight="200.0" prefWidth="850.0">
+        <columns>
+          <TableColumn fx:id="colSocio" prefWidth="142.0" text="SOCIO" />
+          <TableColumn fx:id="colNombre" prefWidth="524.0" text="NOMBRE" />
+            <TableColumn fx:id="colMonto" prefWidth="183.0" text="MONTO" />
+        </columns>
+      </TableView>
+      <Label layoutX="37.0" layoutY="299.0" style="-fx-text-fill: #39577C;" text="AHORROS ANTES DEL RETIRO: ">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="22.0" layoutY="363.0" style="-fx-text-fill: #39577C;" text="AHORROS DESPUÉS DEL RETIRO:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <TextField fx:id="txtAhorroAnt" editable="false" focusTraversable="false" layoutX="315.0" layoutY="293.0" prefHeight="39.0" prefWidth="229.0">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></TextField>
+      <TextField fx:id="txtAhorroDesp" editable="false" focusTraversable="false" layoutX="315.0" layoutY="357.0" prefHeight="39.0" prefWidth="229.0">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></TextField>
+       <Button fx:id="btnCancelar" layoutX="237.0" layoutY="484.0" onAction="#cerrarConBoton" prefHeight="39.0" prefWidth="203.0" style="-fx-background-color: #C0392B; -fx-text-fill: white; -fx-font-weight: bold;" text="CANCELAR" />
+
+       <Button fx:id="btnProcesar" layoutX="504.0" layoutY="484.0" onAction="#procesarRetiro" prefHeight="39.0" prefWidth="203.0" style="-fx-background-color: #39577C; -fx-text-fill: white; -fx-font-weight: bold;" text="PROCESAR" />
+      <Label layoutX="632.0" layoutY="299.0" style="-fx-text-fill: #39577C;" text="ESTADO:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="565.0" layoutY="363.0" style="-fx-text-fill: #39577C;" text="IDENTIFICADOR:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <TextField fx:id="txtEstado" editable="false" focusTraversable="false" layoutX="727.0" layoutY="293.0" prefHeight="39.0" prefWidth="160.0">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></TextField>
+      <TextField fx:id="txtIdentificador" editable="false" focusTraversable="false" layoutX="727.0" layoutY="357.0" prefHeight="39.0" prefWidth="160.0">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </TextField>
+   </children>
+</AnchorPane>

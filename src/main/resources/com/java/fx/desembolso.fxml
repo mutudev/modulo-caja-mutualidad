@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane onKeyPressed="#cerrarConTecla" prefHeight="449.0" prefWidth="1077.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.DesembolsoController">
+   <children>
+      <Label layoutX="378.0" layoutY="29.0" style="-fx-text-fill: #39577C;" text="DESEMBOLSOS PENDIENTES">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <TableView fx:id="tableDesembolsos" layoutX="23.0" layoutY="86.0" prefHeight="200.0" prefWidth="1031.0">
+        <columns>
+          <TableColumn fx:id="colSocio" prefWidth="140.0" text="SOCIO" />
+          <TableColumn fx:id="colNombre" prefWidth="438.0" text="NOMBRE" />
+            <TableColumn fx:id="colMonto" prefWidth="162.0" text="MONTO" />
+            <TableColumn fx:id="colEstado" prefWidth="152.0" text="ESTADO" />
+            <TableColumn fx:id="colCredito" prefWidth="138.0" text="CREDITO" />
+        </columns>
+      </TableView>
+
+       <Button fx:id="btnCancelar" layoutX="307.0" layoutY="361.0" onAction="#cerrarConBoton" prefHeight="39.0" prefWidth="203.0" style="-fx-background-color: #C0392B; -fx-text-fill: white; -fx-font-weight: bold;" text="CANCELAR" />
+
+       <Button fx:id="btnAbonar" layoutX="615.0" layoutY="361.0" onAction="#procesarDesembolso" prefHeight="39.0" prefWidth="203.0" style="-fx-background-color: #39577C; -fx-text-fill: white; -fx-font-weight: bold;" text="PROCESAR" />
+   </children>
+</AnchorPane>

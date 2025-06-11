@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane onKeyPressed="#cerrarConTecla" prefHeight="548.0" prefWidth="1109.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.CreditoController">
+
+    <children>
+        <TextField fx:id="txtMonto" layoutX="728.0" layoutY="459.0" prefHeight="39.0" prefWidth="363.0" />
+        <!-- Título -->
+        <Label layoutX="400.0" layoutY="14.0" style="-fx-text-fill: #39577C;" text="Abono a Cuenta de Crédito">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font></Label>
+
+        <!-- Socio, Nombre, Crédito -->
+        <Label layoutX="31.0" layoutY="60.0" prefHeight="27.0" prefWidth="75.0" style="-fx-text-fill: #39577C;" text="Socio:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+        <Label layoutX="92.0" layoutY="61.0" prefHeight="27.0" prefWidth="75.0" text="8995">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+        <Label layoutX="171.0" layoutY="60.0" style="-fx-text-fill: #39577C;" text="Nombre:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+        <Label layoutX="252.0" layoutY="61.0" prefHeight="27.0" prefWidth="426.0" text="JOSE YAEL MEX MONTERO">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font></Label>
+
+        <Label layoutX="684.0" layoutY="60.0" style="-fx-text-fill: #39577C;" text="Número de Crédito:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+        <Label layoutX="859.0" layoutY="61.0" prefHeight="27.0" prefWidth="151.0" text="123456">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+
+        <!-- Tabla -->
+        <TableView fx:id="tablaCuotas" layoutX="32.0" layoutY="100" prefHeight="184.0" prefWidth="1059.0">
+            <columns>
+                <TableColumn prefWidth="125.0" text="Cuota" />
+                <TableColumn prefWidth="161.0" text="Fecha" />
+                <TableColumn prefWidth="134.0" text="Capital" />
+                <TableColumn prefWidth="144.0" text="Ordinarios" />
+                <TableColumn prefWidth="150.0" text="Moratorios" />
+                <TableColumn prefWidth="95.0" text="IVA" />
+                <TableColumn prefWidth="128.0" text="Bonif." />
+                <TableColumn prefWidth="121.0" text="Total" />
+            </columns>
+        </TableView>
+
+        <!-- Datos informativos -->
+        <Label layoutX="30.0" layoutY="310.0" style="-fx-text-fill: #39577C;" text="Plazo: 18 meses">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+        <Label layoutX="30.0" layoutY="346.0" style="-fx-text-fill: #39577C;" text="Tasa Ordinaria: 2%">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+        <Label layoutX="30.0" layoutY="385.0" style="-fx-text-fill: #39577C;" text="Tasa Moratoria: 2%">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+        <Label layoutX="30.0" layoutY="424.0" style="-fx-text-fill: #39577C;" text="Tipo: Tradicional">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+
+        <Label layoutX="675.0" layoutY="304.0" style="-fx-text-fill: #39577C;" text="Total 3 Cuotas inmediatas:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+        <Label layoutX="700" layoutY="270" text="" />
+
+        <Label layoutX="749.0" layoutY="360.0" style="-fx-text-fill: #39577C;" text="Saldo del Crédito:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+        <Label layoutX="700" layoutY="290" text="" />
+
+        <!-- Botones -->
+        <Button fx:id="btnCancelar" layoutX="400.0" layoutY="459.0" onAction="#cerrarConBoton" prefWidth="120" style="-fx-background-color: #C0392B; -fx-text-fill: white; -fx-font-weight: bold;" text="Cancelar" />
+
+        <Button fx:id="btnAbonar" layoutX="555.0" layoutY="459.0" prefWidth="120" style="-fx-background-color: #39577C; -fx-text-fill: white; -fx-font-weight: bold;" text="Abonar" />
+
+        <!-- Campo adicional -->
+
+      <Label layoutX="30.0" layoutY="462.0" style="-fx-text-fill: #39577C;" text="Código: TRA1">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <TextField alignment="CENTER_RIGHT" editable="false" layoutX="927.0" layoutY="298.0" prefHeight="39.0" prefWidth="164.0" text="\$1,500.00" />
+      <TextField alignment="CENTER_RIGHT" editable="false" layoutX="927.0" layoutY="354.0" prefHeight="39.0" prefWidth="164.0" text="\$1,500.00" />
+      <Label fx:id="lblError" alignment="TOP_LEFT" focusTraversable="false" layoutX="728.0" layoutY="498.0" prefHeight="27.0" prefWidth="363.0" style="-fx-text-fill: red;">
+         <font>
+            <Font size="12.0" />
+         </font>
+      </Label>
+    </children>
+</AnchorPane>

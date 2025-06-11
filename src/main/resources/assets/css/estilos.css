@@ -1,0 +1,25 @@
+.texto-blanco {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.boton {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.texto-inicio-cajero {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.texto-rojo {
+    -fx-text-fill: #ff0000;
+    -fx-font-weight: bold;
+}
+
+.text-azulado {
+    -fx-text-fill: #39577C;
+    -fx-font-weight: bold;
+}

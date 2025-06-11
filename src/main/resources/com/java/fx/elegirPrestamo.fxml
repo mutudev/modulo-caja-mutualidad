@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane onKeyPressed="#cambiarConTecla" prefHeight="546.0" prefWidth="986.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.ElegirController">
+   <children>
+      <Label fx:id="lblTitulo" layoutX="360.0" layoutY="32.0" style="-fx-text-fill: #39577C;" text="ELECCIÓN DE PRESTAMO">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <TableView fx:id="tablePrestamos" layoutX="31.0" layoutY="93.0" prefHeight="336.0" prefWidth="942.0">
+        <columns>
+          <TableColumn fx:id="colCredito" minWidth="0.0" prefWidth="147.0" text="CRÉDITO" />
+          <TableColumn fx:id="colTipo" prefWidth="149.0" text="TIPO" />
+            <TableColumn fx:id="colFC" prefWidth="287.0" text="FECHA DE DESEMBOLSO" />
+            <TableColumn fx:id="colMonto" prefWidth="179.0" text="MONTO" />
+            <TableColumn fx:id="colEmpresa" prefWidth="179.0" text="EMPRESA" />
+        </columns>
+      </TableView>
+       <Button fx:id="btnCancelar" layoutX="300.0" layoutY="467.0" onAction="#cerrarConBoton" prefHeight="39.0" prefWidth="203.0" style="-fx-background-color: #C0392B; -fx-text-fill: white; -fx-font-weight: bold;" text="CANCELAR" />
+
+       <Button fx:id="btnAbonar" layoutX="544.0" layoutY="467.0" onAction="#cambiarConBoton" prefHeight="39.0" prefWidth="203.0" style="-fx-background-color: #39577C; -fx-text-fill: white; -fx-font-weight: bold;" text="ELEGIR" />
+   </children>
+</AnchorPane>

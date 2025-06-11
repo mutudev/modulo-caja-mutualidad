@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane onKeyPressed="#cerrarModal" prefHeight="449.0" prefWidth="835.0" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.BusquedaController">
+   <children>
+      <Label layoutX="312.0" layoutY="14.0" style="-fx-text-fill: #39577c;" styleClass="text-azulado" text="BUSQUEDA DE SOCIO" textFill="#39577c">
+         <font>
+            <Font name="System Bold" size="21.0" />
+         </font>
+      </Label>
+      <TextField fx:id="txtNombreSocio" layoutX="44.0" layoutY="68.0" prefHeight="43.0" prefWidth="748.0" promptText="Ingrese el nombre del socio..." style="-fx-background-color: #39577C; -fx-text-fill: white; -fx-prompt-text-fill: white; -fx-font-weight: bold; -fx-hgap: 20px; -vx-padding: 10px; -fx-background-radius: 50px; -fx-border-radius: 50px; -fx-border-width: 2px; -fx-border-color: white;" />
+      <Line disable="true" endX="-100.0" endY="40.0" layoutX="814.0" layoutY="70.0" startX="-100.0" startY="-0.999995231628418" stroke="WHITE" strokeWidth="2.0" />
+      <ImageView fitHeight="30.0" fitWidth="26.0" layoutX="732.0" layoutY="76.0" onMouseClicked="#traerCoincidencias" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@/assets/images/icono-busqueda.png" />
+         </image>
+      </ImageView>
+      <TableView fx:id="tableSocios" focusTraversable="false" layoutX="15.0" layoutY="138.0" onMouseClicked="#cargarSocio" prefHeight="274.0" prefWidth="809.0" scaleShape="false">
+        <columns>
+          <TableColumn fx:id="colNumero" prefWidth="121.0" text="NÚMERO" />
+          <TableColumn fx:id="colSocio" editable="false" prefWidth="433.0" text="SOCIO" />
+            <TableColumn fx:id="colTipo" editable="false" prefWidth="120.0" text="TIPO" />
+            <TableColumn fx:id="colEmpresa" editable="false" prefWidth="134.0" text="EMPRESA" />
+        </columns>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+      </TableView>
+      <Label fx:id="lblError" alignment="TOP_LEFT" layoutX="60.0" layoutY="111.0" prefHeight="27.0" prefWidth="578.0" textFill="RED">
+         <font>
+            <Font size="12.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

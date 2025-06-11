@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane onKeyPressed="#cerrarConTecla" prefHeight="719.0" prefWidth="936.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.HistorialController">
+   <children>
+      <Label layoutX="302.0" layoutY="36.0" style="-fx-text-fill: #39577C;" text="HISTORIAL DE OPERACIONES">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="67.0" layoutY="110.0" style="-fx-text-fill: #39577C;" text="EMPRESA:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="45.0" layoutY="173.0" style="-fx-text-fill: #39577C;" text="OPERACIÓN:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <ComboBox fx:id="cmbOperacion" layoutX="170.0" layoutY="167.0" onAction="#traerOperaciones" prefHeight="39.0" prefWidth="705.0" />
+      <ComboBox fx:id="cmbEmpresa" layoutX="170.0" layoutY="104.0" onAction="#traerOperaciones" prefHeight="39.0" prefWidth="705.0" />
+      <TableView fx:id="tableHistorial" layoutX="45.0" layoutY="241.0" onMouseClicked="#detectarClicks" prefHeight="360.0" prefWidth="847.0">
+        <columns>
+          <TableColumn fx:id="colSocio" editable="false" prefWidth="147.0" text="SOCIO" />
+          <TableColumn fx:id="colNombre" editable="false" prefWidth="201.0" text="NOMBRE" />
+            <TableColumn fx:id="colFecha" editable="false" prefWidth="177.0" text="FECHA" />
+            <TableColumn fx:id="colHora" editable="false" prefWidth="154.0" text="HORA" />
+            <TableColumn fx:id="colMonto" editable="false" prefWidth="167.0" text="MONTO" />
+        </columns>
+      </TableView>
+       <Button fx:id="btnCancelar" layoutX="201.0" layoutY="631.0" onAction="#cerrarConBoton" prefHeight="39.0" prefWidth="203.0" style="-fx-background-color: #C0392B; -fx-text-fill: white; -fx-font-weight: bold;" text="CANCELAR" />
+
+       <Button fx:id="btnVer" layoutX="534.0" layoutY="631.0" onAction="#verOperacion" prefHeight="39.0" prefWidth="203.0" style="-fx-background-color: #39577C; -fx-text-fill: white; -fx-font-weight: bold;" text="VER OPERACIÓN" />
+   </children>
+</AnchorPane>

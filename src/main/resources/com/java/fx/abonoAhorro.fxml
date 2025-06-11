@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane onKeyPressed="#cerrarConTecla" prefHeight="471.0" prefWidth="700.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.AhorroController">
+   <children>
+      <Label layoutX="181.0" layoutY="37.0" style="-fx-text-fill: #39577C;" text="AHORRO A CUENTA DE SOCIO">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="61.0" layoutY="110.0" style="-fx-text-fill: #39577C;" text="SOCIO: ">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="40.0" layoutY="160.0" style="-fx-text-fill: #39577C;" text="NOMBRE:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="50.0" layoutY="222.0" style="-fx-text-fill: #39577C;" text="MONTO:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <TextField fx:id="txtMonto" layoutX="153.0" layoutY="216.0" prefHeight="41.0" prefWidth="521.0" style="-fx-border-color: #000000;" />
+
+      <Label fx:id="lblNumSocio" layoutX="152.0" layoutY="109.0" prefHeight="27.0" prefWidth="116.0" style="-fx-border-color: #000000; -fx-padding: 2 0 2 10; -fx-background-color: #E1E1E1;">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblNombreSocio" layoutX="151.0" layoutY="160.0" prefHeight="27.0" prefWidth="521.0" style="-fx-border-color: #000000; -fx-padding: 2 0 2 10; -fx-background-color: #E1E1E1;" wrapText="true">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="293.0" layoutY="110.0" style="-fx-text-fill: #39577C;" text="CUENTA:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblCuentaSocio" layoutX="387.0" layoutY="109.0" prefHeight="33.0" prefWidth="286.0" style="-fx-background-color: #E1E1E1; -fx-padding: 2 0 2 10; -fx-border-color: #000000;">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+
+      <Button fx:id="btnCancelar" layoutX="208.0" layoutY="320.0" mnemonicParsing="false" onAction="#cerrarConBoton" prefWidth="120" style="-fx-background-color: #C0392B; -fx-text-fill: white; -fx-font-weight: bold;" text="Cancelar" />
+
+
+      <Button fx:id="btnAbonar" layoutX="393.0" layoutY="320.0" mnemonicParsing="false" onAction="#AbonarAhorro" prefWidth="120" style="-fx-background-color: #39577C; -fx-text-fill: white; -fx-font-weight: bold;" text="Abonar" />
+      <Label fx:id="lblError" alignment="TOP_LEFT" focusTraversable="false" layoutX="152.0" layoutY="257.0" prefHeight="27.0" prefWidth="521.0" style="-fx-text-fill: red;">
+         <font>
+            <Font size="12.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

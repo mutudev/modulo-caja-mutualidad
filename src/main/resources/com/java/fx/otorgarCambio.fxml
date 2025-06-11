@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane onKeyPressed="#obtenerCambioConTecla" prefHeight="433.0" prefWidth="647.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.CambioController">
+   <children>
+      <Label focusTraversable="false" layoutX="155.0" layoutY="14.0" style="-fx-text-fill: #39577C; -fx-font-weight: bold;" text="CAMBIO PARA OPERACIONES">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+       <Label layoutX="66.0" layoutY="173.0" style="-fx-text-fill: #39577C; -fx-font-weight: bold;" text="TOTAL RECIBIDO:" />
+       <TextField fx:id="txtRecibido" layoutX="236.0" layoutY="167.0" prefHeight="39.0" prefWidth="386.0" />
+      <TextField fx:id="txtTotal" editable="false" focusTraversable="false" layoutX="236.0" layoutY="97.0" prefHeight="39.0" prefWidth="386.0" />
+      <Label layoutX="25.0" layoutY="103.0" style="-fx-text-fill: #39577C; -fx-font-weight: bold;" text="TOTAL OPERACIONES:" />
+      <Label layoutX="138.0" layoutY="251.0" style="-fx-text-fill: #39577C; -fx-font-weight: bold;" text="CAMBIO:" />
+      <TextField fx:id="txtCambio" editable="false" focusTraversable="false" layoutX="236.0" layoutY="245.0" prefHeight="39.0" prefWidth="386.0" />
+      <Separator focusTraversable="false" layoutX="6.0" layoutY="63.0" prefHeight="0.0" prefWidth="635.0" />
+      <Button fx:id="btnCalcular" focusTraversable="false" layoutX="355.0" layoutY="346.0" mnemonicParsing="false" onAction="#imprimir" prefHeight="46.0" prefWidth="149.0" style="-fx-background-color: #39577C; -fx-text-fill: #ffffff; -fx-font-weight: bold;" text="IMPRIMIR" />
+      <Button fx:id="btnCerrar" focusTraversable="false" layoutX="141.0" layoutY="346.0" mnemonicParsing="false" onAction="#cerrar" prefHeight="46.0" prefWidth="149.0" style="-fx-background-color: #C0392B; -fx-text-fill: #ffffff; -fx-font-weight: bold;" text="CERRAR" />
+   </children>
+</AnchorPane>

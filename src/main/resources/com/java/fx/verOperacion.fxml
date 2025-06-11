@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="631.0" prefWidth="654.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.ReimpresionController">
+   <children>
+      <Label fx:id="lblTitulo" alignment="CENTER" layoutY="22.0" prefHeight="27.0" prefWidth="654.0" text="REIMPRESIÓN DE OPERACIÓN">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblSocio" alignment="CENTER_RIGHT" layoutX="38.0" layoutY="102.0" prefHeight="27.0" prefWidth="101.0" text="SOCIO:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblOperacion" alignment="CENTER_RIGHT" layoutX="11.0" layoutY="215.0" prefHeight="27.0" prefWidth="131.0" text="OPERACIÓN:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblEmpresa" alignment="CENTER_RIGHT" layoutX="19.0" layoutY="279.0" prefHeight="27.0" prefWidth="121.0" text="EMPRESA:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblMonto" layoutX="64.0" layoutY="416.0" text="MONTO:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblFecha" layoutX="75.0" layoutY="349.0" text="FECHA:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <TextField fx:id="txtSocio" editable="false" layoutX="158.0" layoutY="96.0" prefHeight="27.0" prefWidth="189.0">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </TextField>
+      <TextField fx:id="txtOperacion" editable="false" layoutX="158.0" layoutY="209.0" prefHeight="39.0" prefWidth="446.0">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </TextField>
+      <TextField fx:id="txtEmpresa" editable="false" layoutX="158.0" layoutY="273.0" prefHeight="39.0" prefWidth="446.0">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </TextField>
+      <TextField fx:id="txtFecha" editable="false" layoutX="158.0" layoutY="345.0" prefHeight="39.0" prefWidth="239.0">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </TextField>
+      <TextField fx:id="txtMonto" editable="false" layoutX="158.0" layoutY="411.0" prefHeight="39.0" prefWidth="239.0">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="1.0" layoutY="60.0" prefHeight="10.0" prefWidth="648.0" />
+      <Label layoutX="381.0" layoutY="102.0" text="ID:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <TextField fx:id="txtID" editable="false" layoutX="415.0" layoutY="96.0" prefHeight="27.0" prefWidth="189.0">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </TextField>
+      <Button fx:id="btnReimprimir" layoutX="338.0" layoutY="545.0" mnemonicParsing="false" onAction="#filtrarOpcion" prefHeight="48.0" prefWidth="161.0" style="-fx-background-color: #C0392B; -fx-text-fill: #FFFFFF; -fx-font-weight: BOLD;" text="REIMPRIMIR">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Button>
+      <Button fx:id="btnRegresar" layoutX="144.0" layoutY="545.0" mnemonicParsing="false" onAction="#cerrar" prefHeight="48.0" prefWidth="161.0" style="-fx-background-color: #39577C; -fx-text-fill: #FFFFFF; -fx-font-weight: BOLD;" text="REGRESAR">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Button>
+      <Separator layoutX="6.0" layoutY="488.0" prefHeight="10.0" prefWidth="648.0" />
+      <Label fx:id="lblNombre" alignment="CENTER_RIGHT" layoutX="25.0" layoutY="157.0" prefHeight="27.0" prefWidth="113.0" text="NOMBRE:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <TextField fx:id="txtNomSocio" editable="false" layoutX="158.0" layoutY="151.0" prefHeight="39.0" prefWidth="446.0">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </TextField>
+   </children>
+</AnchorPane>
