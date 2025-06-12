@@ -161,6 +161,12 @@ public class RetiroController implements Initializable {
         alert.setContentText(result.toUpperCase());
         alert.showAndWait();
       }
+    } else {
+      Alert alert = new Alert(Alert.AlertType.ERROR);
+      alert.setTitle("NO TIENE RETIROS PENDIENTES");
+      alert.setHeaderText("NO TIENE RETIROS PENDIENTES");
+      alert.setContentText("NO TIENE RETIROS PENDIENTES");
+      alert.showAndWait();
     }
   }
 }

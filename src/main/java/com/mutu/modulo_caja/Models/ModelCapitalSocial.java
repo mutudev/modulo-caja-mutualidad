@@ -15,6 +15,7 @@ import java.util.Date;
     parameters = {
       @StoredProcedureParameter(mode = ParameterMode.IN, name = "socio", type = Integer.class),
       @StoredProcedureParameter(mode = ParameterMode.IN, name = "empresa", type = String.class),
+      @StoredProcedureParameter(mode = ParameterMode.IN, name = "hora", type = String.class),
       @StoredProcedureParameter(mode = ParameterMode.IN, name = "monto", type = Double.class),
       @StoredProcedureParameter(
           mode = ParameterMode.IN,

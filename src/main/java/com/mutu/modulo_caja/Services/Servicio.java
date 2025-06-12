@@ -60,9 +60,9 @@ public class Servicio {
 
   @Transactional
   public Map<String, Object> AbonarAhorro(
-      double cant_ahorro, String cuenta, String nombre_usuario, String empresa, String resultado, double ahorro_total,
+      double cant_ahorro, String cuenta, String nombre_usuario, String empresa, String hora, String resultado, double ahorro_total,
       int transaccion_id) {
-    return repoAhorro.pa_AbonarAhorro(cant_ahorro, cuenta, nombre_usuario, empresa, resultado,ahorro_total,transaccion_id);
+    return repoAhorro.pa_AbonarAhorro(cant_ahorro, cuenta, nombre_usuario, empresa, hora, resultado,ahorro_total,transaccion_id);
   }
 
   public List<Object[]> consultarCreditos(int socio, int status) {
@@ -103,10 +103,10 @@ public class Servicio {
 
   @Transactional
   public Map<String, Object>  AbonarCapitalSocial(
-      int socio, String empresa, double monto, String nombre_usuario, String Resultado,
+      int socio, String empresa, String hora, double monto, String nombre_usuario, String Resultado,
       double socialNGU,
       double socialMUT, int transaccion_id) {
-    return repoCS.pa_AbonarCapitalSocial(socio, empresa, monto, nombre_usuario, Resultado,  socialNGU,
+    return repoCS.pa_AbonarCapitalSocial(socio, empresa,hora, monto, nombre_usuario, Resultado,  socialNGU,
     socialMUT,  transaccion_id);
   }
 
@@ -149,9 +149,9 @@ public class Servicio {
 
   @Transactional
   public Map<String, Object> AbonarPrevisionSocial(
-      int num_socio, String empresa, double monto_pagado, String usuario, String Resultado, double monto_asignado,
+      int num_socio, String empresa, String hora, double monto_pagado, String usuario, String Resultado, double monto_asignado,
       double monto_ticket, int transaccion_id) {
-    return  repoPS.AbonarPrevisionSocial(num_socio, empresa, monto_pagado, usuario, Resultado, monto_asignado,
+    return  repoPS.AbonarPrevisionSocial(num_socio, empresa,hora, monto_pagado, usuario, Resultado, monto_asignado,
     monto_ticket, transaccion_id);
   }
 
@@ -241,4 +241,8 @@ public class Servicio {
   }
 
   public String traerCajeroPorUsuario (String  usuario){return repoUsuario.traerCajero(usuario);}
+
+
+
+
 }

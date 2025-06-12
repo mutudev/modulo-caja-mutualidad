@@ -1,8 +1,11 @@
 package com.mutu.modulo_caja.Controllers;
 
-import br.com.adilson.util.Extenso;
 import br.com.adilson.util.PrinterMatrix;
+import com.mutu.modulo_caja.Models.ModelCapitalSocial;
+import com.mutu.modulo_caja.Models.ModelPrevisionSocial;
 import com.mutu.modulo_caja.Services.Servicio;
+import com.mutu.modulo_caja.utils.PrintJob;
+import com.tenpisoft.n2w.MoneyConverters;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -11,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import javax.print.*;
 import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttribute;
 import javax.print.attribute.PrintRequestAttributeSet;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,6 +21,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -43,8 +46,10 @@ public class ReimpresionController {
       turno,
       tipo_traslado,
       cuenta_origen,
-      cuenta_destino;
+      cuenta_destino,
+      hora;
   public int opcion = 0;
+  public int operaciontipo = 0;
   public double montoExtraido = 0;
   public String empresaEnviar = "";
 
@@ -99,7 +104,9 @@ public class ReimpresionController {
       String empresa,
       String fecha,
       String monto,
-      String nombre) {
+      String nombre,
+      int operaciontipo,
+      String hora) {
     this.nombre = nombre;
     this.socio = socio;
     this.id = id;
@@ -107,6 +114,8 @@ public class ReimpresionController {
     this.empresa = empresa;
     this.fecha = fecha;
     this.monto = monto;
+    this.hora = hora;
+    this.operaciontipo = operaciontipo;
     txtSocio.setText(socio);
     txtID.setText(id);
     txtOperacion.setText(operacion);
@@ -270,56 +279,109 @@ public class ReimpresionController {
     if (opcion != 0) {
       cancelarOperacion();
     } else {
-      PrinterMatrix printer = new PrinterMatrix();
-      String empresa = "MUTUALIDAD DOCE DE AGOSTO, S.C. DE R.L. DE C.V.";
-      String rfc = "RFC: MDA-770513-NHB";
-      String direccion = "CALLE 23 No. 100-B ENTRE 18 Y 20 COL. CENTRO";
-      String fecha = "FECHA: 05/06/2025";
-      String folio = "FOlIO: 000001";
-      String numSocio = "SOCIO: 8995";
-      String nombre = "NOMBRE: JOSE YAEL MEX MONTERO";
-      String cuenta = "No. CUENTA: 00028995";
-      String tipoCuenta = "TIPO DE CUENTA: AHORRO   -   ABONO AHORRO";
-      String efectivo = "ABONO: 5274.00";
-      String Documentos = "RECIBIDO:";
-      String linea = "________________________________";
-      String total = "TOTAL:";
-      String letras = "CINCO MIL DOSCIENTOS SETENTA Y CUATRO PESOS";
-      String descripcion = "LA NO OBJECION A ESTE COMPROBANTE IMPLICA SU ACEPTACION";
-      String hora = "08:14";
-      String cajero = "USUARIO: JMEX";
-      String totalAhorro = "AHORRO: 17000.00";
-      String parteSocialMUT = "PARTE SOCIAL MUT: 1,000.00";
-      String parteSocialNGU = "PARTE SOCIAL NGU: 1,000.00";
-      Extenso e = new Extenso();
-      e.setNumber(21.59);printer.setOutSize(30, 60);
-      printer.printTextWrap(1, 2, 1, 60, empresa);           // Columna 1
-      printer.printTextWrap(2, 3, 1, 60, rfc);              // Columna 2
-      printer.printTextWrap(3, 4, 1, 60, direccion);        // Columna 3
-      printer.printTextWrap(4, 5, 1, 60, fecha);            // Columna 4
-      printer.printTextWrap(5, 6, 1, 60, numSocio);
-      printer.printTextWrap(5, 6, 30, 60, folio);            // Columna 5// Columna 6
-      printer.printTextWrap(6, 7, 1, 60, nombre);           // Columna 7
-      printer.printTextWrap(7, 8, 1, 60, cuenta);           // Columna 8
-      printer.printTextWrap(8, 9, 1, 60, tipoCuenta);
-      printer.printTextWrap(10, 11, 1, 60, efectivo);// Columna 10
-      printer.printTextWrap(11, 12, 1, 60, letras);
-      printer.printTextWrap(12, 13, 1, 60, "00/100 MXN");
-      printer.printTextWrap(14, 15, 1, 60, "_____________________________");
-      printer.printTextWrap(15, 16, 1, 60, nombre);
-      printer.printTextWrap(16, 17, 1, 60, hora);
-      printer.printTextWrap(16, 17, 8, 60, hora);
-      printer.printTextWrap(16, 17, 16, 60, "JTEC");   // Columna 16
-      printer.printTextWrap(17, 18, 1, 60, "CREDITO PREI: 8600.00");
-      printer.printTextWrap(18, 19, 1, 60, totalAhorro);    // Columna 17// Columna 18
-      // Columna 18
-      printer.toFile("impresion.txt");
+      String empresacod =
+          empresa.equals("MUTUALIDAD DOCE DE AGOSTO S.C. DE R.L. DE C.V.") ? "0001" : "0002";
+      String nombreEmpresa = servicio.traerEmpresa(empresacod).getRazonSocial();
+      String rfcEmpresa = servicio.traerEmpresa(empresacod).getRfc();
+      String direcEmpresa =
+          servicio.traerEmpresa(empresacod).getCalle()
+              + " "
+              + servicio.traerEmpresa(empresacod).getCruzamiento()
+              + " COL. CENTRO";
+
+      PrintJob impresora = new PrintJob();
+      double abono = 0;
+      NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
+      PrinterMatrix printer = null;
+      MoneyConverters converter = MoneyConverters.SPANISH_BANKING_MONEY_VALUE;
+      switch (operaciontipo) {
+        case 1:
+          try {
+            Number numero = formatoMoneda.parse(monto);
+            abono = numero.doubleValue();
+          } catch (ParseException e) {
+            e.printStackTrace();
+          }
+          String moneyAsWords = converter.asWords(BigDecimal.valueOf(abono)).toUpperCase() + " MXN";
+          String cuenta =
+              servicio.traerCuentaAhorroPorSocio(Integer.parseInt(socio)).getNum_cuenta();
+          double ahorro = servicio.traerCuentaAhorroPorSocio(Integer.parseInt(socio)).getSaldo();
+          String totalhorro = formatoMoneda.format(ahorro);
+          printer =
+              impresora.imprimirAhorro(
+                  nombreEmpresa,
+                  rfcEmpresa,
+                  direcEmpresa,
+                  socio,
+                  id,
+                  nombre,
+                  cuenta,
+                  monto,
+                  moneyAsWords,
+                  fecha,
+                  hora,
+                  totalhorro);
+          break;
+        case 5:
+          try {
+            Number numero = formatoMoneda.parse(monto);
+            abono = numero.doubleValue();
+          } catch (ParseException e) {
+            e.printStackTrace();
+          }
+          String abonoletras = converter.asWords(BigDecimal.valueOf(abono)).toUpperCase() + " MXN";
+          double psmut = 0;
+          double psngu = 0;
+          List<ModelCapitalSocial> cuentas = servicio.traerCuentasCS(Integer.parseInt(socio));
+          if (cuentas.size() == 2) {
+            psmut = cuentas.get(0).getMonto_cubierto();
+            psngu = cuentas.get(1).getMonto_cubierto();
+          } else {
+            if (cuentas.get(0).getEmpresa_cod().equals("0001")) {
+              psmut = cuentas.get(0).getMonto_cubierto();
+            } else {
+              psngu = cuentas.get(0).getMonto_cubierto();
+            }
+          }
+          String psmutEnviar = formatoMoneda.format(psmut);
+          String psnguEnviar = formatoMoneda.format(psngu);
+          printer =
+              impresora.imprimirCapSocial(
+                  nombreEmpresa,
+                  rfcEmpresa,
+                  direcEmpresa,
+                  socio,
+                  id,
+                  nombre,
+                  monto,
+                  abonoletras,
+                  fecha,
+                  hora,
+                  psmutEnviar,
+                  psnguEnviar);
+          break;
+
+        case 10:
+
+          ModelPrevisionSocial prevsocial = servicio.traerCuentaPS(Integer.parseInt(socio),empresacod);
+          String montoletras = converter.asWords(BigDecimal.valueOf(abono)).toUpperCase() + " MXN";
+          double montoAsignado = prevsocial.getMontoAsignado();
+          double montoCubierto = prevsocial.getPrevision();
+
+          String montoAsigEnviar = formatoMoneda.format(montoAsignado);
+          String montoCubEnviar = formatoMoneda.format(montoCubierto);
+          printer = impresora.imprimirPrevision(nombreEmpresa,rfcEmpresa,direcEmpresa,socio,id,nombre,monto,
+                montoletras,fecha,hora,montoAsigEnviar,montoCubEnviar);
+          break;
+      }
+
+      printer.toFile("Reimpresion.txt");
 
       InputStream inputStream = null;
       try {
-          inputStream = new FileInputStream("impresion.txt");
+        inputStream = new FileInputStream("Reimpresion.txt");
       } catch (FileNotFoundException a) {
-          a.printStackTrace();
+        a.printStackTrace();
       }
 
       if (inputStream == null) {
@@ -330,27 +392,32 @@ public class ReimpresionController {
       Doc document = new SimpleDoc(inputStream, docFormat, null);
       PrintRequestAttributeSet attributeSet = new HashPrintRequestAttributeSet();
       PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
-      if(defaultPrintService!=null){
+      if (defaultPrintService != null) {
         DocPrintJob printJob = defaultPrintService.createPrintJob();
-          try{
-          printJob.print( document, attributeSet);
-              Alert alert2 = new Alert(Alert.AlertType.INFORMATION);
-              alert2.setTitle("IMPRESIÓN REALIZADA CON ÉXITO");
-              alert2.setHeaderText("IMPRESIÓN REALIZADA CON ÉXITO");
-              Stage ventanaActual = (Stage) btnReimprimir.getScene().getWindow();
-              ventanaActual.close();
-        }catch (PrintException b){
-          System.out.println("Error "+ b.toString());
+
+        try {
+          printJob.print(document, attributeSet);
+        } catch (PrintException b) {
+          Alert alert2 = new Alert(Alert.AlertType.ERROR);
+          alert2.setTitle("ERROR IMPRIMIENDO");
+          alert2.setHeaderText("ERROR IMPRIMIENDO");
+          alert2.setContentText(b.getMessage());
+          alert2.showAndWait();
         }
-      }else{
-        System.err.println("NO HAY IMPRESORAS INSTALADAS");
+      } else {
+
         Alert alert2 = new Alert(Alert.AlertType.ERROR);
         alert2.setTitle("ERROR IMPRIMIENDO");
         alert2.setHeaderText("ERROR IMPRIMIENDO");
         alert2.showAndWait();
-
       }
     }
+    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    alert.setTitle("REIMPRESIÓN REALIZADA CON ÉXITO");
+    alert.setHeaderText("REIMPRESIÓN REALIZADA CON ÉXITO");
+    alert.setContentText("REIMPRESIÓN REALIZADA CON ÉXITO");
+    alert.showAndWait();
+    Stage ventanaActual = (Stage) txtMonto.getScene().getWindow();
+    ventanaActual.close();
   }
 }
-

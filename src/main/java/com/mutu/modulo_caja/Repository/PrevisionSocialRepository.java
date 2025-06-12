@@ -12,6 +12,6 @@ public interface PrevisionSocialRepository extends JpaRepository<ModelPrevisionS
 
   @Procedure(name = "Prevision_Social.pa_AbonarPrevisionSocial")
   Map<String, Object> AbonarPrevisionSocial(
-      int num_socio, String empresa, double monto_pagado, String usuario, String Resultado, double monto_asignado,
+      int num_socio, String empresa, String hora, double monto_pagado, String usuario, String Resultado, double monto_asignado,
       double monto_ticket, int transaccion_id);
 }

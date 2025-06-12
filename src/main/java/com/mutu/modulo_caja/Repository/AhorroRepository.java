@@ -14,7 +14,7 @@ public interface AhorroRepository extends JpaRepository<ModelAhorro, Integer> {
 
   @Procedure(name = "Cuenta_Ahorro.pa_AbonarAhorro")
   Map<String, Object> pa_AbonarAhorro(
-      double cant_ahorro, String cuenta, String nombre_usuario, String empresa, String resultado, double ahorro_total,
+      double cant_ahorro, String cuenta, String nombre_usuario, String empresa, String hora, String resultado, double ahorro_total,
       int transaccion_id);
 
   @Query(value = "SELECT * FROM VW_RETIROS_PENDIENTES WHERE SOCIO = :socio", nativeQuery = true)
@@ -23,4 +23,7 @@ public interface AhorroRepository extends JpaRepository<ModelAhorro, Integer> {
   @Procedure(name = "Cuenta_Ahorro.pa_ProcesarRetiro")
   String pa_ProcesarRetiro(
       int ID, int num_socio, String nombre_usuario, double monto_retiro, String empresa, String turno, String Resultado);
+
+
+
 }

@@ -170,8 +170,13 @@ public class AhorroController implements Initializable {
       }
 
       Double abono = Double.parseDouble(txtMonto.getText().trim());
+
+      LocalDateTime fecha = LocalDateTime.now();
+      LocalTime hora = fecha.toLocalTime();
+      DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm:ss");
+      String horaFormateada = hora.format(formatterHora);
       Map<String, Object> result =
-          servicio.AbonarAhorro(abono, lblCuentaSocio.getText().trim(), usuario, empresaCod, "",0,0);
+          servicio.AbonarAhorro(abono, lblCuentaSocio.getText().trim(), usuario, empresaCod, horaFormateada,"",0,0);
 
       if (result.get("resultado").toString().equals("CORRECTO")) {
         ahorrototal = Double.parseDouble(result.get("ahorro_total").toString());
@@ -191,24 +196,16 @@ public class AhorroController implements Initializable {
                 + " "
                 + servicio.traerEmpresa(empresaCod).getCruzamiento()
                 + " COL. CENTRO";
-        LocalDateTime fecha = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String fechaTicket = fecha.format(formatter);
         String socio = lblNumSocio.getText();
         String folio = result.get("transaccion_id").toString();
-        System.out.println(folio);
         String numCuenta = lblCuentaSocio.getText().trim();
         NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
         String monto = formatoMoneda.format(abono);
         MoneyConverters converter = MoneyConverters.SPANISH_BANKING_MONEY_VALUE;
         String moneyAsWords = converter.asWords(BigDecimal.valueOf(abono)).toUpperCase() + " MXN";
-
         String letrasEnviar = "";
-
-        // Contar chars para mejor visualizacion
-        LocalTime hora = fecha.toLocalTime();
-        DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm:ss");
-        String horaFormateada = hora.format(formatterHora);
         String Ahorro = formatoMoneda.format(ahorrototal);
         PrintJob impresion = new PrintJob();
         PrinterMatrix printer =

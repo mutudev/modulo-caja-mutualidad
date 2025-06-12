@@ -37,6 +37,8 @@ public class HistorialController implements Initializable {
 
   @FXML private TableView tableHistorial;
 
+  public int operacionreimpresion;
+
   @FXML private TableColumn<Object[], String> colSocio, colNombre, colFecha, colHora, colMonto;
   public String usuario, turno;
 
@@ -209,13 +211,16 @@ public class HistorialController implements Initializable {
 
     Object[] selectedRow = (Object[]) tableHistorial.getSelectionModel().getSelectedItem();
 
+
     String nombre = "", numSocio = "", fecha = "", monto = "";
     String IdOperacion = "";
+    String hora = "";
     if (selectedRow != null) {
       nombre = (String) selectedRow[1];
       numSocio = String.valueOf(selectedRow[0]);
       fecha = (String) selectedRow[2];
       monto = (String) selectedRow[3];
+      hora= (String) selectedRow[6];
       IdOperacion = String.valueOf(selectedRow[11]);
     }else {
       Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -229,13 +234,33 @@ public class HistorialController implements Initializable {
     String operacion = cmbOperacion.getSelectionModel().getSelectedItem().toString();
     String empresa = cmbEmpresa.getSelectionModel().getSelectedItem().toString();
 
+    switch (operacion) {
+      case "ABONO A CUENTA DE AHORRO":
+        operacionreimpresion = 1;
+        break;
+      case "ABONO A CUENTA DE CRÉDITO":
+        operacionreimpresion = 2;
+        break;
+      case "PROCESAMIENTO DE DESEMBOLSO":
+        operacionreimpresion = 3;
+        break;
+      case "PROCESAMIENTO DE RETIRO":
+        operacionreimpresion = 4;
+        break;
+      case "ABONO A CUENTA DE CAPITAL SOCIAL":
+        operacionreimpresion = 5;
+        break;
+      case "ABONO A CUENTA DE PREVISIÓN SOCIAL":
+        operacionreimpresion = 10;
+        break;
+    }
     try {
       Stage nuevaVentana = new Stage();
       FXMLLoader fxml = new FXMLLoader(getClass().getResource("/com/java/fx/verOperacion.fxml"));
       fxml.setControllerFactory(Main.context::getBean);
       Scene nuevaEscena = new Scene(fxml.load());
       ReimpresionController controller = fxml.getController();
-      controller.setDatos(numSocio, IdOperacion, operacion, empresa, fecha, monto, nombre);
+      controller.setDatos(numSocio, IdOperacion, operacion, empresa, fecha, monto, nombre,operacionreimpresion,hora);
       nuevaEscena
           .getStylesheets()
           .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());
@@ -248,6 +273,7 @@ public class HistorialController implements Initializable {
     } catch (IOException e) {
       e.printStackTrace();
     }
+
   }
 
   @FXML

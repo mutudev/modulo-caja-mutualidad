@@ -20,6 +20,7 @@ import java.util.Date;
           name = "nombre_usuario",
           type = String.class),
       @StoredProcedureParameter(mode = ParameterMode.IN, name = "empresa", type = String.class),
+            @StoredProcedureParameter(mode = ParameterMode.IN, name = "hora", type = String.class),
       @StoredProcedureParameter(mode = ParameterMode.OUT, name = "resultado", type = String.class),
       @StoredProcedureParameter(
           mode = ParameterMode.OUT,

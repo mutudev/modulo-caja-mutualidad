@@ -132,6 +132,10 @@ public class CapitalSocialController implements Initializable {
         ventanaActual.close();
       }
     }
+
+    if(event.getCode().equals(KeyCode.ENTER)){
+      abonarCapitalSocial();
+    }
   }
 
   @FXML
@@ -162,9 +166,14 @@ public class CapitalSocialController implements Initializable {
         empresaCod = "0002";
       }
 
+      LocalDateTime fecha = LocalDateTime.now();
+      LocalTime hora = fecha.toLocalTime();
+      DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm:ss");
+      String horaFormateada = hora.format(formatterHora);
       double montoP = Double.parseDouble(txtMontoP.getText().trim());
       Map<String, Object> res =
-          servicio.AbonarCapitalSocial(socio, empresaCod, montoP, usuario, "", 0, 0, 0);
+          servicio.AbonarCapitalSocial(socio, empresaCod, horaFormateada,montoP, usuario,"",
+                  0,0 , 0);
 
       if (res.get("Resultado").toString().equals("ACTUALIZADO")
           || res.get("Resultado").toString().equals("ABONADO")) {
@@ -181,7 +190,6 @@ public class CapitalSocialController implements Initializable {
                 + servicio.traerEmpresa(empresaCod).getCruzamiento()
                 + " COL. CENTRO";
         alert.showAndWait();
-        LocalDateTime fecha = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String fechaTicket = fecha.format(formatter);
         String folio = res.get("transaccion_id").toString();
@@ -192,9 +200,6 @@ public class CapitalSocialController implements Initializable {
         MoneyConverters converter = MoneyConverters.SPANISH_BANKING_MONEY_VALUE;
         String moneyAsWords = converter.asWords(BigDecimal.valueOf(montoP)).toUpperCase() + " MXN";
         String letrasEnviar = "";
-        LocalTime hora = fecha.toLocalTime();
-        DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm:ss");
-        String horaFormateada = hora.format(formatterHora);
         PrintJob impresion = new PrintJob();
         PrinterMatrix printer =
             impresion.imprimirCapSocial(

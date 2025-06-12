@@ -15,10 +15,12 @@ import java.time.LocalDate;
     parameters = {
       @StoredProcedureParameter(mode = ParameterMode.IN, name = "num_socio", type = Integer.class),
       @StoredProcedureParameter(mode = ParameterMode.IN, name = "empresa", type = String.class),
+            @StoredProcedureParameter(mode = ParameterMode.IN, name = "hora", type = String.class),
       @StoredProcedureParameter(
           mode = ParameterMode.IN,
           name = "monto_pagado",
           type = Double.class),
+
       @StoredProcedureParameter(mode = ParameterMode.IN, name = "usuario", type = String.class),
       @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Resultado", type = String.class),
       @StoredProcedureParameter(

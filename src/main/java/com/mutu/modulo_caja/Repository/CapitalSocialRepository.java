@@ -13,6 +13,9 @@ public interface CapitalSocialRepository extends JpaRepository<ModelCapitalSocia
 
   @Procedure(name = "Capital_Social.pa_AbonarCapitalSocial")
   Map<String, Object> pa_AbonarCapitalSocial(
-      int socio, String empresa, double monto, String nombre_usuario, String Resultado, double socialNGU,
+      int socio, String empresa, String hora, double monto, String nombre_usuario, String Resultado, double socialNGU,
       double socialMUT, int transaccion_id);
+
+
+
 }

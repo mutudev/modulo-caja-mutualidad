@@ -482,6 +482,10 @@ public class ElegirController implements Initializable {
       Stage ventanaActual = (Stage) lblTitulo.getScene().getWindow();
       ventanaActual.close();
     }
+    if (event.getCode().equals(KeyCode.ENTER)) {
+      cambiar();
+    }
+
   }
 
   @FXML

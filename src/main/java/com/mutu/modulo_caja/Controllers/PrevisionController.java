@@ -45,6 +45,7 @@ public class PrevisionController implements Initializable {
   @FXML private Label lblError;
 
   public final Validator validator = new Validator();
+  NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
 
   public String nombreSocio, usuario, empresa;
   public int socio;
@@ -101,7 +102,7 @@ public class PrevisionController implements Initializable {
     this.nombreSocio = nombreSocio;
     txtNombre.setText(nombreSocio);
     this.montoCubierto = montoCubierto;
-    txtMontoC.setText(String.valueOf(montoCubierto));
+    txtMontoC.setText(formatoMoneda.format(montoCubierto));
   }
 
   public void cierreDeVentana(Event event) {
@@ -170,7 +171,12 @@ public class PrevisionController implements Initializable {
         empresa = "0002";
       }
 
-      Map<String, Object>  resultado = servicio.AbonarPrevisionSocial(numSocio, empresa, monto, usuario, "",
+      LocalDateTime fecha = LocalDateTime.now();
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+      LocalTime hora = fecha.toLocalTime();
+      DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm:ss");
+      String horaFormateada = hora.format(formatterHora);
+      Map<String, Object>  resultado = servicio.AbonarPrevisionSocial(numSocio, empresa,horaFormateada, monto, usuario, "",
               0,0,0);
 
       if (resultado.get("Resultado").toString().equals("ABONADO")||resultado.get("Resultado").toString().equals("ACTUALIZADO")) {
@@ -187,8 +193,6 @@ public class PrevisionController implements Initializable {
                 + " "
                 + servicio.traerEmpresa(empresa).getCruzamiento()
                 + " COL. CENTRO";
-        LocalDateTime fecha = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String fechaTicket = fecha.format(formatter);
         String socio = String.valueOf(numSocio);
         String folio = resultado.get("transaccion_id").toString();
@@ -200,9 +204,6 @@ public class PrevisionController implements Initializable {
         String montoAsignado = formatoMoneda.format(Double.parseDouble(resultado.get("monto_asignado").toString()));;
 
         // Contar chars para mejor visualizacion
-        LocalTime hora = fecha.toLocalTime();
-        DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm:ss");
-        String horaFormateada = hora.format(formatterHora);
         PrintJob impresion = new PrintJob();
         PrinterMatrix printer =
             impresion.imprimirPrevision(

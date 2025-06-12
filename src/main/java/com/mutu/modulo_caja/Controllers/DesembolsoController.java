@@ -156,6 +156,12 @@ public class DesembolsoController implements Initializable {
         alert.setContentText(result.toUpperCase());
         alert.showAndWait();
       }
+    }else{
+      Alert alert = new Alert(Alert.AlertType.ERROR);
+      alert.setTitle("NO HAY DESEMBOLSO PENDIENTE");
+      alert.setHeaderText("NO HAY DESEMBOLSO PENDIENTE");
+      alert.setContentText("NO HAY DESEMBOLSO PENDIENTE");
+      alert.showAndWait();
     }
   }
 }

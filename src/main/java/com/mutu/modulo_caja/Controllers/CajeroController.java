@@ -613,10 +613,10 @@ public class CajeroController implements Initializable {
         LocalDate fecha = LocalDate.now();
         List<Object[]> cuentaMUT =
             servicio.CuentasdeCierre(
-                LoginController.usuarioLoggeado, fecha.toString(), 0, turno, empresa_cod, 0);
+                LoginController.usuarioLoggeado, fecha.toString(), 1, turno, empresa_cod, 2);
         List<Object[]> cuentaNGU =
             servicio.CuentasdeCierre(
-                LoginController.usuarioLoggeado, fecha.toString(), 0, turno, empresa_cod2, 0);
+                LoginController.usuarioLoggeado, fecha.toString(), 1, turno, empresa_cod2, 2);
 
         if (cuentaMUT.isEmpty() && cuentaNGU.isEmpty()) {
           Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -628,27 +628,16 @@ public class CajeroController implements Initializable {
         }
 
         if (cuentaMUT.size() == 1 && cuentaNGU.size() == 1) {
-          if (Integer.parseInt(cuentaMUT.getFirst()[9].toString()) == 0) {
+          if (Integer.parseInt(cuentaMUT.getFirst()[9].toString()) == 0 || Integer.parseInt(cuentaNGU.getFirst()[9].toString()) == 0) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE");
             alert.setHeaderText("NO TIENE PERMITIDO CERRAR");
             alert.setContentText(
-                "POR FAVOR, REALICE SU PROCESO DE AJUSTE Y TRASLADO PARA LA EMPRESA: "
-                    + empresa_cod);
+                "POR FAVOR, REALICE SU PROCESO DE AJUSTE Y TRASLADO PARA AMBAS EMPRESAS");
             alert.showAndWait();
             return;
           }
 
-          if (Integer.parseInt(cuentaNGU.getFirst()[9].toString()) == 0) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE");
-            alert.setHeaderText("NO TIENE PERMITIDO CERRAR");
-            alert.setContentText(
-                "POR FAVOR, REALICE SU PROCESO DE AJUSTE Y TRASLADO PARA LA EMPRESA: "
-                    + empresa_cod2);
-            alert.showAndWait();
-            return;
-          }
         } else if (cuentaMUT.size() == 1 && cuentaNGU.size() == 0) {
           if (Integer.parseInt(cuentaMUT.getFirst()[9].toString()) == 0) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
