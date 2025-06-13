@@ -84,7 +84,7 @@ public class PrintJob {
       printer.printTextWrap(17, 18, 1, 60, "HORA: " + hora);
       printer.printTextWrap(17, 18, 16, 60, cajero); // Columna 16
       printer.printTextWrap(18, 19, 1, 60, totalAhorro); // Columna 17// Columna 18
-      printer.printTextWrap(18, 19, 20, 60, "CREDITO PREI: 8600.00");
+
 
     } else {
       String primeralinea = "";
@@ -204,6 +204,81 @@ public class PrintJob {
       printer.printTextWrap(17, 18, 25, 60, psngu);
     } else {
       printer.printTextWrap(17, 18, 1, 60, psngu);
+    }
+
+    return printer;
+  }
+
+  public PrinterMatrix imprimirCancelarAhorro(
+      String empresa,
+      String rfc,
+      String direc,
+      String numsocio,
+      String folio,
+      String nomsocio,
+      String numcuenta,
+      String montoextraido,
+      String montoextraidoletras,
+      String ahorrooriginal,
+      String ahorroactualizado,
+      String fecha,
+      String hora) {
+    PrinterMatrix printer = new PrinterMatrix();
+    String numSocio = "SOCIO: " + numsocio;
+    String nombre = "NOMBRE: " + nomsocio;
+    String cuenta = "No. CUENTA: " + numcuenta;
+    String tipoCuenta = "COMPROBANTE DE CANCELACION DE ABONO A AHORRO";
+    String efectivo = "MONTO CANCELADO: " + montoextraido;
+    String descripcion1 = "LA NO OBJECION A ESTE COMPROBANTE";
+    String descripcion2 = "IMPLICA SU ACEPTACION";
+    String antiguo = "AHORRO ANTES DE CANCELACION: " + ahorrooriginal;
+    String nuevo = "AHORRO ACTUAL: "+ ahorroactualizado;
+    String cajero = "USUARIO: " + LoginController.usuarioLoggeado;
+    Extenso e = new Extenso();
+    e.setNumber(21.59);
+    printer.setOutSize(30, 60);
+    printer.printTextWrap(1, 2, 1, 60, empresa); // Columna 1
+    printer.printTextWrap(2, 3, 1, 60, "RFC: " + rfc); // Columna 2
+    printer.printTextWrap(3, 4, 1, 60, direc); // Columna 3
+    printer.printTextWrap(4, 5, 1, 60, "FECHA: " + fecha); // Columna 4
+    printer.printTextWrap(5, 6, 1, 60, numSocio);
+    printer.printTextWrap(5, 6, 30, 60, "FOLIO: " + folio); // Columna 5// Columna 6
+    printer.printTextWrap(6, 7, 1, 60, nombre); // Columna 7
+    printer.printTextWrap(7, 8, 1, 60, cuenta); // Columna 8
+    printer.printTextWrap(8, 9, 1, 60, tipoCuenta);
+
+    int numchar = montoextraidoletras.length();
+    if (numchar <= 43) {
+      printer.printTextWrap(10, 11, 1, 60, efectivo);
+      printer.printTextWrap(11, 12, 1, 60, montoextraidoletras);
+      printer.printTextWrap(13, 14, 1, 60, "___________________________________");
+      printer.printTextWrap(14, 15, 1, 60, nombre);
+      printer.printTextWrap(15, 16, 1, 60, descripcion1);
+      printer.printTextWrap(16, 17, 1, 60, descripcion2);
+      printer.printTextWrap(17, 18, 1, 60, "HORA: " + hora);
+      printer.printTextWrap(17, 18, 16, 60, cajero); // Columna 16
+      printer.printTextWrap(18, 19, 1, 60, antiguo); // Columna 17// Columna 18
+      printer.printTextWrap(19, 20, 20, 60, nuevo);
+
+    } else {
+      String primeralinea = "";
+      String segundalinea = "";
+      String[] partes = montoextraidoletras.split("(?i)\\s*CON\\s*");
+      if (partes.length >= 2) {
+        primeralinea = partes[0];
+        segundalinea = "CON " + partes[1];
+      }
+      printer.printTextWrap(9, 10, 1, 60, efectivo);
+      printer.printTextWrap(10, 11, 1, 60, primeralinea);
+      printer.printTextWrap(11, 12, 1, 60, segundalinea);
+      printer.printTextWrap(13, 14, 1, 60, "___________________________________");
+      printer.printTextWrap(14, 15, 1, 60, nombre);
+      printer.printTextWrap(15, 16, 1, 60, descripcion1);
+      printer.printTextWrap(16, 17, 1, 60, descripcion2);
+      printer.printTextWrap(17, 18, 1, 60, "HORA: " + hora);
+      printer.printTextWrap(17, 18, 16, 60, cajero); // Columna 16
+      printer.printTextWrap(18, 19, 1, 60, antiguo);
+      printer.printTextWrap(19, 20, 1, 60, nuevo);// Columna 17// Columna 18
     }
 
     return printer;

@@ -31,3 +31,11 @@ build/
 
 ### VS Code ###
 .vscode/
+impresion.txt
+impresion_Abono.txt
+impresion_Ahorro.txt
+impresion_Cambio.txt
+impresion_PRESOC.txt
+Reimpresion.txt
+Cancelacion.txt
+/resources/application.properties

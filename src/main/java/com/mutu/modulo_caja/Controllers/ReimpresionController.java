@@ -1,8 +1,10 @@
 package com.mutu.modulo_caja.Controllers;
 
 import br.com.adilson.util.PrinterMatrix;
+import com.mutu.modulo_caja.Models.ModelAhorro;
 import com.mutu.modulo_caja.Models.ModelCapitalSocial;
 import com.mutu.modulo_caja.Models.ModelPrevisionSocial;
+import com.mutu.modulo_caja.Models.ModelSocio;
 import com.mutu.modulo_caja.Services.Servicio;
 import com.mutu.modulo_caja.utils.PrintJob;
 import com.tenpisoft.n2w.MoneyConverters;
@@ -21,6 +23,9 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -167,6 +172,7 @@ public class ReimpresionController {
 
   public void cancelarOperacion() {
     boolean validador = false;
+    double montooriginal= servicio.traerCuentaAhorroPorSocio(Integer.parseInt(socio)).getSaldo();
     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
     alert.setTitle("CANCELACIÓN");
     if (opcion == 6 || opcion == 7) {
@@ -241,7 +247,6 @@ public class ReimpresionController {
         } else {
           empresa = "0002";
         }
-
         String Result =
             servicio.pa_CancelarOperacion(
                 opcion,
@@ -254,15 +259,83 @@ public class ReimpresionController {
                 "");
 
         if (Result.equals("CORRECTO")) {
-          Alert alert2 = new Alert(Alert.AlertType.INFORMATION);
+          String idoperacion = txtID.getText();
+          PrinterMatrix printer = null;
+          String nombreEmpresa = servicio.traerEmpresa(empresa).getRazonSocial();
+          String rfcEmpresa = servicio.traerEmpresa(empresa).getRfc();
+          String direcEmpresa =
+                  servicio.traerEmpresa(empresa).getCalle()
+                          + " "
+                          + servicio.traerEmpresa(empresa).getCruzamiento()
+                          + " COL. CENTRO";
+          MoneyConverters converter = MoneyConverters.SPANISH_BANKING_MONEY_VALUE;Alert alert2 = new Alert(Alert.AlertType.INFORMATION);
           alert2.setTitle("OPERACIÓN CANCELADA CON ÉXITO");
           alert2.setHeaderText("OPERACIÓN CANCELADA CON ÉXITO");
           alert2.setContentText(
-              "ID DE OPERACIÓN: " + txtID.getText().trim() + " CANCELADA CON ÉXITO");
+                  "ID DE OPERACIÓN: " + txtID.getText().trim() + " CANCELADA CON ÉXITO");
           alert2.showAndWait();
+          PrintJob impresora = new PrintJob();
+          switch (opcion){
+            case 1:
+              System.out.println("ME ESTOY EJECUTANDO");
+              String monto = txtMonto.getText();
+              double montonuevo = servicio.traerCuentaAhorroPorSocio(Integer.parseInt(socio)).getSaldo();
+              String montonuevoenviar = formatoMoneda.format(montonuevo);
+              String montoorigenviar = formatoMoneda.format(montooriginal);
+              String numcuenta = servicio.traerCuentaAhorroPorSocio(Integer.parseInt(socio)).getNum_cuenta();
+              String moneyAsWords = converter.asWords(BigDecimal.valueOf(montoExtraido)).toUpperCase() + " MXN";
+              LocalDateTime fecha = LocalDateTime.now();
+              LocalTime hora = fecha.toLocalTime();
+              DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm:ss");
+              String horaFormateada = hora.format(formatterHora);
+              DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+              String fechaTicket = fecha.format(formatter);
+              printer = impresora.imprimirCancelarAhorro(nombreEmpresa, rfcEmpresa,direcEmpresa,socio,idoperacion, nombre,numcuenta,
+                      monto, moneyAsWords, montoorigenviar,montonuevoenviar,fechaTicket,horaFormateada);
+              break;
+
+          }
+          printer.toFile("Cancelacion.txt");
+
+          InputStream inputStream = null;
+          try {
+            inputStream = new FileInputStream("Cancelacion.txt");
+          } catch (FileNotFoundException a) {
+            a.printStackTrace();
+          }
+
+          if (inputStream == null) {
+            return;
+          }
+
+          DocFlavor docFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
+          Doc document = new SimpleDoc(inputStream, docFormat, null);
+          PrintRequestAttributeSet attributeSet = new HashPrintRequestAttributeSet();
+          PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
+          if (defaultPrintService != null) {
+            DocPrintJob printJob = defaultPrintService.createPrintJob();
+
+            try {
+              printJob.print(document, attributeSet);
+            } catch (PrintException b) {
+              Alert alert3 = new Alert(Alert.AlertType.ERROR);
+              alert3.setTitle("ERROR IMPRIMIENDO");
+              alert3.setHeaderText("ERROR IMPRIMIENDO");
+              alert3.setContentText(b.getMessage());
+              alert3.showAndWait();
+            }
+          } else {
+
+            Alert alert5 = new Alert(Alert.AlertType.ERROR);
+            alert5.setTitle("ERROR IMPRIMIENDO");
+            alert5.setHeaderText("ERROR IMPRIMIENDO");
+            alert5.showAndWait();
+          }
+
           Stage ventanaActual = (Stage) btnReimprimir.getScene().getWindow();
-          controller.traerOperaciones();
           ventanaActual.close();
+          controller.traerOperaciones();
+
         } else {
           Alert alert2 = new Alert(Alert.AlertType.ERROR);
           alert2.setTitle("ERROR CANCELANDO LA OPERACIÓN");
