@@ -28,7 +28,7 @@ public class Main extends Application {
 	}
 
 	@Override
-	pulic void start(Stage stage) throws Exception {
+	public void start(Stage stage) throws Exception {
 		// Inicia contexto de Spring
 		context = SpringApplication.run(Main.class);
 
