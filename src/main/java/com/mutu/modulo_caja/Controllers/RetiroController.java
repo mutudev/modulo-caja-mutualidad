@@ -113,6 +113,9 @@ public class RetiroController implements Initializable {
         ventanaActual.close();
       }
     }
+    if (event.getCode().equals(KeyCode.ENTER)) {
+      procesarRetiro();
+    }
   }
 
   @FXML

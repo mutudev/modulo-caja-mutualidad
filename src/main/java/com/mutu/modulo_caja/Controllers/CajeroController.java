@@ -5,6 +5,7 @@ import com.mutu.modulo_caja.Services.Servicio;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingNode;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,14 +20,17 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import net.sf.jasperreports.swing.JRViewer;
+import net.sf.jasperreports.view.JasperViewer;
 import net.synedra.validatorfx.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -153,22 +157,59 @@ public class CajeroController implements Initializable {
   @FXML
   public void generarReporte() {
     try {
-      InputStream input = getClass().getResourceAsStream("/Reports/desembolso.jrxml");
+      // Cargando el archivo compilado
+      InputStream isRepo = getClass().getResourceAsStream("/Reports/desembolso.jasper");
+      JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
+      JasperPrint jpRepo = JasperFillManager.fillReport(jrRepo, null, new JREmptyDataSource());
 
-      JasperDesign jasperDesign = JRXmlLoader.load(input);
-      JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
-      JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, null, new JREmptyDataSource());
+      JasperViewer viewer = new JasperViewer(jpRepo, false);
 
-      Stage owner = (Stage) lblBienvenida.getScene().getWindow();
-      JRViewerFX viewer = new JRViewerFX();
-      viewer.preview(owner, jasperPrint);
+      viewer.setAlwaysOnTop(true);
+      viewer.setSize(800, 600);
+      viewer.setLocationRelativeTo(null);
+      viewer.setTitle("REPORTE DE DESEMBOLSO");
+      viewer.setVisible(true);
 
     } catch (Exception e) {
       e.printStackTrace();
-      throw new RuntimeException("Error al generar el reporte", e);
     }
   }
 
+  private void mostrarReporteEnSwingNode(JasperPrint jasperPrint) {
+    Stage reportStage = new Stage();
+    reportStage.setTitle("REPORTE DE CLIENTES");
+
+    SwingNode swingNode = new SwingNode();
+
+    SwingUtilities.invokeLater(() -> {
+      try {
+        // Usar JasperViewer embebido en SwingNode
+        JasperViewer viewer = new JasperViewer(jasperPrint, false);
+        viewer.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        viewer.setTitle("REPORTE DE CLIENTES");
+        swingNode.setContent((JComponent) viewer.getContentPane());
+
+      } catch (Exception ex) {
+        ex.printStackTrace();
+        Platform.runLater(() -> {
+          mostrarAlerta("Error al mostrar el reporte en SwingNode: " + ex.getMessage());
+        });
+      }
+    });
+
+    StackPane root = new StackPane(swingNode);
+    Scene scene = new Scene(root, 500, 500);
+    reportStage.setScene(scene);
+    reportStage.show();
+  }
+
+  private void mostrarAlerta(String mensaje) {
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setTitle("Error");
+    alert.setHeaderText("Error de Reporte");
+    alert.setContentText(mensaje);
+    alert.showAndWait();
+  }
 
 
   @FXML

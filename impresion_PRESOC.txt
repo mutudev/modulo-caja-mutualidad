@@ -1,22 +1,22 @@
                                                             
- NUEVA GENERACION DE UMAN, AC.                              
- RFC: NGU081125HL9                                          
+ MUTUALIDAD DOCE DE AGOSTO S.C. DE R.L. DE C.V.             
+ RFC: MDA770513NH8                                          
  CALLE 23 No. 100-B ENTRE 18 Y 20 COL. CENTRO               
- FECHA: 10/06/2025                                          
- SOCIO: 8995                  FOLIO: 14                     
- NOMBRE: JOSE YAEL MEX MONTERO                              
+ FECHA: 16/06/2025                                          
+ SOCIO: 100                   FOLIO: 3                      
+ NOMBRE: LORENZO LORENZO CETINA UC                          
  TIPO DE CUENTA: PREVISION SOCIAL - ABONO A PS              
                                                             
- ABONO: $10.50                                              
- DIEZ CON 50/100 MXN                                        
+ ABONO: $200.00                                             
+ DOSCIENTOS CON 00/100 MXN                                  
                                                             
  ___________________________________                        
- NOMBRE: JOSE YAEL MEX MONTERO                              
+ NOMBRE: LORENZO LORENZO CETINA UC                          
  LA NO OBJECION A ESTE COMPROBANTE                          
  IMPLICA SU ACEPTACION                                      
- HORA: 09:34:59 USUARIO: JMEX                               
- MONTO CUBIERTO: $170.50                                    
- MONTO ASIGNADO: $2,983.75                                  
+ HORA: 11:29:28 USUARIO: JMEX                               
+ MONTO CUBIERTO: $200.00                                    
+ MONTO ASIGNADO: $3,500.00                                  
                                                             
                                                             
                                                             

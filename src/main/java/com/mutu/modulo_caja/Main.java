@@ -11,6 +11,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import javax.swing.*;
+
 @SpringBootApplication
 
 public class Main extends Application {
@@ -18,11 +20,15 @@ public class Main extends Application {
 	public static ConfigurableApplicationContext context;
 
 	public static void main(String[] args) {
+		System.setProperty("java.awt.headless","false");
+		SwingUtilities.invokeLater(()->{
+			java.awt.Toolkit.getDefaultToolkit();
+		});
 		launch(); // esto inicia la app JavaFX
 	}
 
 	@Override
-	public void start(Stage stage) throws Exception {
+	pulic void start(Stage stage) throws Exception {
 		// Inicia contexto de Spring
 		context = SpringApplication.run(Main.class);
 

@@ -172,7 +172,6 @@ public class ReimpresionController {
 
   public void cancelarOperacion() {
     boolean validador = false;
-    double montooriginal= servicio.traerCuentaAhorroPorSocio(Integer.parseInt(socio)).getSaldo();
     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
     alert.setTitle("CANCELACIÓN");
     if (opcion == 6 || opcion == 7) {
@@ -242,10 +241,36 @@ public class ReimpresionController {
           alert2.showAndWait();
         }
       } else {
+
         if (empresa.equals("MUTUALIDAD DOCE DE AGOSTO S.C. DE R.L. DE C.V.")) {
           empresa = "0001";
         } else {
           empresa = "0002";
+        }
+        double montooriginal = 0;
+        double csasignada=0;
+        double psmut = 0;
+        double psngu = 0;
+
+        switch (opcion){
+          case 1:
+            montooriginal= servicio.traerCuentaAhorroPorSocio(Integer.parseInt(socio)).getSaldo();
+            break;
+          case 5:
+            List<ModelCapitalSocial> caps = servicio.traerCuentasCS(Integer.parseInt(socio));
+            if(caps.size() == 2){
+              psmut = caps.get(0).getMonto_cubierto();
+              psngu=caps.get(1).getMonto_cubierto();
+            }else{
+              psngu=caps.get(0).getMonto_cubierto();
+            }
+            break;
+          case 10:
+            montooriginal=servicio.traerCuentaPS(Integer.parseInt(socio),empresa).getPrevision();
+            csasignada=servicio.traerCuentaPS(Integer.parseInt(socio),empresa).getMontoAsignado();
+System.out.println("Me ejecute1");
+            break;
+
         }
         String Result =
             servicio.pa_CancelarOperacion(
@@ -259,6 +284,8 @@ public class ReimpresionController {
                 "");
 
         if (Result.equals("CORRECTO")) {
+
+
           String idoperacion = txtID.getText();
           PrinterMatrix printer = null;
           String nombreEmpresa = servicio.traerEmpresa(empresa).getRazonSocial();
@@ -275,24 +302,64 @@ public class ReimpresionController {
                   "ID DE OPERACIÓN: " + txtID.getText().trim() + " CANCELADA CON ÉXITO");
           alert2.showAndWait();
           PrintJob impresora = new PrintJob();
+          LocalDateTime fecha = LocalDateTime.now();
+          LocalTime hora = fecha.toLocalTime();
+          DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm:ss");
+          String horaFormateada = hora.format(formatterHora);
+          DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+          String fechaTicket = fecha.format(formatter);
+          String monto = txtMonto.getText();
+          String moneyAsWords = converter.asWords(BigDecimal.valueOf(montoExtraido)).toUpperCase() + " MXN";
           switch (opcion){
             case 1:
-              System.out.println("ME ESTOY EJECUTANDO");
-              String monto = txtMonto.getText();
               double montonuevo = servicio.traerCuentaAhorroPorSocio(Integer.parseInt(socio)).getSaldo();
               String montonuevoenviar = formatoMoneda.format(montonuevo);
               String montoorigenviar = formatoMoneda.format(montooriginal);
               String numcuenta = servicio.traerCuentaAhorroPorSocio(Integer.parseInt(socio)).getNum_cuenta();
-              String moneyAsWords = converter.asWords(BigDecimal.valueOf(montoExtraido)).toUpperCase() + " MXN";
-              LocalDateTime fecha = LocalDateTime.now();
-              LocalTime hora = fecha.toLocalTime();
-              DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm:ss");
-              String horaFormateada = hora.format(formatterHora);
-              DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-              String fechaTicket = fecha.format(formatter);
               printer = impresora.imprimirCancelarAhorro(nombreEmpresa, rfcEmpresa,direcEmpresa,socio,idoperacion, nombre,numcuenta,
                       monto, moneyAsWords, montoorigenviar,montonuevoenviar,fechaTicket,horaFormateada);
               break;
+            case 5:
+              List<ModelCapitalSocial> caps = servicio.traerCuentasCS(Integer.parseInt(socio));
+              double montonuevongu=0;
+              double montonuevomut=0;
+              String montonuevonguenviar = "";
+              String montonuevomutgenviar = "";
+
+              if(caps.size() == 2){
+                      montonuevongu = caps.get(1).getMonto_cubierto();
+                      montonuevomut=caps.get(0).getMonto_cubierto();
+                String montoantiguonguenviar = formatoMoneda.format(psngu);
+                String montoantiguomutgenviar = formatoMoneda.format(psmut);
+                montonuevonguenviar = formatoMoneda.format(montonuevongu);
+                      montonuevomutgenviar = formatoMoneda.format(montonuevomut);
+                printer = impresora.imprimirCancelacionCapSocial(nombreEmpresa,rfcEmpresa,direcEmpresa,socio,
+                        idoperacion,nombre,monto,moneyAsWords,fechaTicket,horaFormateada,montoantiguomutgenviar,
+                        montonuevonguenviar,montonuevomutgenviar,montonuevonguenviar);
+                    }else{
+                montonuevongu = caps.get(0).getMonto_cubierto();
+                String montoantiguonguenviar = formatoMoneda.format(psngu);
+                String montoantiguomutgenviar = formatoMoneda.format(0);
+                montonuevonguenviar = formatoMoneda.format(montonuevonguenviar);
+                montonuevomutgenviar = formatoMoneda.format(0);
+                printer = impresora.imprimirCancelacionCapSocial(nombreEmpresa,rfcEmpresa,direcEmpresa,socio,
+                        idoperacion,nombre,monto,moneyAsWords,fechaTicket,horaFormateada,montoantiguomutgenviar,
+                        montonuevonguenviar,montonuevomutgenviar,montonuevonguenviar);
+                    }
+
+
+              break;
+            case 10:
+              System.out.println("Me ejecute2");
+              double montocubierto=servicio.traerCuentaPS(Integer.parseInt(socio),empresa).getPrevision();
+              double csasignadanuevo=servicio.traerCuentaPS(Integer.parseInt(socio),empresa).getMontoAsignado();
+              String montocap = txtMonto.getText();
+              String montocubiertoantiguo = formatoMoneda.format(montooriginal);
+              String montocubiertnuevo = formatoMoneda.format(montocubierto);
+              String csanuevo = formatoMoneda.format(csasignadanuevo);
+              String csocialantiguo = formatoMoneda.format(csasignada);
+              printer=impresora.imprimirCancelacionPrevision(nombreEmpresa,rfcEmpresa,direcEmpresa,socio,idoperacion,nombre,
+                      montocap,moneyAsWords,montocubiertoantiguo,csocialantiguo,montocubiertnuevo,csanuevo,fechaTicket,horaFormateada);
 
           }
           printer.toFile("Cancelacion.txt");
@@ -484,13 +551,14 @@ public class ReimpresionController {
         alert2.setHeaderText("ERROR IMPRIMIENDO");
         alert2.showAndWait();
       }
+      Alert alert = new Alert(Alert.AlertType.INFORMATION);
+      alert.setTitle("REIMPRESIÓN REALIZADA CON ÉXITO");
+      alert.setHeaderText("REIMPRESIÓN REALIZADA CON ÉXITO");
+      alert.setContentText("REIMPRESIÓN REALIZADA CON ÉXITO");
+      alert.showAndWait();
+      Stage ventanaActual = (Stage) txtMonto.getScene().getWindow();
+      ventanaActual.close();
     }
-    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-    alert.setTitle("REIMPRESIÓN REALIZADA CON ÉXITO");
-    alert.setHeaderText("REIMPRESIÓN REALIZADA CON ÉXITO");
-    alert.setContentText("REIMPRESIÓN REALIZADA CON ÉXITO");
-    alert.showAndWait();
-    Stage ventanaActual = (Stage) txtMonto.getScene().getWindow();
-    ventanaActual.close();
+
   }
 }
