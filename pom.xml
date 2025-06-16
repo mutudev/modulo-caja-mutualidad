@@ -52,6 +52,11 @@
 			<version>0.6.1</version>
 		</dependency>
 		<dependency>
+			<groupId>win.zqxu</groupId>
+			<artifactId>jrviewer-fx</artifactId>
+			<version>0.1.1</version>
+		</dependency>
+		<dependency>
 			<groupId>org.controlsfx</groupId>
 			<artifactId>controlsfx</artifactId>
 			<version>11.2.2</version>
@@ -64,6 +69,16 @@
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>
 			<version>7.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports-pdf</artifactId>
+			<version>7.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.17</version>
 		</dependency>
 		<dependency>
 			<groupId>org.lucee</groupId>

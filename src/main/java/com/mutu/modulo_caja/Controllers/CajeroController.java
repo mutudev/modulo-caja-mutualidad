@@ -17,17 +17,26 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.swing.JRViewer;
 import net.synedra.validatorfx.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import win.zqxu.jrviewer.JRViewerFX;
 
+import javax.swing.*;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -140,6 +149,27 @@ public class CajeroController implements Initializable {
       ventanaActual.close();
     }
   }
+
+  @FXML
+  public void generarReporte() {
+    try {
+      InputStream input = getClass().getResourceAsStream("/Reports/desembolso.jrxml");
+
+      JasperDesign jasperDesign = JRXmlLoader.load(input);
+      JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+      JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, null, new JREmptyDataSource());
+
+      Stage owner = (Stage) lblBienvenida.getScene().getWindow();
+      JRViewerFX viewer = new JRViewerFX();
+      viewer.preview(owner, jasperPrint);
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new RuntimeException("Error al generar el reporte", e);
+    }
+  }
+
+
 
   @FXML
   public void handlerKeyPressed(KeyEvent event) {
