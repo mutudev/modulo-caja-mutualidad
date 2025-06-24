@@ -44,8 +44,11 @@ import java.util.Date;
           name = "monto_retiro",
           type = Double.class),
       @StoredProcedureParameter(mode = ParameterMode.IN, name = "empresa", type = String.class),
+            @StoredProcedureParameter(mode = ParameterMode.IN, name = "hora", type = String.class),
       @StoredProcedureParameter(mode = ParameterMode.IN, name = "turno", type = String.class),
+            @StoredProcedureParameter(mode = ParameterMode.OUT, name = "transaccion_id", type = String.class),
       @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Resultado", type = String.class)
+
     })
 public class ModelAhorro {
 

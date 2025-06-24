@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CreditoRepository extends JpaRepository<ModelCredito, Integer> {
 
@@ -20,6 +21,10 @@ public interface CreditoRepository extends JpaRepository<ModelCredito, Integer> 
   List<Object[]> buscarDesembolsosPendientes(@Param("socio") int socio);
 
   @Procedure(name = "Cuenta_Credito.pa_ProcesarDesembolso")
-  String pa_ProcesarDesembolso(
-      int CreditoID, String nombre_usuario, double monto_desembolso, String Resultado);
+  Map<String, Object> pa_ProcesarDesembolso(
+      int CreditoID, String nombre_usuario, double monto_desembolso,String hora, String Resultado, int transaccion_id);
+
+  ModelCredito findById(int id);
+
+
 }

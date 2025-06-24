@@ -391,7 +391,7 @@ public class OperacionesController implements Initializable {
             cuenta_origen,
             cuenta_destino,
             fecha,
-            tipo_operacion, this);
+            tipo_operacion, this, turno);
       }
 
       nuevaEscena

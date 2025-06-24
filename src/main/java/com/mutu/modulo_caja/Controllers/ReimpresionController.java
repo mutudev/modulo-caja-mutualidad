@@ -1,16 +1,19 @@
 package com.mutu.modulo_caja.Controllers;
 
 import br.com.adilson.util.PrinterMatrix;
-import com.mutu.modulo_caja.Models.ModelAhorro;
-import com.mutu.modulo_caja.Models.ModelCapitalSocial;
-import com.mutu.modulo_caja.Models.ModelPrevisionSocial;
-import com.mutu.modulo_caja.Models.ModelSocio;
+import com.mutu.modulo_caja.Models.*;
 import com.mutu.modulo_caja.Services.Servicio;
 import com.mutu.modulo_caja.utils.PrintJob;
 import com.tenpisoft.n2w.MoneyConverters;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.view.JasperViewer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,9 +29,7 @@ import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 public class ReimpresionController {
@@ -69,7 +70,7 @@ public class ReimpresionController {
       String cuenta_destino,
       String fecha,
       int opcion,
-      OperacionesController controller) {
+      OperacionesController controller, String turno) {
     this.id = id;
     this.opcion = opcion;
     this.usuario = usuario;
@@ -79,6 +80,7 @@ public class ReimpresionController {
     this.cuenta_origen = cuenta_origen;
     this.cuenta_destino = cuenta_destino;
     this.fecha = fecha;
+    this.turno=turno;
     txtSocio.setText(usuario);
     txtID.setText(id);
     if (opcion == 6) {
@@ -172,6 +174,7 @@ public class ReimpresionController {
 
   public void cancelarOperacion() {
     boolean validador = false;
+    InputStream isLogo = null;
     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
     alert.setTitle("CANCELACIÓN");
     if (opcion == 6 || opcion == 7) {
@@ -199,20 +202,29 @@ public class ReimpresionController {
 
       if (opcion == 6 || opcion == 7) {
         id_traslado = Integer.parseInt(txtID.getText().trim());
+        String protesonom = "";
+
         if (opcion == 6) {
           if (cuenta_origen.equals("BVDA-NGU")) {
             empresaEnviar = "0002";
+            protesonom ="CASIMIRO UITZ VILLANUEVA";
+            isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
           } else {
             empresaEnviar = "0001";
+            isLogo = getClass().getResourceAsStream("/assets/images/logo-mut.png");
+            protesonom ="CONT.PRIV. MARIA CARMINIA MONTERO QUINTAL";
           }
         } else {
           if (cuenta_destino.equals("BVDA-NGU")) {
             empresaEnviar = "0002";
+            isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
+            protesonom ="CASIMIRO UITZ VILLANUEVA";
           } else {
             empresaEnviar = "0001";
+            isLogo = getClass().getResourceAsStream("/assets/images/logo-mut.png");
+            protesonom ="CONT.PRIV. MARIA CARMINIA MONTERO QUINTAL";
           }
         }
-
         String res =
             servicio.pa_CancelarTraslados(
                 opcion,
@@ -224,6 +236,99 @@ public class ReimpresionController {
                 "");
 
         if (res.equals("CORRECTO")) {
+          try {
+
+            LocalDateTime fecha = LocalDateTime.now();
+            LocalTime hora = fecha.toLocalTime();
+            DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm:ss");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            String fechaTicket = fecha.format(formatter);
+            String horaticket = hora.format(formatterHora);
+
+            String id = txtID.getText();
+            String nomcajero = servicio.traerCajeroPorUsuario(usuario);
+            int usuarioid = servicio.traerDatosUsuario(usuario).getId();
+
+            String horaFormateada = hora.format(formatterHora);
+            String nombreEmpresa = servicio.traerEmpresa(empresaEnviar).getRazonSocial();
+            String rfcEmpresa = servicio.traerEmpresa(empresaEnviar).getRfc();
+            String direcEmpresa =
+                    servicio.traerEmpresa(empresaEnviar).getCalle()
+                            + " "
+                            + servicio.traerEmpresa(empresaEnviar).getCruzamiento()
+                            + " COL. CENTRO";
+
+
+            MoneyConverters converter = MoneyConverters.SPANISH_BANKING_MONEY_VALUE;
+            String moneyAsWords = converter.asWords(BigDecimal.valueOf(montoExtraido)).toUpperCase() + " MXN";
+
+
+
+            Map pars = new HashMap<>();
+            pars.put("Empresa", nombreEmpresa);
+            pars.put("Logo", isLogo);
+            pars.put("Rfc", rfcEmpresa);
+            pars.put("Direccion", direcEmpresa);
+            pars.put("Id", id);
+            pars.put("Fecha", fechaTicket);
+            pars.put("Turno", turno);
+
+
+            pars.put("Monto", txtMonto.getText());
+            pars.put("Montoletras", moneyAsWords);
+
+
+
+            pars.put("Cajerouser",LoginController.usuarioLoggeado);
+            pars.put("Cajeronom", nomcajero);
+            pars.put("Hora", horaFormateada);
+
+            pars.put("Protesonom", protesonom);
+            InputStream isRepo = null;
+            if(cuenta_origen.equals("BVDA-NGU")  || cuenta_origen.equals("BVDA-MUT")){
+
+              pars.put("Titulo", "REPORTE DE CANCELACION DE TRASLADO DE APERTURA");
+
+              pars.put("Origen", "CUENTA DE CAJERO " +  cuenta_destino);
+              pars.put("Destino", cuenta_origen) ;
+              pars.put(
+                      "Descripcion",
+                      "TRASLADO DE APERTURA cancelado por "+ txtMonto.getText()+ " (" +moneyAsWords +
+                              ") efectuado en la sucursal de " +
+                              "UMAN autorizado por " + protesonom+ ".");
+              isRepo = getClass().getResourceAsStream("/Reports/cancelacion_traslado_apertura.jasper");
+
+            }else{
+              pars.put("Titulo", "REPORTE DE CANCELACION DE TRASLADO DE CIERRE");
+
+              pars.put("Origen",  cuenta_destino );
+              pars.put("Destino", "CUENTA DE CAJERO " + cuenta_origen) ;
+              pars.put(
+                      "Descripcion",
+                      "TRASLADO DE CIERRE cancelado por "+ txtMonto.getText()+ " (" +moneyAsWords +
+                              ") efectuado en la sucursal de " +
+                              "UMAN autorizado por " + protesonom+ ".");
+              isRepo = getClass().getResourceAsStream("/Reports/cancelar_traslado_cierre.jasper");
+
+
+            }
+
+
+            JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
+            JasperPrint jpRepo = JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
+
+            JasperViewer viewer = new JasperViewer(jpRepo, false);
+
+            viewer.setAlwaysOnTop(true);
+            viewer.setSize(800, 600);
+            viewer.setLocationRelativeTo(null);
+            viewer.setTitle("REPORTE DE CANCELACION DE TRASLADO");
+            viewer.setVisible(true);
+
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+
           Alert alert2 = new Alert(Alert.AlertType.INFORMATION);
           alert2.setTitle("TRASLADO CANCELADO CON ÉXITO");
           alert2.setHeaderText("TRASLADO CANCELADO CON ÉXITO");
@@ -268,7 +373,6 @@ public class ReimpresionController {
           case 10:
             montooriginal=servicio.traerCuentaPS(Integer.parseInt(socio),empresa).getPrevision();
             csasignada=servicio.traerCuentaPS(Integer.parseInt(socio),empresa).getMontoAsignado();
-System.out.println("Me ejecute1");
             break;
 
         }
@@ -284,7 +388,6 @@ System.out.println("Me ejecute1");
                 "");
 
         if (Result.equals("CORRECTO")) {
-
 
           String idoperacion = txtID.getText();
           PrinterMatrix printer = null;
@@ -310,6 +413,10 @@ System.out.println("Me ejecute1");
           String fechaTicket = fecha.format(formatter);
           String monto = txtMonto.getText();
           String moneyAsWords = converter.asWords(BigDecimal.valueOf(montoExtraido)).toUpperCase() + " MXN";
+          String id = txtID.getText();
+          String nomcajero = servicio.traerCajeroPorUsuario(usuario);
+          int usuarioid = servicio.traerDatosUsuario(usuario).getId();
+
           switch (opcion){
             case 1:
               double montonuevo = servicio.traerCuentaAhorroPorSocio(Integer.parseInt(socio)).getSaldo();
@@ -319,6 +426,66 @@ System.out.println("Me ejecute1");
               printer = impresora.imprimirCancelarAhorro(nombreEmpresa, rfcEmpresa,direcEmpresa,socio,idoperacion, nombre,numcuenta,
                       monto, moneyAsWords, montoorigenviar,montonuevoenviar,fechaTicket,horaFormateada);
               break;
+            case 3:
+//              try {
+//
+//                String folio = txtID.getText();
+//                String nomsocio = txtNomSocio.getText();
+//                LocalDateTime fechaVenc = fecha.plusYears(1);
+//                String fechaVencticket = fechaVenc.format(formatter);
+//                isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
+//                //ModelCredito credito = servicio.traerDatosCredito(Integer.parseInt(colCredito));
+//                String ord = String.valueOf(credito.getOrdinarios()) + " %";
+//                String mor = String.valueOf(credito.getMoratorios()) + " %";
+//                String fechvenc = String.valueOf(credito.getFecha_venci());
+//                isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
+//                Map pars = new HashMap<>();
+//                pars.put("Empresa", nombreEmpresa);
+//                pars.put("Logo", isLogo);
+//                pars.put("RFC", rfcEmpresa);
+//                pars.put("Direccion", direcEmpresa);
+//                pars.put("Numcredito", colCredito);
+//                pars.put("Titulo", "REPORTE DE DESEMBOLSO DE CRÉDITO");
+//                pars.put("Fecha", fechaTicket);
+//                pars.put("Folio", folio);
+//                pars.put("NumSocio", String.valueOf(socio));
+//                pars.put("NombreSocio", nomsocio);
+//
+//                pars.put("IntOrd", ord);
+//                pars.put("IntMora", mor);
+//                pars.put("Vencimiento", fechaVencticket);
+//
+//                pars.put("Monto", montoenviar);
+//                pars.put("MontoLetras", moneyAsWords);
+//                pars.put("Cajero", LoginController.usuarioLoggeado);
+//                pars.put("Hora", horaFormateada);
+//                pars.put("LogoImg", isLogo);
+//                pars.put(
+//                        "Descripcion",
+//                        "Recibí de " + nombreEmpresa + " la cantidad de "+ montoenviar +
+//                                " ("+moneyAsWords +
+//                                ") recibido en efectivo a mi entera satisfacción. Así mismo, manifiesto conocer y apegarme al " +
+//                                "cumplimiento del acuerdo 2 de la Asamblea General efectuada el 22 de Julio de 2011," +
+//                                " el cual menciona que todo socio que realice un crédito por sus ahorros o menos y que " +
+//                                "en seis meses consecutivos no realice abono alguno a su crédito, será dado de baja con el fin " +
+//                                "de evitar el incremento de su deuda y la cartera vencida.");
+//
+//                InputStream isRepo = getClass().getResourceAsStream("/Reports/desembolso.jasper");
+//                JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
+//                JasperPrint jpRepo = JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
+//
+//                JasperViewer viewer = new JasperViewer(jpRepo, false);
+//
+//                viewer.setAlwaysOnTop(true);
+//                viewer.setSize(800, 600);
+//                viewer.setLocationRelativeTo(null);
+//                viewer.setTitle("REPORTE DE DESEMBOLSO");
+//                viewer.setVisible(true);
+//
+//              } catch (Exception e) {
+//                e.printStackTrace();
+//              }
+            break;
             case 5:
               List<ModelCapitalSocial> caps = servicio.traerCuentasCS(Integer.parseInt(socio));
               double montonuevongu=0;
@@ -350,7 +517,7 @@ System.out.println("Me ejecute1");
 
               break;
             case 10:
-              System.out.println("Me ejecute2");
+
               double montocubierto=servicio.traerCuentaPS(Integer.parseInt(socio),empresa).getPrevision();
               double csasignadanuevo=servicio.traerCuentaPS(Integer.parseInt(socio),empresa).getMontoAsignado();
               String montocap = txtMonto.getText();

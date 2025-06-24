@@ -226,9 +226,7 @@ public class FalSobController implements Initializable {
         ventanaActual.close();
       }
     }
-    if (event.getCode().equals(KeyCode.ENTER)) {
-      procesarAjuste();
-    }
+
   }
 
   @FXML

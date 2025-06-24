@@ -21,8 +21,9 @@ public interface AhorroRepository extends JpaRepository<ModelAhorro, Integer> {
   List<Object[]> buscarRetirosPendientes(@Param("socio") int socio);
 
   @Procedure(name = "Cuenta_Ahorro.pa_ProcesarRetiro")
-  String pa_ProcesarRetiro(
-      int ID, int num_socio, String nombre_usuario, double monto_retiro, String empresa, String turno, String Resultado);
+  Map<String, Object> pa_ProcesarRetiro(
+      int ID, int num_socio, String nombre_usuario, double monto_retiro, String empresa,String hora, String turno,
+      int transaccion_id, String Resultado);
 
 
 

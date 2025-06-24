@@ -10,18 +10,21 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface TrasladoRepository extends JpaRepository<ModelTraslado, Integer> {
 
   @Procedure(name = "Traslado.pa_ProcesarTraslado")
-  String pa_ProcesarTraslado(
+  Map<String, Object> pa_ProcesarTraslado(
       String nombre_usuario,
       double monto_trasladar,
       int tipo,
       String empresa,
+      String hora,
       String turno,
-      String Resultado);
+      String Resultado,
+      int transaccion_id);
 
   ModelTraslado findByCuentaOrigen(String cuenta);
 

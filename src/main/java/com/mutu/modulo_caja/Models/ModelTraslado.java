@@ -22,8 +22,10 @@ import java.time.LocalDateTime;
           type = Double.class),
       @StoredProcedureParameter(mode = ParameterMode.IN, name = "tipo", type = Integer.class),
       @StoredProcedureParameter(mode = ParameterMode.IN, name = "empresa", type = String.class),
+            @StoredProcedureParameter(mode = ParameterMode.IN, name = "hora", type = String.class),
       @StoredProcedureParameter(mode = ParameterMode.IN, name = "turno", type = String.class),
-      @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Resultado", type = String.class)
+      @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Resultado", type = String.class),
+            @StoredProcedureParameter(mode = ParameterMode.OUT, name = "transaccion_id", type = Integer.class)
     })
 
 @NamedStoredProcedureQuery(
@@ -37,7 +39,8 @@ import java.time.LocalDateTime;
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "cuenta_destino", type = String.class),
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "monto", type = Double.class),
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "empresa", type = String.class),
-                @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Resultado", type = String.class)
+                @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Resultado", type = String.class),
+
 
         })
 

@@ -201,6 +201,6 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Label>
-      <Button fx:id="btnReporte" layoutX="907.0" layoutY="473.0" mnemonicParsing="false" onAction="#generarReporte" text="Button" />
+      <Button layoutX="670.0" layoutY="499.0" mnemonicParsing="false" onAction="#pruebaCierre" text="Button" />
    </children>
 </AnchorPane>

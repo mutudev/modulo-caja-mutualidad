@@ -34,6 +34,8 @@ public class Servicio {
 
   @Autowired private EmpresaRepository repoEmpresa;
 
+  @Autowired private CajaRepository repoCaja;
+
   @Transactional
   public HashMap validarLogin(String usuario, String password, String resultado, int rol) {
     return repoUsuario.pa_validarLogin(usuario, password, resultado, rol);
@@ -74,10 +76,10 @@ public class Servicio {
   }
 
   @Transactional
-  public String ProcesarDesembolso(
-      int CreditoID, String nombre_usuario, double monto_desembolso, String Resultado) {
+  public Map<String, Object> ProcesarDesembolso(
+      int CreditoID, String nombre_usuario, double monto_desembolso, String hora, String Resultado, int transaccion_id) {
     return repoCredito.pa_ProcesarDesembolso(
-        CreditoID, nombre_usuario, monto_desembolso, Resultado);
+        CreditoID, nombre_usuario, monto_desembolso,hora, Resultado, transaccion_id);
   }
 
   public List<Object[]> retirosPendientes(int socio) {
@@ -85,16 +87,11 @@ public class Servicio {
   }
 
   @Transactional
-  public String ProcesarRetiro(
-      int ID,
-      int num_socio,
-      String nombre_usuario,
-      double monto_retiro,
-      String empresa,
-      String turno,
-      String Resultado) {
+  public Map<String, Object> ProcesarRetiro(
+          int ID, int num_socio, String nombre_usuario, double monto_retiro, String empresa,String hora, String turno,
+          int transaccion_id, String Resultado) {
     return repoAhorro.pa_ProcesarRetiro(
-        ID, num_socio, nombre_usuario, monto_retiro, empresa, turno, Resultado);
+        ID, num_socio, nombre_usuario, monto_retiro, empresa,hora, turno, transaccion_id, Resultado);
   }
 
   public List<ModelCapitalSocial> traerCuentasCS(int socio) {
@@ -116,15 +113,17 @@ public class Servicio {
   }
 
   @Transactional
-  public String procesarTraslado(
+  public Map<String, Object> procesarTraslado(
       String nombre_usuario,
       double monto_trasladar,
       int tipo,
       String empresa,
+      String hora,
       String turno,
-      String Resultado) {
+      String Resultado,
+      int transaccion_id) {
     return repoTraslado.pa_ProcesarTraslado(
-        nombre_usuario, monto_trasladar, tipo, empresa, turno, Resultado);
+        nombre_usuario, monto_trasladar, tipo, empresa, hora, turno, Resultado,transaccion_id);
   }
 
   public List<Object[]> traerHistorial(
@@ -242,7 +241,13 @@ public class Servicio {
 
   public String traerCajeroPorUsuario (String  usuario){return repoUsuario.traerCajero(usuario);}
 
+  public ModelCredito traerDatosCredito(int id){return repoCredito.findById(id);}
 
+  public  ModelCaja traerDatosCaja(int usuario_id,String turno, String empresa, int estado
+  ){return repoCaja.findByUsuarioIdAndTurnoAndEmpresaAndEstado(usuario_id, turno,empresa,estado);}
 
+  public  Object[] traerCierreCajero(int id){
+    return repoCierre.traerCierreCajero(id);
+  }
 
 }

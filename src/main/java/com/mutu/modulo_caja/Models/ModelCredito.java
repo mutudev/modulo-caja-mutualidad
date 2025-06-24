@@ -22,7 +22,9 @@ import java.util.Date;
           mode = ParameterMode.IN,
           name = "monto_desembolso",
           type = Double.class),
-      @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Resultado", type = String.class)
+            @StoredProcedureParameter(mode = ParameterMode.IN, name = "hora", type = String.class),
+      @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Resultado", type = String.class),
+            @StoredProcedureParameter(mode = ParameterMode.OUT, name = "transaccion_id", type = Integer.class)
     })
 public class ModelCredito {
 

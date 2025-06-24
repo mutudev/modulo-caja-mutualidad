@@ -81,7 +81,7 @@ public class CajeroController implements Initializable {
   // Empieza declaración de variables
   public String usuario;
   public int rolUsuario;
-  public final Validator validator = new Validator();
+  public Validator validator = new Validator();
   private Map<String, Label> labelMap = new HashMap<>();
   public boolean apertura = false;
   public String turno = "";
@@ -153,64 +153,6 @@ public class CajeroController implements Initializable {
       ventanaActual.close();
     }
   }
-
-  @FXML
-  public void generarReporte() {
-    try {
-      // Cargando el archivo compilado
-      InputStream isRepo = getClass().getResourceAsStream("/Reports/desembolso.jasper");
-      JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
-      JasperPrint jpRepo = JasperFillManager.fillReport(jrRepo, null, new JREmptyDataSource());
-
-      JasperViewer viewer = new JasperViewer(jpRepo, false);
-
-      viewer.setAlwaysOnTop(true);
-      viewer.setSize(800, 600);
-      viewer.setLocationRelativeTo(null);
-      viewer.setTitle("REPORTE DE DESEMBOLSO");
-      viewer.setVisible(true);
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  private void mostrarReporteEnSwingNode(JasperPrint jasperPrint) {
-    Stage reportStage = new Stage();
-    reportStage.setTitle("REPORTE DE CLIENTES");
-
-    SwingNode swingNode = new SwingNode();
-
-    SwingUtilities.invokeLater(() -> {
-      try {
-        // Usar JasperViewer embebido en SwingNode
-        JasperViewer viewer = new JasperViewer(jasperPrint, false);
-        viewer.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        viewer.setTitle("REPORTE DE CLIENTES");
-        swingNode.setContent((JComponent) viewer.getContentPane());
-
-      } catch (Exception ex) {
-        ex.printStackTrace();
-        Platform.runLater(() -> {
-          mostrarAlerta("Error al mostrar el reporte en SwingNode: " + ex.getMessage());
-        });
-      }
-    });
-
-    StackPane root = new StackPane(swingNode);
-    Scene scene = new Scene(root, 500, 500);
-    reportStage.setScene(scene);
-    reportStage.show();
-  }
-
-  private void mostrarAlerta(String mensaje) {
-    Alert alert = new Alert(Alert.AlertType.ERROR);
-    alert.setTitle("Error");
-    alert.setHeaderText("Error de Reporte");
-    alert.setContentText(mensaje);
-    alert.showAndWait();
-  }
-
 
   @FXML
   public void handlerKeyPressed(KeyEvent event) {
@@ -491,7 +433,6 @@ public class CajeroController implements Initializable {
           tituloEleccion = "ELECCIÓN DE EMPRESA";
           opcion = "PRESOC";
 
-
         } else if (!txtNombreCargado.isVisible() && lblPrevisionSocial.isVisible()) {
           mostrarError("PAGAR PREVISIÓN SOCIAL");
         }
@@ -699,7 +640,8 @@ public class CajeroController implements Initializable {
         }
 
         if (cuentaMUT.size() == 1 && cuentaNGU.size() == 1) {
-          if (Integer.parseInt(cuentaMUT.getFirst()[9].toString()) == 0 || Integer.parseInt(cuentaNGU.getFirst()[9].toString()) == 0) {
+          if (Integer.parseInt(cuentaMUT.getFirst()[9].toString()) == 0
+              || Integer.parseInt(cuentaNGU.getFirst()[9].toString()) == 0) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE");
             alert.setHeaderText("NO TIENE PERMITIDO CERRAR");
@@ -1135,31 +1077,30 @@ public class CajeroController implements Initializable {
   }
 
   @FXML
-  public void cerrarSesion(){
+  public void cerrarSesion() {
     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
     alert.setTitle("CIERRE DE APLICATIVO");
     alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR EL APLICATIVO?");
     alert.setContentText(
-            "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR");
+        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR");
 
     Optional<ButtonType> result = alert.showAndWait();
     if (result.isPresent() && result.get() == ButtonType.OK) {
-      apertura=false;
-      turno="";
-      bufferOperaciones=0;
-      try{
+      apertura = false;
+      turno = "";
+      bufferOperaciones = 0;
+      try {
         Stage ventanaActual = (Stage) lblBienvenida.getScene().getWindow();
         Stage nuevaVentana = new Stage();
-        FXMLLoader fxml =
-                new FXMLLoader(getClass().getResource("/com/java/fx/login.fxml"));
+        FXMLLoader fxml = new FXMLLoader(getClass().getResource("/com/java/fx/login.fxml"));
         fxml.setControllerFactory(Main.context::getBean);
         Scene nuevaEscena = new Scene(fxml.load());
         LoginController controlador = fxml.getController();
         controlador.rol = 0;
         LoginController.usuarioLoggeado = "";
         nuevaEscena
-                .getStylesheets()
-                .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());
+            .getStylesheets()
+            .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());
         JMetro jMetro = new JMetro(Style.LIGHT);
         jMetro.setScene(nuevaEscena);
         nuevaVentana.setTitle("AUTENTICACIÓN DE USUARIO");
@@ -1170,8 +1111,35 @@ public class CajeroController implements Initializable {
         nuevaVentana.centerOnScreen();
         nuevaVentana.show();
         ventanaActual.close();
-      }catch (Exception e ) {
+      } catch (Exception e) {
         e.printStackTrace();
+      }
+    }
+  }
+
+  @FXML
+  public void pruebaCierre() {
+    Object[] datos = servicio.traerCierreCajero(1);
+    for (Object filaObj : datos) {
+      if (filaObj instanceof Object[]) {
+        Object[] fila = (Object[]) filaObj;
+
+        System.out.println("ID: " + fila[0]);
+        System.out.println("USUARIO_ID: " + fila[1]);
+        System.out.println("ABONO_AHORRO: " + fila[2]);
+        System.out.println("ABONO_CREDITO: " + fila[3]);
+        System.out.println("RETIROS: " + fila[4]);
+        System.out.println("DESEMBOLSOS: " + fila[5]);
+        System.out.println("CAPITAL_SOCIAL: " + fila[6]);
+        System.out.println("PREVISION_SOCIAL: " + fila[7]);
+        System.out.println("TRAS_APERTURA: " + fila[8]);
+        System.out.println("TRAS_CIERRE: " + fila[9]);
+        System.out.println("SOBRANTE: " + fila[10]);
+        System.out.println("FALTANTE: " + fila[11]);
+        System.out.println("EMPRESA_COD: " + fila[12]);
+        System.out.println("FECHA (FC): " + fila[13]);
+        System.out.println("HORA (HR): " + fila[14]);
+        System.out.println("----------------------------");
       }
     }
   }
