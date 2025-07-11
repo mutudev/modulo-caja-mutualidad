@@ -30,19 +30,23 @@ public interface TrasladoRepository extends JpaRepository<ModelTraslado, Integer
 
   @Query(
       value =
-          "SELECT * FROM VW_HISTORIAL_TRASLADOS WHERE USUARIO_ID = :usuario AND TIPO_TRASLADO = :tipo AND ESTADO = :estado AND FECHA = :fecha AND TURNO = :turno",
+          "SELECT * FROM VW_HISTORIAL_TRASLADOS WHERE USUARIO_ID = :usuario AND TIPO_TRASLADO = :tipo AND ESTADO = :estado AND FECHA = :fecha AND TURNO = :turno AND EMPRESA = :empresa",
       nativeQuery = true)
   List<Object[]> historialTraslados(
       @Param("usuario") int usuario,
       @Param("tipo") int tipo,
       @Param("estado") int estado,
       @Param("fecha") String fecha,
-      @Param("turno") String turno);
-
+      @Param("turno") String turno,
+      @Param("empresa") String empresa);
 
   @Procedure(name = "Operacion.pa_CancelarTraslados")
-  String pa_CancelarTraslados (int opcion, int id_traslado, String cuenta_origen, String cuenta_destino,
-                                double monto, String empresa, String Resultado);
+  String pa_CancelarTraslados(
+      int opcion,
+      int id_traslado,
+      String cuenta_origen,
+      String cuenta_destino,
+      double monto,
+      String empresa,
+      String Resultado);
 }
-
-

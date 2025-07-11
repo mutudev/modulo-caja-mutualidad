@@ -166,7 +166,7 @@ public class RetiroController implements Initializable {
 
       int id = Integer.parseInt(txtIdentificador.getText().trim());
       Map<String, Object> result =
-          servicio.ProcesarRetiro(id, socio, usuario, monto, empresa, fechaTicket, turno, 0, "");
+          servicio.ProcesarRetiro(id, socio, LoginController.usuarioLoggeado, monto, empresa, fechaTicket, turno, 0, "");
 
       if (result.get("Resultado").toString().equals("CORRECTO")) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -194,8 +194,8 @@ public class RetiroController implements Initializable {
           String folio = result.get("transaccion_id").toString();
 
           NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
-          String montoenviar = formatoMoneda.format(monto);
-          String montoresenviar = formatoMoneda.format(montores);
+          String montoactual = String.valueOf(primeraFila[2]);
+          String montoretirado = String.valueOf(primeraFila[3]);
           MoneyConverters converter = MoneyConverters.SPANISH_BANKING_MONEY_VALUE;
           String moneyAsWords = converter.asWords(BigDecimal.valueOf(monto)).toUpperCase() + " MXN";
           if (empresa.equals("0001")) {
@@ -217,20 +217,20 @@ public class RetiroController implements Initializable {
           pars.put("Numsocio", String.valueOf(socio));
           pars.put("Nombresocio", nomsocio);
           pars.put("Numcuenta", numcuenta);
-          pars.put("Montoretirado", montoenviar);
-          pars.put("Montorestante", montoresenviar);
+          pars.put("Montoretirado", montoretirado);
+          pars.put("Montorestante", montoactual);
           pars.put("Montoletras", moneyAsWords);
           pars.put("Cajero", LoginController.usuarioLoggeado);
           pars.put("Hora", horaFormateada);
           if (empresa.equals("0001")) {
             pars.put(
                     "Descripcion",
-                    "Recibí de la " + nombreEmpresa + " la cantidad de " + montoenviar
+                    "Recibí de la " + nombreEmpresa + " la cantidad de " + montoretirado
                             + " (" + moneyAsWords +") por concepto de RETIRO DE CUENTA DE AHORRO.");
           } else {
             pars.put(
                     "Descripcion",
-                    "Recibí de " + nombreEmpresa + " la cantidad de " + montoenviar
+                    "Recibí de " + nombreEmpresa + " la cantidad de " + montoretirado
                             + " (" + moneyAsWords +") por concepto de RETIRO DE CUENTA DE AHORRO.");
 
           }
@@ -244,7 +244,7 @@ public class RetiroController implements Initializable {
           viewer.setAlwaysOnTop(true);
           viewer.setSize(800, 600);
           viewer.setLocationRelativeTo(null);
-          viewer.setTitle("REPORTE DE DESEMBOLSO");
+          viewer.setTitle("REPORTE DE RETIRO");
           viewer.setVisible(true);
 
         } catch (Exception e) {

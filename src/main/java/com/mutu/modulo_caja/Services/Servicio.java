@@ -204,8 +204,8 @@ public class Servicio {
   }
 
   public List<Object[]> historialTraslados(
-      int usuario, int tipo, int estado, String fecha, String turno) {
-    return repoTraslado.historialTraslados(usuario, tipo, estado, fecha, turno);
+      int usuario, int tipo, int estado, String fecha, String turno, String empresa) {
+    return repoTraslado.historialTraslados(usuario, tipo, estado, fecha, turno, empresa);
   }
 
   @Transactional
@@ -249,5 +249,17 @@ public class Servicio {
   public  Object[] traerCierreCajero(int id){
     return repoCierre.traerCierreCajero(id);
   }
+  public ModelCredito traerDatosDesembolsoCancelado(int socio, int status, double monto, String empresa){
+    return repoCredito.findBySocioAndStatusAndMontoAndEmpresa(socio, status, monto, empresa);
+  }
+
+  public List<Object[]> traerCuotasxCredito(int credito_id, int status) {
+    return repoCredito.cuotasInmediatasXCredito(credito_id, status);
+  }
+
+  public Object[] traerUltimaCuotaPagada(int credito_id, int status) {
+    return repoCredito.cuotaAnteriorXCredito(credito_id, status);
+  }
+
 
 }

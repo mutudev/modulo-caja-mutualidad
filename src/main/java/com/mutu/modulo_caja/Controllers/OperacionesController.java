@@ -201,7 +201,7 @@ public class OperacionesController implements Initializable {
     List<Object[]> operaciones;
 
     if (tipo_operacion == 6 || tipo_operacion == 7) {
-      operaciones = servicio.historialTraslados(usuario_id, tipo_operacion, 1, fechaEnviar, turno);
+      operaciones = servicio.historialTraslados(usuario_id, tipo_operacion, 1, fechaEnviar, turno, empresa);
       tablaOperaciones.setVisible(false);
       tableTraslados.setVisible(true);
     } else {

@@ -36,10 +36,12 @@ public class HistorialController implements Initializable {
   @FXML private Button btnCancelar, btnVer;
 
   @FXML private TableView tableHistorial;
+  @FXML private TableView tableTraslados;
 
   public int operacionreimpresion;
 
   @FXML private TableColumn<Object[], String> colSocio, colNombre, colFecha, colHora, colMonto;
+  @FXML private TableColumn<Object[], String> colID, colUsuario, colOrigen, colDestino, colMontoT, colFechaT;
   public String usuario, turno;
 
   List<Object[]> CopiaOperaciones;
@@ -88,6 +90,24 @@ public class HistorialController implements Initializable {
         cellData -> new SimpleStringProperty((String) cellData.getValue()[6]));
     colMonto.setCellValueFactory(
         cellData -> new SimpleStringProperty((String) cellData.getValue()[3]));
+
+
+
+    //Parte de los traslados
+    colID.setCellValueFactory(
+            cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[0])));
+    colUsuario.setCellValueFactory(
+            cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[1])));
+    colOrigen.setCellValueFactory(
+            cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[5])));
+    colDestino.setCellValueFactory(
+            cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[6])));
+    colMontoT.setCellValueFactory(
+            cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[3])));
+    colFechaT.setCellValueFactory(
+            cellData -> new SimpleStringProperty((String) cellData.getValue()[7]));
+
+
 
     Platform.runLater(
         () -> {
@@ -164,7 +184,7 @@ public class HistorialController implements Initializable {
                 .equals("MUTUALIDAD DOCE DE AGOSTO S.C. DE R.L. DE C.V.")
             ? "0001"
             : "0002";
-    int usuario_id = servicio.traerDatosUsuario(usuario).getId();
+    int usuario_id = servicio.traerDatosUsuario(LoginController.usuarioLoggeado).getId();
     int tipo_operacion = 0;
 
     // Determina el tipo de operación basado en la selección
@@ -184,15 +204,28 @@ public class HistorialController implements Initializable {
       case "ABONO A CUENTA DE CAPITAL SOCIAL":
         tipo_operacion = 5;
         break;
+      case "TRASLADO DE BÓVEDA A CAJAS":
+        tipo_operacion = 6;
+        break;
+      case "TRASLADO DE CAJAS A BÓVEDA":
+        tipo_operacion = 7;
+        break;
       case "ABONO A CUENTA DE PREVISIÓN SOCIAL":
         tipo_operacion = 10;
         break;
     }
 
-    List<Object[]> operaciones =
-        servicio.traerHistorial(fechaEnviar, 1, empresa, turno, usuario_id, tipo_operacion, 1);
-    CopiaOperaciones = operaciones;
-
+    List<Object[]> operaciones;
+    if (tipo_operacion != 6 && tipo_operacion != 7) {
+      operaciones =
+              servicio.traerHistorial(fechaEnviar, 1, empresa, turno, usuario_id, tipo_operacion, 1);
+      tableHistorial.setVisible(true);
+      tableTraslados.setVisible(false);
+    } else {
+      operaciones = servicio.historialTraslados(usuario_id, tipo_operacion, 1, fechaEnviar, turno, empresa);
+      tableHistorial.setVisible(false);
+      tableTraslados.setVisible(true);
+    }
 
     ObservableList<Object[]> datosOperaciones = FXCollections.observableArrayList();
     for (Object[] resultado : operaciones) {
@@ -202,33 +235,69 @@ public class HistorialController implements Initializable {
       }
     }
 
-    // Asignar los datos filtrados al TableView
-    tableHistorial.setItems(datosOperaciones);
+    if (tableHistorial.isVisible()) {
+      tableHistorial.setItems(datosOperaciones);
+    } else {
+      tableTraslados.setItems(datosOperaciones);
+    }
+
+
   }
 
   @FXML
   public void verOperacion() {
 
     Object[] selectedRow = (Object[]) tableHistorial.getSelectionModel().getSelectedItem();
+    Object[] selectedRowTraslado = (Object[]) tableTraslados.getSelectionModel().getSelectedItem();
 
 
     String nombre = "", numSocio = "", fecha = "", monto = "";
     String IdOperacion = "";
     String hora = "";
-    if (selectedRow != null) {
-      nombre = (String) selectedRow[1];
-      numSocio = String.valueOf(selectedRow[0]);
-      fecha = (String) selectedRow[2];
-      monto = (String) selectedRow[3];
-      hora= (String) selectedRow[6];
-      IdOperacion = String.valueOf(selectedRow[11]);
+    String cuenta_origen= "";
+    String cuenta_destino= "";
+
+
+    if (tableHistorial.isVisible() && selectedRow != null) {
+
+
+        nombre = (String) selectedRow[1];
+        numSocio = String.valueOf(selectedRow[0]);
+        fecha = (String) selectedRow[2];
+        monto = (String) selectedRow[3];
+        hora= (String) selectedRow[6];
+        IdOperacion = String.valueOf(selectedRow[11]);
+
+    } else if(tableTraslados.isVisible() && selectedRowTraslado != null) {
+
+      IdOperacion = String.valueOf(selectedRowTraslado[0]);
+      nombre = (String) selectedRowTraslado[1];
+      numSocio = String.valueOf(selectedRowTraslado[0]);
+      monto = (String) selectedRowTraslado[3];
+      hora= (String) selectedRowTraslado[8];
+      fecha = (String) selectedRowTraslado[7];
+
+      if(selectedRowTraslado[4].equals("6")){
+        cuenta_origen = (String) selectedRowTraslado[6];
+        cuenta_destino = (String) selectedRowTraslado[5];
+
+      }else{
+
+        cuenta_origen = (String) selectedRowTraslado[5];
+        cuenta_destino = (String) selectedRowTraslado[6];
+
+
+      }
+
+
     }else {
-      Alert alert = new Alert(Alert.AlertType.ERROR);
-      alert.setTitle("NO HA SELECCIONADO NINGUNA OPERACIÓN");
-      alert.setHeaderText("SIN OPERACIÓN SELECCIONADA");
-      alert.setContentText("POR FAVOR, SELECCIONE UNA OPERACIÓN.");
-      alert.showAndWait();
-      return;
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("NO HA SELECCIONADO NINGUNA OPERACIÓN");
+        alert.setHeaderText("SIN OPERACIÓN SELECCIONADA");
+        alert.setContentText("POR FAVOR, SELECCIONE UNA OPERACIÓN.");
+        alert.showAndWait();
+        return;
+
     }
 
     String operacion = cmbOperacion.getSelectionModel().getSelectedItem().toString();
@@ -250,6 +319,12 @@ public class HistorialController implements Initializable {
       case "ABONO A CUENTA DE CAPITAL SOCIAL":
         operacionreimpresion = 5;
         break;
+      case "TRASLADO DE BÓVEDA A CAJAS":
+        operacionreimpresion = 6;
+        break;
+      case "TRASLADO DE CAJAS A BÓVEDA":
+        operacionreimpresion = 7;
+        break;
       case "ABONO A CUENTA DE PREVISIÓN SOCIAL":
         operacionreimpresion = 10;
         break;
@@ -260,7 +335,20 @@ public class HistorialController implements Initializable {
       fxml.setControllerFactory(Main.context::getBean);
       Scene nuevaEscena = new Scene(fxml.load());
       ReimpresionController controller = fxml.getController();
-      controller.setDatos(numSocio, IdOperacion, operacion, empresa, fecha, monto, nombre,operacionreimpresion,hora);
+      if (operacionreimpresion != 6 && operacionreimpresion != 7) {
+        controller.setDatos(numSocio, IdOperacion, operacion, empresa, fecha, monto, nombre,operacionreimpresion,hora);
+      } else {
+        controller.setDatosTrasladosHistorial(
+                IdOperacion,
+                nombre,
+                monto,
+                cmbOperacion.getSelectionModel().getSelectedItem().toString(),
+                cuenta_origen,
+                cuenta_destino,
+                fecha,
+                operacionreimpresion, this, turno,empresa,hora);
+      }
+
       nuevaEscena
           .getStylesheets()
           .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());

@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane onKeyPressed="#cerrarConTecla" prefHeight="719.0" prefWidth="936.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.HistorialController">
+<AnchorPane onKeyPressed="#cerrarConTecla" prefHeight="719.0" prefWidth="936.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.HistorialController">
    <children>
       <Label layoutX="302.0" layoutY="36.0" style="-fx-text-fill: #39577C;" text="HISTORIAL DE OPERACIONES">
          <font>
@@ -23,7 +27,7 @@
       </Label>
       <ComboBox fx:id="cmbOperacion" layoutX="170.0" layoutY="167.0" onAction="#traerOperaciones" prefHeight="39.0" prefWidth="705.0" />
       <ComboBox fx:id="cmbEmpresa" layoutX="170.0" layoutY="104.0" onAction="#traerOperaciones" prefHeight="39.0" prefWidth="705.0" />
-      <TableView fx:id="tableHistorial" layoutX="45.0" layoutY="241.0" onMouseClicked="#detectarClicks" prefHeight="360.0" prefWidth="847.0">
+      <TableView fx:id="tableHistorial" layoutX="45.0" layoutY="241.0" onMouseClicked="#detectarClicks" prefHeight="360.0" prefWidth="847.0" visible="false">
         <columns>
           <TableColumn fx:id="colSocio" editable="false" prefWidth="147.0" text="SOCIO" />
           <TableColumn fx:id="colNombre" editable="false" prefWidth="201.0" text="NOMBRE" />
@@ -35,5 +39,15 @@
        <Button fx:id="btnCancelar" layoutX="201.0" layoutY="631.0" onAction="#cerrarConBoton" prefHeight="39.0" prefWidth="203.0" style="-fx-background-color: #C0392B; -fx-text-fill: white; -fx-font-weight: bold;" text="CANCELAR" />
 
        <Button fx:id="btnVer" layoutX="534.0" layoutY="631.0" onAction="#verOperacion" prefHeight="39.0" prefWidth="203.0" style="-fx-background-color: #39577C; -fx-text-fill: white; -fx-font-weight: bold;" text="VER OPERACIÓN" />
+      <TableView fx:id="tableTraslados" layoutX="45.0" layoutY="241.0" prefHeight="360.0" prefWidth="847.0" visible="false">
+        <columns>
+          <TableColumn fx:id="colID" prefWidth="83.0" text="ID" />
+          <TableColumn fx:id="colUsuario" prefWidth="115.0" text="USUARIO" />
+            <TableColumn fx:id="colOrigen" prefWidth="179.0" text="ORIGEN" />
+            <TableColumn fx:id="colDestino" prefWidth="177.0" text="DESTINO" />
+            <TableColumn fx:id="colMontoT" prefWidth="156.0" text="MONTO" />
+            <TableColumn fx:id="colFechaT" prefWidth="136.0" text="FECHA" />
+        </columns>
+      </TableView>
    </children>
 </AnchorPane>

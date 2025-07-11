@@ -88,13 +88,29 @@ public class ElegirController implements Initializable {
   @FXML
   public void cambiarConBoton() {
     try {
+      Object[] selectedRow = (Object[]) tablePrestamos.getSelectionModel().getSelectedItem();
+
+      String numSocio = String.valueOf(selectedRow[5]);
+      String nomSocio = (String) selectedRow[6];
+      String numCredito = String.valueOf(selectedRow[0]);
+      String plazos = String.valueOf(selectedRow[8]);
+      String tasa = String.valueOf(selectedRow[9]);
+      String mora = String.valueOf(selectedRow[10]);
+      String iva = String.valueOf(selectedRow[11]);
+      String tipoCredito = (String) selectedRow[12];
+      String codigoSistema = (String) selectedRow[1];
+      String fechaDesembolso = (String) selectedRow[2];
+      String capital = String.valueOf(selectedRow[3]);
+
+
+
       Stage ventanaActual = (Stage) lblTitulo.getScene().getWindow();
       Stage nuevaVentana = new Stage();
       FXMLLoader fxml = new FXMLLoader(getClass().getResource("/com/java/fx/abonoCredito.fxml"));
       fxml.setControllerFactory(Main.context::getBean);
       Scene nuevaEscena = new Scene(fxml.load());
-      // CajeroController controlador = fxml.getController();
-      // controlador.setUsuario(txtUsuario.getText().trim());
+      CreditoController controlador = fxml.getController();
+      controlador.setDatos(numSocio, nomSocio, numCredito, plazos, tasa, mora, iva, tipoCredito, codigoSistema, fechaDesembolso, capital);
       nuevaEscena
           .getStylesheets()
           .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());

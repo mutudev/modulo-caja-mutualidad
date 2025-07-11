@@ -210,11 +210,11 @@ public class TrasladoController implements Initializable {
       }
 
       Map<String, Object> res =
-          servicio.procesarTraslado(usuario, monto_trasladar, opcion, cod_empresa,horaticket, turno, "",0);
+          servicio.procesarTraslado(LoginController.usuarioLoggeado, monto_trasladar, opcion, cod_empresa,horaticket, turno, "",0);
       boolean procesar = true;
       boolean permitir = false;
-      int userid = servicio.traerDatosUsuario(usuario).getId();
-      String nomcajero = servicio.traerCajeroPorUsuario(usuario);
+      int userid = servicio.traerDatosUsuario(LoginController.usuarioLoggeado).getId();
+      String nomcajero = servicio.traerCajeroPorUsuario(LoginController.usuarioLoggeado);
 
       Alert alert = new Alert(Alert.AlertType.INFORMATION);
       InputStream isLogo = null;
@@ -231,17 +231,28 @@ public class TrasladoController implements Initializable {
 
 
       String folio = res.get("transaccion_id").toString();
+      if(folio.equals("0")){
+        Alert alert2 = new Alert(Alert.AlertType.ERROR);
+        alert2.setTitle("ERROR AL PROCESAR EL TRASLADO DEL CAJERO");
+        alert2.setHeaderText("ERROR AL INTENTAR LA OPERACIÓN DESEADA");
+        alert2.setContentText(res.get("Resultado").toString().toUpperCase());
+        alert2.showAndWait();
+        return;
+
+      }
 
       NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
       String montotraslado = formatoMoneda.format(monto_trasladar);
       MoneyConverters converter = MoneyConverters.SPANISH_BANKING_MONEY_VALUE;
       String moneyAsWords = converter.asWords(BigDecimal.valueOf(monto_trasladar)).toUpperCase() + " MXN";
       int codcaja = 0;
-
+      String desc = "";
       if (cod_empresa.equals("0001")) {
         isLogo = getClass().getResourceAsStream("/assets/images/logo-mut.png");
+        desc = "NOMBRE Y FIRMA DE LA PROTESORERA";
       } else {
         isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
+        desc = "NOMBRE Y FIRMA DEL PROTESORERO";
       }
       switch (res.get("Resultado").toString()) {
         case "APERTURA":
@@ -250,10 +261,10 @@ public class TrasladoController implements Initializable {
           alert.setHeaderText("APERTURA REALIZADA CORRECTAMENTE");
           alert.setContentText(
               "EL CAJERO: "
-                  + usuario
+                  + LoginController.usuarioLoggeado
                   + " AHORA ESTÁ LISTO PARA REALIZAR SUS OPERACIONES EN: "
                   + nom_empresa);
-         ;
+          alert.showAndWait();
           try {
 
             Map pars = new HashMap<>();
@@ -271,7 +282,7 @@ public class TrasladoController implements Initializable {
             pars.put("Destino", "CUENTA DE CAJERO " + codcaja);
             pars.put("Monto", montotraslado);
             pars.put("Montoletras", moneyAsWords);
-
+            pars.put("DescProteso", desc);
 
 
             pars.put("Cajerouser", LoginController.usuarioLoggeado);
@@ -306,7 +317,7 @@ public class TrasladoController implements Initializable {
             e.printStackTrace();
           }
 
-          alert.showAndWait();
+
 
           permitir = true;
           break;
@@ -314,7 +325,8 @@ public class TrasladoController implements Initializable {
           alert.setTitle("TRASLADO DE CIERRE EXITOSO");
           alert.setHeaderText("TRASLADO DE CIERRE REALIZADO CORRECTAMENTE");
           alert.setContentText(
-              "EL CAJERO: " + usuario + " AHORA ESTÁ LISTO PARA CERRAR EN: " + nom_empresa);
+              "EL CAJERO: " + LoginController.usuarioLoggeado + " AHORA ESTÁ LISTO PARA CERRAR EN: " + nom_empresa);
+          alert.showAndWait();
           codcaja = servicio.traerDatosCaja(userid,turno,cod_empresa,0).getId();
           try {
 
@@ -334,8 +346,7 @@ public class TrasladoController implements Initializable {
             pars.put("Destino",  cod_boveda);
             pars.put("Monto", montotraslado);
             pars.put("Montoletras", moneyAsWords);
-
-
+            pars.put("DescProteso", desc);
 
             pars.put("Cajerouser", LoginController.usuarioLoggeado);
             pars.put("Cajeronom", nomcajero);
@@ -368,13 +379,13 @@ public class TrasladoController implements Initializable {
           } catch (Exception e) {
             e.printStackTrace();
           }
-          alert.showAndWait();
+
           break;
         default:
           Alert alert2 = new Alert(Alert.AlertType.ERROR);
           alert2.setTitle("ERROR AL PROCESAR EL TRASLADO DEL CAJERO");
           alert2.setHeaderText("ERROR AL INTENTAR LA OPERACIÓN DESEADA");
-          alert2.setContentText(res.get("resultado").toString().toUpperCase());
+          alert2.setContentText(res.get("Resultado").toString().toUpperCase());
           alert2.showAndWait();
           procesar = false;
       }
