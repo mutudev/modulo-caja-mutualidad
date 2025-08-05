@@ -261,5 +261,27 @@ public class Servicio {
     return repoCredito.cuotaAnteriorXCredito(credito_id, status);
   }
 
+  @Transactional
+  public Map<String, Object>  pa_PagarCredito(    int opcion,
+                                  double monto_capital,
+                                  double intereses,
+                                  double mora,
+                                  double iva,
+                                  int cuota_id,
+                                  int credito_id,
+                                  double total_cuota_pendiente,
+                                  int numero_cuota,
+                                  double bonificacion,
+                                  double total_pago,
+                                  int numero_cuotas,
+                                    String nombre_usuario,
+                                    String empresa,
+                                    String hora,
+                                    int num_socio,
+                                  int transaccion_id,
+                                  String Resultado, String saldo_ticket){
+    return  repoCredito.pa_PagarCredito(opcion, monto_capital, intereses, mora, iva, cuota_id, credito_id, total_cuota_pendiente,
+            numero_cuota, bonificacion, total_pago, numero_cuotas , nombre_usuario, empresa, hora, num_socio, transaccion_id, Resultado, saldo_ticket);
+}
 
 }

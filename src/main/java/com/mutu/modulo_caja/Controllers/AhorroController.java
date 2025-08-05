@@ -205,7 +205,6 @@ public class AhorroController implements Initializable {
         String monto = formatoMoneda.format(abono);
         MoneyConverters converter = MoneyConverters.SPANISH_BANKING_MONEY_VALUE;
         String moneyAsWords = converter.asWords(BigDecimal.valueOf(abono)).toUpperCase() + " MXN";
-        String letrasEnviar = "";
         String Ahorro = formatoMoneda.format(ahorrototal);
         PrintJob impresion = new PrintJob();
         PrinterMatrix printer =

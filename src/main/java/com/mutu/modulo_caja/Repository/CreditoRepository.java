@@ -28,6 +28,29 @@ public interface CreditoRepository extends JpaRepository<ModelCredito, Integer> 
       String Resultado,
       int transaccion_id);
 
+  @Procedure(name = "Cuenta_Credito.pa_PagarCredito")
+  Map<String, Object>  pa_PagarCredito(
+          int opcion,
+          double monto_capital,
+          double intereses,
+          double mora,
+          double iva,
+          int cuota_id,
+          int credito_id,
+          double total_cuota_pendiente,
+          int numero_cuota,
+          double bonificacion,
+          double total_pago,
+          int numero_cuotas,
+          String nombre_usuario,
+          String empresa,
+          String hora,
+          int num_socio,
+          int transaccion_id,
+          String Resultado,
+          String saldo_ticket
+          );
+
   ModelCredito findById(int id);
 
   ModelCredito findBySocioAndStatusAndMontoAndEmpresa(
@@ -39,7 +62,7 @@ public interface CreditoRepository extends JpaRepository<ModelCredito, Integer> 
   List<Object[]> cuotasInmediatasXCredito(@Param("credito_id") int credito_id, @Param("status") int status);
 
   @Query(
-          value = "SELECT TOP 3 * FROM VW_CUOTAS_CREDITO WHERE CREDITO_ID = :credito_id AND STATUS = :status ORDER BY ID DESC",
+          value = "SELECT TOP 1 * FROM VW_CUOTAS_CREDITO WHERE CREDITO_ID = :credito_id AND STATUS = :status ORDER BY ID DESC",
           nativeQuery = true)
   Object[] cuotaAnteriorXCredito(@Param("credito_id") int credito_id, @Param("status") int status);
 }

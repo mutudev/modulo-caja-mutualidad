@@ -1119,140 +1119,141 @@ public class CajeroController implements Initializable {
 
   @FXML
   public void pruebaCierre() {
-    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-    alert.setTitle("CIERRE HECHO CORRECTAMENTE");
-    alert.setHeaderText("CIERRE EXITOSO");
-    alert.setContentText(
-            "CIERRE EXITOSO DEL CAJERO: " + LoginController.usuarioLoggeado);
-    alert.showAndWait();
-
-    Object[] datos = servicio.traerCierreCajero(2);
-    String folio = "";
-    String fecha = "";
-    String hora = "";
-    String empresa = "";
-    String rfcEmpresa = "";
-    String direcEmpresa = "";
-    InputStream isLogo = null;
-    String nomcajero = "";
-    String ahorros = "";
-    double ahorrosCant = 0;
-    String creditos = "";
-    double creditosCant = 0;
-    String retiros = "";
-    double retirosCant = 0;
-    String desembolsos = "";
-    double desembolsosCant = 0;
-    String capital = "";
-    double csCant = 0;
-    String presoc = "";
-    double presocCant = 0;
-    String apertura = "";
-    double aperturaCant = 0;
-    String cierre = "";
-    double cierreCant = 0;
-    String sobrante = "";
-    double sobranteCant = 0;
-    String faltante = "";
-    double faltanteCant = 0;
-    NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
-
-    for (Object filaObj : datos) {
-      if (filaObj instanceof Object[]) {
-        Object[] fila = (Object[]) filaObj;
-
-        folio = String.valueOf(fila[0]);
-        fecha = fila[13].toString();
-        hora = fila[14].toString();
-        empresa = servicio.traerEmpresa(fila[12].toString()).getRazonSocial();
-        rfcEmpresa = servicio.traerEmpresa(fila[12].toString()).getRfc();
-        direcEmpresa =
-                servicio.traerEmpresa(fila[12].toString()).getCalle()
-                        + " "
-                        + servicio.traerEmpresa(fila[12].toString()).getCruzamiento()
-                        + " COL. CENTRO";
-        if (fila[12].toString().equals("0001")) {
-          isLogo = getClass().getResourceAsStream("/assets/images/logo-mut.png");
-        } else {
-          isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
-        }
-        nomcajero = servicio.traerCajeroPorUsuario(LoginController.usuarioLoggeado);
-        ahorrosCant = Double.parseDouble(String.valueOf(fila[2]));
-        ahorros = formatoMoneda.format(ahorrosCant);
-
-        creditosCant = Double.parseDouble(String.valueOf(fila[3]));
-        creditos = formatoMoneda.format(creditosCant);
-
-        retirosCant = Double.parseDouble(String.valueOf(fila[4]));
-        retiros = formatoMoneda.format(retirosCant);
-
-        desembolsosCant = Double.parseDouble(String.valueOf(fila[5]));
-        desembolsos = formatoMoneda.format(desembolsosCant);
-
-        csCant = Double.parseDouble(String.valueOf(fila[6]));
-        capital = formatoMoneda.format(csCant);
-
-        presocCant = Double.parseDouble(String.valueOf(fila[7]));
-        presoc = formatoMoneda.format(presocCant);
-
-        aperturaCant = Double.parseDouble(String.valueOf(fila[8]));
-        apertura = formatoMoneda.format(aperturaCant);
-
-        cierreCant = Double.parseDouble(String.valueOf(fila[9]));
-        cierre = formatoMoneda.format(cierreCant);
-
-        sobranteCant = Double.parseDouble(String.valueOf(fila[10]));
-        sobrante = formatoMoneda.format(sobranteCant);
-
-
-        faltanteCant = Double.parseDouble(String.valueOf(fila[11]));
-        faltante = formatoMoneda.format(faltanteCant);
-
-
-      }
-    }
-
-
-    try {
-      Map pars = new HashMap<>();
-      pars.put("Empresa", empresa);
-      pars.put("LogoImg", isLogo);
-      pars.put("RFC", rfcEmpresa);
-      pars.put("Direccion", direcEmpresa);
-      pars.put("Titulo", "REPORTE DE CIERRE DE CAJERO");
-
-      pars.put("Folio", folio);
-      pars.put("Fecha", fecha);
-      pars.put("Hora", hora);
-
-      pars.put("USUARIO", LoginController.usuarioLoggeado);
-      pars.put("NOMBRE_USER", nomcajero);
-
-      pars.put("DEP_AHORRO", ahorros);
-      pars.put("DEP_CREDITO", creditos);
-      pars.put("DEP_CS", capital);
-      pars.put("DEP_RETIROS", retiros);
-      pars.put("DEP_DESEMBOLSO", desembolsos);
-      pars.put("DEP_PRESOC", presoc);
-      pars.put("DEP_TRASLADO_A", apertura);
-      pars.put("DEP_TRASLADO_C", cierre);
-      pars.put("SOBRANTE", sobrante);
-      pars.put("FALTANTE", faltante);
-
-      InputStream isRepo = getClass().getResourceAsStream("/Reports/cierre_cajero.jasper");
-      JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
-      JasperPrint jpRepo = JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
-
-      JasperViewer viewer = new JasperViewer(jpRepo, false);
-
-      viewer.setSize(800, 600);
-      viewer.setLocationRelativeTo(null);
-      viewer.setTitle("REPORTE DE CIERRE DE CAJERO");
-      viewer.setVisible(true);
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    System.out.println(((0.02 * 12) / 360) * 24 * 9728.00);
+//    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//    alert.setTitle("CIERRE HECHO CORRECTAMENTE");
+//    alert.setHeaderText("CIERRE EXITOSO");
+//    alert.setContentText(
+//            "CIERRE EXITOSO DEL CAJERO: " + LoginController.usuarioLoggeado);
+//    alert.showAndWait();
+//
+//    Object[] datos = servicio.traerCierreCajero(2);
+//    String folio = "";
+//    String fecha = "";
+//    String hora = "";
+//    String empresa = "";
+//    String rfcEmpresa = "";
+//    String direcEmpresa = "";
+//    InputStream isLogo = null;
+//    String nomcajero = "";
+//    String ahorros = "";
+//    double ahorrosCant = 0;
+//    String creditos = "";
+//    double creditosCant = 0;
+//    String retiros = "";
+//    double retirosCant = 0;
+//    String desembolsos = "";
+//    double desembolsosCant = 0;
+//    String capital = "";
+//    double csCant = 0;
+//    String presoc = "";
+//    double presocCant = 0;
+//    String apertura = "";
+//    double aperturaCant = 0;
+//    String cierre = "";
+//    double cierreCant = 0;
+//    String sobrante = "";
+//    double sobranteCant = 0;
+//    String faltante = "";
+//    double faltanteCant = 0;
+//    NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
+//
+//    for (Object filaObj : datos) {
+//      if (filaObj instanceof Object[]) {
+//        Object[] fila = (Object[]) filaObj;
+//
+//        folio = String.valueOf(fila[0]);
+//        fecha = fila[13].toString();
+//        hora = fila[14].toString();
+//        empresa = servicio.traerEmpresa(fila[12].toString()).getRazonSocial();
+//        rfcEmpresa = servicio.traerEmpresa(fila[12].toString()).getRfc();
+//        direcEmpresa =
+//                servicio.traerEmpresa(fila[12].toString()).getCalle()
+//                        + " "
+//                        + servicio.traerEmpresa(fila[12].toString()).getCruzamiento()
+//                        + " COL. CENTRO";
+//        if (fila[12].toString().equals("0001")) {
+//          isLogo = getClass().getResourceAsStream("/assets/images/logo-mut.png");
+//        } else {
+//          isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
+//        }
+//        nomcajero = servicio.traerCajeroPorUsuario(LoginController.usuarioLoggeado);
+//        ahorrosCant = Double.parseDouble(String.valueOf(fila[2]));
+//        ahorros = formatoMoneda.format(ahorrosCant);
+//
+//        creditosCant = Double.parseDouble(String.valueOf(fila[3]));
+//        creditos = formatoMoneda.format(creditosCant);
+//
+//        retirosCant = Double.parseDouble(String.valueOf(fila[4]));
+//        retiros = formatoMoneda.format(retirosCant);
+//
+//        desembolsosCant = Double.parseDouble(String.valueOf(fila[5]));
+//        desembolsos = formatoMoneda.format(desembolsosCant);
+//
+//        csCant = Double.parseDouble(String.valueOf(fila[6]));
+//        capital = formatoMoneda.format(csCant);
+//
+//        presocCant = Double.parseDouble(String.valueOf(fila[7]));
+//        presoc = formatoMoneda.format(presocCant);
+//
+//        aperturaCant = Double.parseDouble(String.valueOf(fila[8]));
+//        apertura = formatoMoneda.format(aperturaCant);
+//
+//        cierreCant = Double.parseDouble(String.valueOf(fila[9]));
+//        cierre = formatoMoneda.format(cierreCant);
+//
+//        sobranteCant = Double.parseDouble(String.valueOf(fila[10]));
+//        sobrante = formatoMoneda.format(sobranteCant);
+//
+//
+//        faltanteCant = Double.parseDouble(String.valueOf(fila[11]));
+//        faltante = formatoMoneda.format(faltanteCant);
+//
+//
+//      }
+//    }
+//
+//
+//    try {
+//      Map pars = new HashMap<>();
+//      pars.put("Empresa", empresa);
+//      pars.put("LogoImg", isLogo);
+//      pars.put("RFC", rfcEmpresa);
+//      pars.put("Direccion", direcEmpresa);
+//      pars.put("Titulo", "REPORTE DE CIERRE DE CAJERO");
+//
+//      pars.put("Folio", folio);
+//      pars.put("Fecha", fecha);
+//      pars.put("Hora", hora);
+//
+//      pars.put("USUARIO", LoginController.usuarioLoggeado);
+//      pars.put("NOMBRE_USER", nomcajero);
+//
+//      pars.put("DEP_AHORRO", ahorros);
+//      pars.put("DEP_CREDITO", creditos);
+//      pars.put("DEP_CS", capital);
+//      pars.put("DEP_RETIROS", retiros);
+//      pars.put("DEP_DESEMBOLSO", desembolsos);
+//      pars.put("DEP_PRESOC", presoc);
+//      pars.put("DEP_TRASLADO_A", apertura);
+//      pars.put("DEP_TRASLADO_C", cierre);
+//      pars.put("SOBRANTE", sobrante);
+//      pars.put("FALTANTE", faltante);
+//
+//      InputStream isRepo = getClass().getResourceAsStream("/Reports/cierre_cajero.jasper");
+//      JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
+//      JasperPrint jpRepo = JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
+//
+//      JasperViewer viewer = new JasperViewer(jpRepo, false);
+//
+//      viewer.setSize(800, 600);
+//      viewer.setLocationRelativeTo(null);
+//      viewer.setTitle("REPORTE DE CIERRE DE CAJERO");
+//      viewer.setVisible(true);
+//
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//    }
 
 
   }

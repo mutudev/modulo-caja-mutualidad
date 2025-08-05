@@ -101,6 +101,7 @@ public class ElegirController implements Initializable {
       String codigoSistema = (String) selectedRow[1];
       String fechaDesembolso = (String) selectedRow[2];
       String capital = String.valueOf(selectedRow[3]);
+      boolean bonifAplicable = (Boolean) selectedRow[13];
 
 
 
@@ -110,7 +111,7 @@ public class ElegirController implements Initializable {
       fxml.setControllerFactory(Main.context::getBean);
       Scene nuevaEscena = new Scene(fxml.load());
       CreditoController controlador = fxml.getController();
-      controlador.setDatos(numSocio, nomSocio, numCredito, plazos, tasa, mora, iva, tipoCredito, codigoSistema, fechaDesembolso, capital);
+      controlador.setDatos(numSocio, nomSocio, numCredito, plazos, tasa, mora, iva, tipoCredito, codigoSistema, fechaDesembolso, capital, bonifAplicable);
       nuevaEscena
           .getStylesheets()
           .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());
