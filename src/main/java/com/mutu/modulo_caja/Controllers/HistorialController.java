@@ -256,7 +256,13 @@ public class HistorialController implements Initializable {
     String hora = "";
     String cuenta_origen= "";
     String cuenta_destino= "";
-
+    String capital_pagado = "";
+    String interes_pagado = "";
+    String mora_pagada = "";
+    String iva_pagado = "";
+    String bonif_aplicada = "";
+    String saldo_credito = "";
+    String tipo_credito = "";
 
     if (tableHistorial.isVisible() && selectedRow != null) {
 
@@ -267,6 +273,13 @@ public class HistorialController implements Initializable {
         monto = (String) selectedRow[3];
         hora= (String) selectedRow[6];
         IdOperacion = String.valueOf(selectedRow[11]);
+        capital_pagado = (String) selectedRow[13];
+        interes_pagado = (String) selectedRow[14];
+        mora_pagada = (String) selectedRow[15];
+        iva_pagado = (String) selectedRow[16];
+        bonif_aplicada = (String) selectedRow[17];
+        saldo_credito = (String) selectedRow[18];
+        tipo_credito = (String) selectedRow[19];
 
     } else if(tableTraslados.isVisible() && selectedRowTraslado != null) {
 
@@ -290,7 +303,7 @@ public class HistorialController implements Initializable {
       }
 
 
-    }else {
+    } else {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("NO HA SELECCIONADO NINGUNA OPERACIÓN");
         alert.setHeaderText("SIN OPERACIÓN SELECCIONADA");
@@ -336,7 +349,7 @@ public class HistorialController implements Initializable {
       Scene nuevaEscena = new Scene(fxml.load());
       ReimpresionController controller = fxml.getController();
       if (operacionreimpresion != 6 && operacionreimpresion != 7) {
-        controller.setDatos(numSocio, IdOperacion, operacion, empresa, fecha, monto, nombre,operacionreimpresion,hora);
+        controller.setDatos(numSocio, IdOperacion, operacion, empresa, fecha, monto, nombre,operacionreimpresion,hora, capital_pagado, interes_pagado, mora_pagada, iva_pagado, bonif_aplicada, saldo_credito, tipo_credito);
       } else {
         controller.setDatosTrasladosHistorial(
                 IdOperacion,

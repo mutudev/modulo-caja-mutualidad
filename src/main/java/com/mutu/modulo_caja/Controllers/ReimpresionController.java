@@ -35,9 +35,16 @@ import java.util.*;
 public class ReimpresionController {
 
   @FXML
-  private TextField txtSocio, txtID, txtOperacion, txtEmpresa, txtFecha, txtMonto, txtNomSocio;
-  @FXML private Label lblTitulo, lblEmpresa, lblSocio, lblOperacion, lblNombre;
+  private TextField txtSocio, txtID, txtOperacion, txtEmpresa, txtFecha, txtMonto, txtNomSocio, txtCapital, txtInteres, txtMora, txtIva, txtBonif;
+  @FXML private Label lblTitulo, lblEmpresa, lblSocio, lblOperacion, lblNombre, lblCapital, lblInteres, lblMora, lblIva, lblBonif;
   @FXML private Button btnReimprimir, btnRegresar;
+  String capital_pagado = "";
+  String interes_pagado = "";
+  String mora_pagada = "";
+  String iva_pagado = "";
+  String bonif_aplicada = "";
+  String saldo_credito = "";
+  String tipo_credito = "";
 
   public OperacionesController controller;
   public  HistorialController controllerhisto;
@@ -162,8 +169,15 @@ public class ReimpresionController {
       String monto,
       String nombre,
       int operaciontipo,
-      String hora) {
+      String hora, String capital_pagado, String interes_pagado, String mora_pagada, String iva_pagado, String bonif_aplicada, String saldo_credito, String tipo_credito) {
     this.nombre = nombre;
+    this.capital_pagado = capital_pagado;
+    this.interes_pagado = interes_pagado;
+    this.mora_pagada = mora_pagada;
+    this.iva_pagado = iva_pagado;
+    this.saldo_credito = saldo_credito;
+    this.tipo_credito = tipo_credito;
+    this.bonif_aplicada = bonif_aplicada;
     this.socio = socio;
     this.id = id;
     this.operacion = operacion;
@@ -179,6 +193,23 @@ public class ReimpresionController {
     txtFecha.setText(fecha);
     txtMonto.setText(monto);
     txtNomSocio.setText(nombre);
+    if (operaciontipo == 2) {
+      txtCapital.setText(capital_pagado);
+      txtInteres.setText(interes_pagado);
+      txtMora.setText(mora_pagada);
+      txtIva.setText(iva_pagado);
+      txtBonif.setText(bonif_aplicada);
+      txtCapital.setVisible(true);
+      txtInteres.setVisible(true);
+      txtMora.setVisible(true);
+      txtIva.setVisible(true);
+      txtBonif.setVisible(true);
+      lblCapital.setVisible(true);
+      lblInteres.setVisible(true);
+      lblMora.setVisible(true);
+      lblIva.setVisible(true);
+      lblBonif.setVisible(true);
+    }
   }
 
   @FXML
@@ -840,6 +871,40 @@ public class ReimpresionController {
                   hora,
                   totalhorro);
           break;
+       case 2:
+         double bonifrestar=0, interes=0,psngu = 0, psmut = 0;
+          System.out.println("INFIEEEEEL: " + opcion);
+        try {
+
+           abono = formatoMoneda.parse(monto).doubleValue();
+           interes = formatoMoneda.parse(txtInteres.getText().toString()).doubleValue();
+           bonifrestar = formatoMoneda.parse(bonif_aplicada).doubleValue();
+
+
+
+          } catch (ParseException e) {
+          e.printStackTrace();
+        }
+         if (servicio.traerCuentasCS(Integer.parseInt(socio)).size() == 1) {
+           psmut = servicio.traerCuentasCS(Integer.parseInt(socio)).getFirst().getMonto_cubierto();
+         } else {
+           psmut = servicio.traerCuentasCS(Integer.parseInt(socio)).getFirst().getMonto_cubierto();
+           psngu = servicio.traerCuentasCS(Integer.parseInt(socio)).get(1).getMonto_cubierto();
+         }
+
+         interes -= bonifrestar;
+         String psnguenviar = formatoMoneda.format(psngu);
+         String psmutenviar = formatoMoneda.format(psmut);
+         String interesconbonif=formatoMoneda.format(interes);
+
+
+        moneyAsWords = converter.asWords(BigDecimal.valueOf(abono)).toUpperCase() + " MXN";
+
+                    printer =
+                            impresora.imprimirAbonoACredito(nombreEmpresa,rfcEmpresa,direcEmpresa,socio, id,nombre,
+                                    fecha,hora,LoginController.usuarioLoggeado,capital_pagado,moneyAsWords,monto,tipo_credito,
+                                    mora_pagada,interes_pagado,bonif_aplicada,iva_pagado,psnguenviar,psmutenviar,saldo_credito,interesconbonif);
+          break;
         case 3:
           int cuentaCredito=
                   servicio
@@ -982,8 +1047,8 @@ public class ReimpresionController {
             e.printStackTrace();
           }
           String abonoletras = converter.asWords(BigDecimal.valueOf(abono)).toUpperCase() + " MXN";
-          double psmut = 0;
-          double psngu = 0;
+          psmut = 0;
+          psngu = 0;
           List<ModelCapitalSocial> cuentas = servicio.traerCuentasCS(Integer.parseInt(socio));
           if (cuentas.size() == 2) {
             psmut = cuentas.get(0).getMonto_cubierto();
@@ -1165,7 +1230,9 @@ public class ReimpresionController {
                   montoCubEnviar);
           break;
       }
-      if (opcion == 1 || opcion == 5 || opcion == 10) {
+      System.out.println("SOY INFIEEEEL: " + operaciontipo);
+      if (operaciontipo == 1 ||operaciontipo ==2 || operaciontipo == 5 || operaciontipo == 10) {
+        System.out.println("ME EJECUTE");
         printer.toFile("Reimpresion.txt");
 
         InputStream inputStream = null;

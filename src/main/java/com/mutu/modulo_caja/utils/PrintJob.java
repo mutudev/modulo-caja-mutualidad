@@ -226,7 +226,6 @@ public class PrintJob {
       String interesenviar,
       String bonifenviar,
       String ivaenviar,
-      String ahorroenviar,
       String psnguenviar,
       String psmutenviar,
       String saldoenviar,
@@ -241,13 +240,13 @@ public class PrintJob {
     String ordianrio = "INT. NETO:  " + interesenviar;
     String capital = "CAPITAL: " + capenviar +" INTERES: " + interesenviar;
     String bonif =  " BONIF: " + bonifenviar;
-    String capitalbonif = "INTERES BONIFICADO: " + interesbonif;
+    String interesbonificado = "INTERES BONIFICADO: " + interesbonif;
     String total = "TOTAL PAGADO: " + totalCuota;
     String descripcion1 = "LA NO OBJECION A ESTE COMPROBANTE";
     String descripcion2 = "IMPLICA SU ACEPTACION";
     String cajero = "USUARIO: " + LoginController.usuarioLoggeado;
     String creditosaldo = "CREDITO " + saldoenviar + " CAPITAL DE CREDITO MAS INTERESES";
-    String Ahorro = "AHORRO " + ahorroenviar;
+
 
     Extenso e = new Extenso();
     e.setNumber(21.59);
@@ -264,10 +263,11 @@ public class PrintJob {
     printer.printTextWrap(6, 7, 1, 60, tipoCuenta);
 
     printer.printTextWrap(7, 8, 1, 60, capital);
-    printer.printTextWrap(8, 9, 1, 60, capitalbonif);
+    printer.printTextWrap(8, 9, 13, 60, bonif);
 
-    printer.printTextWrap(8, 9, 6, 60, capital);
-    printer.printTextWrap(9, 10, 13, 60, bonif);
+
+    printer.printTextWrap(9, 10, 1, 60, interesbonificado );
+
     printer.printTextWrap(10, 11, 15, 60, mora);
     printer.printTextWrap(11, 12, 10, 60, iva);
     printer.printTextWrap(12, 13, 7, 60, total);

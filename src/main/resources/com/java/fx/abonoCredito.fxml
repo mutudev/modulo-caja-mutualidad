@@ -46,7 +46,7 @@
             <columns>
                 <TableColumn fx:id="cuota" prefWidth="99.0" text="Cuota" />
                 <TableColumn fx:id="fecha" prefWidth="143.0" text="Fecha" />
-                <TableColumn fx:id="capital" prefWidth="178.0" text="Capital" />
+                <TableColumn fx:id="colcap" prefWidth="178.0" text="Capital" />
                 <TableColumn fx:id="ord" prefWidth="144.0" text="Ordinarios" />
                 <TableColumn fx:id="colmora" prefWidth="150.0" text="Moratorios" />
                 <TableColumn fx:id="coliva" prefWidth="114.0" text="IVA" />

@@ -297,6 +297,11 @@ public class OperacionesController implements Initializable {
     String fecha = "";
     String nombre_socio = "";
     int tipo_operacion = 0;
+    String capital_pagado = "";
+    String interes_pagado = "";
+    String mora_pagada = "";
+    String iva_pagado = "";
+    String bonif_aplicada = "";
     boolean validador = false;
     String empresa =
         cmbEmpresa
@@ -361,6 +366,11 @@ public class OperacionesController implements Initializable {
         monto = (String) selectedRow[3];
         fecha = (String) selectedRow[2];
         nombre_socio = (String) selectedRow[1];
+        capital_pagado = (String) selectedRow[13];
+        interes_pagado = (String) selectedRow[14];
+        mora_pagada = (String) selectedRow[15];
+        iva_pagado = (String) selectedRow[16];
+        bonif_aplicada = (String) selectedRow[17];
       }
     }
 

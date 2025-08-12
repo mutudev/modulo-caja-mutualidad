@@ -60,7 +60,7 @@ public class CreditoController implements Initializable {
   @Autowired public Servicio servicio;
 
   @FXML
-  private TableColumn<Object[], String> cuota, fecha, capital, ord, colmora, coliva, bonif, tot;
+  private TableColumn<Object[], String> cuota, fecha, colcap, ord, colmora, coliva, bonif, tot;
 
   // Variables de datos básicos
   String numSocio;
@@ -190,10 +190,10 @@ public class CreditoController implements Initializable {
       }
     });
 
-    capital.setCellValueFactory(
+    colcap.setCellValueFactory(
             cellData -> new SimpleStringProperty((String) cellData.getValue()[4]));
 
-    capital.setCellFactory(column -> new TableCell<Object[], String>() {
+    colcap.setCellFactory(column -> new TableCell<Object[], String>() {
       @Override
       protected void updateItem(String item, boolean empty) {
         super.updateItem(item, empty);
@@ -377,6 +377,9 @@ public class CreditoController implements Initializable {
         }
 
       } else {
+        String fechaUltimaCuota = "";
+        double saldoUltimaCuota = 0;
+        int numCuotaReferencia = 0;
 
         Object[] ultimaCuotaPagada = null;
         if (cuota[12] == null) {
@@ -395,21 +398,58 @@ public class CreditoController implements Initializable {
             return Math.round(calcularInteresPorDias(capitalInicial, diasVencidos) * 100.0) / 100.0;
           }
         } else {
-          String fechaUltimaCuota = "";
-          double saldoUltimaCuota = 0;
-          int numCuotaReferencia = 0;
+
+//          if (fechaHoy.isBefore(fechaVencimiento)) {
+//            return 0;
+//          }
 
           // Manejar si ultimaCuotaPagada es un array de arrays o un array simple
           if (ultimaCuotaPagada[0] instanceof Object[]) {
             Object[] filaCuota = (Object[]) ultimaCuotaPagada[0];
-            fechaUltimaCuota = filaCuota[12].toString();
-            saldoUltimaCuota = parseMoneda(filaCuota[10].toString());
+
+            // Lógica replicada del else
+            if (filaCuota[13] != null && cuota[12] == null) {
+
+              if (fechaHoy.isBefore(fechaVencimiento)) {
+                fechaUltimaCuota = filaCuota[13].toString();
+              } else {
+                fechaUltimaCuota = cuota[3].toString();
+              }
+
+              saldoUltimaCuota = parseMoneda(filaCuota[10].toString());
+            } else if (filaCuota[13] != null && cuota[12] != null) {
+              fechaUltimaCuota = cuota[12].toString();
+              saldoUltimaCuota = parseMoneda(cuota[10].toString());
+            } else {
+              fechaUltimaCuota = filaCuota[12].toString();
+              saldoUltimaCuota = parseMoneda(filaCuota[10].toString());
+            }
+
             numCuotaReferencia = Integer.parseInt(String.valueOf(filaCuota[2]));
           } else {
-            fechaUltimaCuota = ultimaCuotaPagada[12].toString();
-            saldoUltimaCuota = parseMoneda(ultimaCuotaPagada[10].toString());
+            // Lógica original del else
+            if (ultimaCuotaPagada[13] != null && cuota[12] == null) {
+
+
+
+              if (fechaHoy.isBefore(fechaVencimiento)) {
+                fechaUltimaCuota = ultimaCuotaPagada[13].toString();
+              } else {
+                fechaUltimaCuota = cuota[3].toString();
+              }
+
+              saldoUltimaCuota = parseMoneda(ultimaCuotaPagada[10].toString());
+            } else if (ultimaCuotaPagada[13] != null && cuota[12] != null) {
+              fechaUltimaCuota = cuota[12].toString();
+              saldoUltimaCuota = parseMoneda(cuota[10].toString());
+            } else {
+              fechaUltimaCuota = ultimaCuotaPagada[12].toString();
+              saldoUltimaCuota = parseMoneda(ultimaCuotaPagada[10].toString());
+            }
+
             numCuotaReferencia = Integer.parseInt(ultimaCuotaPagada[2].toString());
           }
+
 
           if (numeroCuota == (numCuotaReferencia + 1) || numeroCuota == numCuotaReferencia) {
             LocalDate fechaUltimaCuotaDate = LocalDate.parse(fechaUltimaCuota, formatter);
@@ -612,20 +652,7 @@ public class CreditoController implements Initializable {
           ventanaActual.close();
       }
         break;
-      case F3:
-        // Pago si está atrasado y no tiene interés
-        calcularPago(3);
-        break;
-      case F4:
-        // Pago si está atrasado y con todo y el interés
-        calcularPago(4);
-        break;
-      case F5:
-        // Pago si está atrasado y con todo y el interés
-        calcularPago(5);
-        break;
-      default:
-        break;
+
     }
 
 
@@ -667,48 +694,83 @@ public class CreditoController implements Initializable {
     double capital =0;
     switch (opcion) {
       case 1: {
+
+
         abonoTotal = montoPagado + pagoAntesCapital;
         res = servicio.pa_PagarCredito(1, montoPagado, intereses, mora, iva, cuota_id,
                 Integer.parseInt(numCredito), totalCuota, numeroCuota, bonificacion,
                 abonoTotal, Integer.parseInt(plazos), LoginController.usuarioLoggeado,
-                empresaCod, horaFormateada, Integer.parseInt(numSocio), 0, "", "");
+                empresaCod, horaFormateada, Integer.parseInt(numSocio), 0, "", "", "", "", "", "");
         break;
       }
       case 2: {
+
         if (pagoAntesCapital > montoPagado) {
+
           return false;
         }
-        capital = montoPagado - pagoAntesCapital;
+        capital = parseMoneda(colcap.getCellData(filaSeleccionada));
         res = servicio.pa_PagarCredito(1, capital, intereses, mora, iva, cuota_id,
-                Integer.parseInt(numCredito), totalCuota, numeroCuota, bonificacion,
-                montoPagado, Integer.parseInt(plazos), LoginController.usuarioLoggeado,
-                empresaCod, horaFormateada, Integer.parseInt(numSocio), 0, "", "");
+                Integer.parseInt(numCredito),totalCuota,numeroCuota, bonificacion,montoPagado,Integer.parseInt(plazos),LoginController.usuarioLoggeado,
+                empresaCod,horaFormateada, Integer.parseInt(numSocio), 0, "", "", "", "", "", "");
+
         abonoTotal = montoPagado;
         break;
       }
       default:
+
         return false;
     }
 
-    if (res != null && res.get("Resultado").equals("CORRECTO")) {
-      double psngu = 0, psmut = 0, ahorro = 0;
+    if (res != null && res.get("Resultado").toString().equals("CORRECTO")) {
 
+      double psngu = 0, psmut = 0;
+      String capenviar = "", ivaenviar = "", moraenviar = "", interesenviar = "";
       String nombreEmpresa = servicio.traerEmpresa(empresaCod).getRazonSocial();
       String rfcEmpresa = servicio.traerEmpresa(empresaCod).getRfc();
       String direcEmpresa = servicio.traerEmpresa(empresaCod).getCalle() + " "
               + servicio.traerEmpresa(empresaCod).getCruzamiento() + " COL. CENTRO";
 
+      if (servicio.traerCuentasCS(Integer.parseInt(numSocio)).size() == 1) {
+        psmut = servicio.traerCuentasCS(Integer.parseInt(numSocio)).getFirst().getMonto_cubierto();
+      } else {
+        psmut = servicio.traerCuentasCS(Integer.parseInt(numSocio)).getFirst().getMonto_cubierto();
+        psngu = servicio.traerCuentasCS(Integer.parseInt(numSocio)).get(1).getMonto_cubierto();
+      }
+
       DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
       String fechaTicket = fecha.format(formatter);
       String socio = lblNumSocio.getText();
       String folio = res.get("transaccion_id").toString();
-      String capenviar = formatoMoneda.format(capital);
-      String ivaenviar = formatoMoneda.format(iva);
-      String moraenviar = formatoMoneda.format(mora);
-      String interesenviar = formatoMoneda.format(intereses);
+
+
+      if(res.get("capital_devueltos").toString().equals("")){
+       capenviar = formatoMoneda.format(capital);
+      }else{
+        capenviar = res.get("capital_devueltos").toString();
+      }
+      if(res.get("iva_devueltos").toString().equals("")){
+        ivaenviar = formatoMoneda.format(iva);
+      }else{
+        ivaenviar = res.get("iva_devueltos").toString();
+      }
+
+      if(res.get("mora_devueltos").toString().equals("")){
+        moraenviar = formatoMoneda.format(mora);
+      }else{
+        moraenviar =res.get("mora_devueltos").toString();
+      }
+
+      if(res.get("intereses_devueltos").toString().equals("")){
+        interesenviar = formatoMoneda.format(intereses);
+      }else{
+        interesenviar = res.get("intereses_devueltos").toString();
+      }
+
+
       String bonifenviar = formatoMoneda.format(bonificacion);
       String interesbonfienviar = formatoMoneda.format(interesbonif);
-      String ahorroenviar = formatoMoneda.format(ahorro);
+
       String psnguenviar = formatoMoneda.format(psngu);
       String psmutenviar = formatoMoneda.format(psmut);
       String saldoenviar = res.get("saldo_ticket").toString();
@@ -721,19 +783,19 @@ public class CreditoController implements Initializable {
       String moneyAsWords = "";
       if(opcion == 1 ){
         capenviar = formatoMoneda.format(montoPagado);
-        moneyAsWords = converter.asWords(BigDecimal.valueOf(montoPagado)).toUpperCase() + " MXN";
+        moneyAsWords = converter.asWords(BigDecimal.valueOf(abonoTotal).setScale(2, RoundingMode.HALF_UP)).toUpperCase() + " MXN"; //REDONDEAR A DOS DECIMALES
 
 
       }else if(opcion==2){
         capenviar = formatoMoneda.format(capital);
-        moneyAsWords = converter.asWords(BigDecimal.valueOf(capital)).toUpperCase() + " MXN";
+        moneyAsWords = converter.asWords(BigDecimal.valueOf(abonoTotal).setScale(2, RoundingMode.HALF_UP)).toUpperCase() + " MXN";
       }
 
 
       PrintJob impresion = new PrintJob();
       PrinterMatrix printer = impresion.imprimirAbonoACredito(nombreEmpresa,rfcEmpresa,direcEmpresa,numSocio,folio,nomSocio,
       fechaTicket, horaFormateada, LoginController.usuarioLoggeado, capenviar,moneyAsWords,totalCuotaEnviar, codigoSistema,
-              moraenviar, interesenviar ,bonifenviar, ivaenviar, ahorroenviar, psnguenviar, psmutenviar, saldoenviar,
+              moraenviar, interesenviar ,bonifenviar, ivaenviar, psnguenviar, psmutenviar, saldoenviar,
               interesbonfienviar);
       printer.toFile("impresion_Abono_Credito.txt");
 

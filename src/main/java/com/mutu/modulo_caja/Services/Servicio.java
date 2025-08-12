@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,9 +54,9 @@ public class Servicio {
     return repoUsuario.traerModulos(rolUsuario);
   }
 
-  public List<Object[]> traerCoincidencias(String nombreCompleto) {
-    return repoSocio.buscarPorNombreCompleto(nombreCompleto);
-  }
+//  public List<Object[]> traerCoincidencias(String nombreCompleto) {
+//    return repoSocio.buscarPorNombreCompleto(nombreCompleto);
+//  }
 
   public ModelAhorro traerCuentaAhorroPorSocio(int socio) {
     return repoAhorro.findBySocio(socio);
@@ -62,9 +64,23 @@ public class Servicio {
 
   @Transactional
   public Map<String, Object> AbonarAhorro(
-      double cant_ahorro, String cuenta, String nombre_usuario, String empresa, String hora, String resultado, double ahorro_total,
+      double cant_ahorro,
+      String cuenta,
+      String nombre_usuario,
+      String empresa,
+      String hora,
+      String resultado,
+      double ahorro_total,
       int transaccion_id) {
-    return repoAhorro.pa_AbonarAhorro(cant_ahorro, cuenta, nombre_usuario, empresa, hora, resultado,ahorro_total,transaccion_id);
+    return repoAhorro.pa_AbonarAhorro(
+        cant_ahorro,
+        cuenta,
+        nombre_usuario,
+        empresa,
+        hora,
+        resultado,
+        ahorro_total,
+        transaccion_id);
   }
 
   public List<Object[]> consultarCreditos(int socio, int status) {
@@ -77,9 +93,14 @@ public class Servicio {
 
   @Transactional
   public Map<String, Object> ProcesarDesembolso(
-      int CreditoID, String nombre_usuario, double monto_desembolso, String hora, String Resultado, int transaccion_id) {
+      int CreditoID,
+      String nombre_usuario,
+      double monto_desembolso,
+      String hora,
+      String Resultado,
+      int transaccion_id) {
     return repoCredito.pa_ProcesarDesembolso(
-        CreditoID, nombre_usuario, monto_desembolso,hora, Resultado, transaccion_id);
+        CreditoID, nombre_usuario, monto_desembolso, hora, Resultado, transaccion_id);
   }
 
   public List<Object[]> retirosPendientes(int socio) {
@@ -88,10 +109,25 @@ public class Servicio {
 
   @Transactional
   public Map<String, Object> ProcesarRetiro(
-          int ID, int num_socio, String nombre_usuario, double monto_retiro, String empresa,String hora, String turno,
-          int transaccion_id, String Resultado) {
+      int ID,
+      int num_socio,
+      String nombre_usuario,
+      double monto_retiro,
+      String empresa,
+      String hora,
+      String turno,
+      int transaccion_id,
+      String Resultado) {
     return repoAhorro.pa_ProcesarRetiro(
-        ID, num_socio, nombre_usuario, monto_retiro, empresa,hora, turno, transaccion_id, Resultado);
+        ID,
+        num_socio,
+        nombre_usuario,
+        monto_retiro,
+        empresa,
+        hora,
+        turno,
+        transaccion_id,
+        Resultado);
   }
 
   public List<ModelCapitalSocial> traerCuentasCS(int socio) {
@@ -99,12 +135,26 @@ public class Servicio {
   }
 
   @Transactional
-  public Map<String, Object>  AbonarCapitalSocial(
-      int socio, String empresa, String hora, double monto, String nombre_usuario, String Resultado,
+  public Map<String, Object> AbonarCapitalSocial(
+      int socio,
+      String empresa,
+      String hora,
+      double monto,
+      String nombre_usuario,
+      String Resultado,
       double socialNGU,
-      double socialMUT, int transaccion_id) {
-    return repoCS.pa_AbonarCapitalSocial(socio, empresa,hora, monto, nombre_usuario, Resultado,  socialNGU,
-    socialMUT,  transaccion_id);
+      double socialMUT,
+      int transaccion_id) {
+    return repoCS.pa_AbonarCapitalSocial(
+        socio,
+        empresa,
+        hora,
+        monto,
+        nombre_usuario,
+        Resultado,
+        socialNGU,
+        socialMUT,
+        transaccion_id);
   }
 
   public List<Object[]> verificarAperturaCajero(
@@ -123,7 +173,21 @@ public class Servicio {
       String Resultado,
       int transaccion_id) {
     return repoTraslado.pa_ProcesarTraslado(
-        nombre_usuario, monto_trasladar, tipo, empresa, hora, turno, Resultado,transaccion_id);
+        nombre_usuario, monto_trasladar, tipo, empresa, hora, turno, Resultado, transaccion_id);
+  }
+
+  public List<Object[]> buscarSocioPorNombre(String nombreCompleto) {
+    String[] palabras = nombreCompleto.trim().split("\\s+");
+
+    if (palabras.length == 1) {
+      return repoSocio.buscarPorNombreCompleto(nombreCompleto);
+    } else if (palabras.length == 2) {
+      return repoSocio.buscarPorDospalabras(palabras[0], palabras[1]);
+    } else if (palabras.length >= 3) {
+      return repoSocio.buscarPorTresPalabras(palabras[0], palabras[1], palabras[2]);
+    }
+
+    return new ArrayList<>();
   }
 
   public List<Object[]> traerHistorial(
@@ -148,10 +212,25 @@ public class Servicio {
 
   @Transactional
   public Map<String, Object> AbonarPrevisionSocial(
-      int num_socio, String empresa, String hora, double monto_pagado, String usuario, String Resultado, double monto_asignado,
-      double monto_ticket, int transaccion_id) {
-    return  repoPS.AbonarPrevisionSocial(num_socio, empresa,hora, monto_pagado, usuario, Resultado, monto_asignado,
-    monto_ticket, transaccion_id);
+      int num_socio,
+      String empresa,
+      String hora,
+      double monto_pagado,
+      String usuario,
+      String Resultado,
+      double monto_asignado,
+      double monto_ticket,
+      int transaccion_id) {
+    return repoPS.AbonarPrevisionSocial(
+        num_socio,
+        empresa,
+        hora,
+        monto_pagado,
+        usuario,
+        Resultado,
+        monto_asignado,
+        monto_ticket,
+        transaccion_id);
   }
 
   public List<Object[]> traerCuentaCajero(
@@ -235,21 +314,28 @@ public class Servicio {
         opcion, id_traslado, cuenta_origen, cuenta_destino, monto, empresa, Resultado);
   }
 
-  public ModelEmpresa traerEmpresa(String codigo){
+  public ModelEmpresa traerEmpresa(String codigo) {
     return repoEmpresa.findByCodigo(codigo);
   }
 
-  public String traerCajeroPorUsuario (String  usuario){return repoUsuario.traerCajero(usuario);}
+  public String traerCajeroPorUsuario(String usuario) {
+    return repoUsuario.traerCajero(usuario);
+  }
 
-  public ModelCredito traerDatosCredito(int id){return repoCredito.findById(id);}
+  public ModelCredito traerDatosCredito(int id) {
+    return repoCredito.findById(id);
+  }
 
-  public  ModelCaja traerDatosCaja(int usuario_id,String turno, String empresa, int estado
-  ){return repoCaja.findByUsuarioIdAndTurnoAndEmpresaAndEstado(usuario_id, turno,empresa,estado);}
+  public ModelCaja traerDatosCaja(int usuario_id, String turno, String empresa, int estado) {
+    return repoCaja.findByUsuarioIdAndTurnoAndEmpresaAndEstado(usuario_id, turno, empresa, estado);
+  }
 
-  public  Object[] traerCierreCajero(int id){
+  public Object[] traerCierreCajero(int id) {
     return repoCierre.traerCierreCajero(id);
   }
-  public ModelCredito traerDatosDesembolsoCancelado(int socio, int status, double monto, String empresa){
+
+  public ModelCredito traerDatosDesembolsoCancelado(
+      int socio, int status, double monto, String empresa) {
     return repoCredito.findBySocioAndStatusAndMontoAndEmpresa(socio, status, monto, empresa);
   }
 
@@ -262,26 +348,53 @@ public class Servicio {
   }
 
   @Transactional
-  public Map<String, Object>  pa_PagarCredito(    int opcion,
-                                  double monto_capital,
-                                  double intereses,
-                                  double mora,
-                                  double iva,
-                                  int cuota_id,
-                                  int credito_id,
-                                  double total_cuota_pendiente,
-                                  int numero_cuota,
-                                  double bonificacion,
-                                  double total_pago,
-                                  int numero_cuotas,
-                                    String nombre_usuario,
-                                    String empresa,
-                                    String hora,
-                                    int num_socio,
-                                  int transaccion_id,
-                                  String Resultado, String saldo_ticket){
-    return  repoCredito.pa_PagarCredito(opcion, monto_capital, intereses, mora, iva, cuota_id, credito_id, total_cuota_pendiente,
-            numero_cuota, bonificacion, total_pago, numero_cuotas , nombre_usuario, empresa, hora, num_socio, transaccion_id, Resultado, saldo_ticket);
-}
-
+  public Map<String, Object> pa_PagarCredito(
+      int opcion,
+      double monto_capital,
+      double intereses,
+      double mora,
+      double iva,
+      int cuota_id,
+      int credito_id,
+      double total_cuota_pendiente,
+      int numero_cuota,
+      double bonificacion,
+      double total_pago,
+      int numero_cuotas,
+      String nombre_usuario,
+      String empresa,
+      String hora,
+      int num_socio,
+      int transaccion_id,
+      String Resultado,
+      String saldo_ticket,
+      String intereses_devueltos,
+      String mora_devueltos,
+      String iva_devueltos,
+      String capital_devueltos) {
+    return repoCredito.pa_PagarCredito(
+        opcion,
+        monto_capital,
+        intereses,
+        mora,
+        iva,
+        cuota_id,
+        credito_id,
+        total_cuota_pendiente,
+        numero_cuota,
+        bonificacion,
+        total_pago,
+        numero_cuotas,
+        nombre_usuario,
+        empresa,
+        hora,
+        num_socio,
+        transaccion_id,
+        Resultado,
+        saldo_ticket,
+        intereses_devueltos,
+        mora_devueltos,
+        iva_devueltos,
+        capital_devueltos);
+  }
 }

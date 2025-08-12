@@ -104,7 +104,7 @@ public class BusquedaController implements Initializable {
   @FXML
   public void traerCoincidencias() {
     String socioBuscar = txtNombreSocio.getText().trim();
-    List<Object[]> resultados = busquedaServicio.traerCoincidencias(socioBuscar);
+    List<Object[]> resultados = busquedaServicio.buscarSocioPorNombre(socioBuscar);
 
     ObservableList<Object[]> socios = FXCollections.observableArrayList();
 
