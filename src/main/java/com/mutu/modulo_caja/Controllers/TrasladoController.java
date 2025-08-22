@@ -307,7 +307,7 @@ public class TrasladoController implements Initializable {
 
             JasperViewer viewer = new JasperViewer(jpRepo, false);
 
-            viewer.setAlwaysOnTop(true);
+            //viewer.setAlwaysOnTop(true);
             viewer.setSize(800, 600);
             viewer.setLocationRelativeTo(null);
             viewer.setTitle("REPORTE DE TRASLADO");

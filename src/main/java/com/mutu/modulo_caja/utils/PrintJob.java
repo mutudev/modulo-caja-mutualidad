@@ -232,19 +232,18 @@ public class PrintJob {
       String interesbonif) {
     int numchar = moneyAsWords.length();
     PrinterMatrix printer = new PrinterMatrix();
-    String numSocio = "SOCIO: " + numsocio;
+
     String nombre = "NOMBRE: " + nomsocio;
     String tipoCuenta = "ABONO A CREDITO TIPO: " + tipocredito;
     String iva = "IVA. NETO: " + ivaenviar;
     String mora = "MORA: " + moraenviar;
-    String ordianrio = "INT. NETO:  " + interesenviar;
-    String capital = "CAPITAL: " + capenviar +" INTERES: " + interesenviar;
+    String capital = "CAPITAL: " + capenviar +" INTERES: " + interesbonif;
     String bonif =  " BONIF: " + bonifenviar;
-    String interesbonificado = "INTERES BONIFICADO: " + interesbonif;
+    String interesbonificado = "INTERES BONIFICADO: " + interesenviar;
     String total = "TOTAL PAGADO: " + totalCuota;
     String descripcion1 = "LA NO OBJECION A ESTE COMPROBANTE";
     String descripcion2 = "IMPLICA SU ACEPTACION";
-    String cajero = "USUARIO: " + LoginController.usuarioLoggeado;
+
     String creditosaldo = "CREDITO " + saldoenviar + " CAPITAL DE CREDITO MAS INTERESES";
 
 

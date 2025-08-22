@@ -51,7 +51,7 @@ public class Main extends Application {
 
 		Image icon = new Image(getClass().getResourceAsStream("/assets/images/logo.png"));
 		stage.getIcons().add(icon);
-
+		stage.setAlwaysOnTop(false);
 		stage.setScene(scene);
 		stage.setResizable(false);
 		stage.centerOnScreen();

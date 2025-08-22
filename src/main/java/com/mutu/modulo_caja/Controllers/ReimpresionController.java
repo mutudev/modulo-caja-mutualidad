@@ -326,8 +326,8 @@ public class ReimpresionController {
             String horaticket = hora.format(formatterHora);
 
             String id = txtID.getText();
-            String nomcajero = servicio.traerCajeroPorUsuario(LoginController.usuarioLoggeado);
-            int usuarioid = servicio.traerDatosUsuario(LoginController.usuarioLoggeado).getId();
+            String nomcajero = servicio.traerCajeroPorUsuario(usuario);
+            int usuarioid = servicio.traerDatosUsuario(usuario).getId();
 
             String horaFormateada = hora.format(formatterHora);
             String nombreEmpresa = servicio.traerEmpresa(empresaEnviar).getRazonSocial();
@@ -468,13 +468,14 @@ public class ReimpresionController {
         String Result =
             servicio.pa_CancelarOperacion(
                 opcion,
-                LoginController.usuarioLoggeado,
+                usuario,
                 Integer.parseInt(socio),
                 Integer.parseInt(txtID.getText().trim()),
                 montoExtraido,
                 empresa,
                 turno,
                 "");
+
 
         if (Result.equals("CORRECTO")) {
 
@@ -873,7 +874,7 @@ public class ReimpresionController {
           break;
        case 2:
          double bonifrestar=0, interes=0,psngu = 0, psmut = 0;
-          System.out.println("INFIEEEEEL: " + opcion);
+
         try {
 
            abono = formatoMoneda.parse(monto).doubleValue();
@@ -892,7 +893,7 @@ public class ReimpresionController {
            psngu = servicio.traerCuentasCS(Integer.parseInt(socio)).get(1).getMonto_cubierto();
          }
 
-         interes -= bonifrestar;
+         interes += bonifrestar;
          String psnguenviar = formatoMoneda.format(psngu);
          String psmutenviar = formatoMoneda.format(psmut);
          String interesconbonif=formatoMoneda.format(interes);
