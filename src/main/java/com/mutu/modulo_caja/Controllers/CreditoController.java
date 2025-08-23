@@ -795,7 +795,7 @@ public class CreditoController implements Initializable {
         }
       case 2:
         {
-
+          //IF NO NECESARIO
           //        if (pagoAntesCapital > montoPagado) {
           //
           //          return false;
