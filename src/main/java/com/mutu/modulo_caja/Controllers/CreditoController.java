@@ -692,7 +692,7 @@ public class CreditoController implements Initializable {
 
     switch (event.getCode()) {
       case F1:
-        // Pago normal con todo y el interés
+        // Pago normal y aparte el interés
         validador = calcularPago(1);
         if (validador) {
           Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -706,7 +706,7 @@ public class CreditoController implements Initializable {
         }
         break;
       case F2:
-        // Pago normal y aparte el interés
+        // Pago normal con todo y el interes
         validador = calcularPago(2);
         if (!validador) {
           Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -859,8 +859,11 @@ public class CreditoController implements Initializable {
 
       if (res.get("capital_devueltos").toString().equals("")) {
         capenviar = formatoMoneda.format(capital);
-      } else {
+        System.out.println("CAI AQUI EN CAPITAL");
+        }
+      else{
         capenviar = res.get("capital_devueltos").toString();
+        System.out.println("AQUI BUSCO EN CAPITAL");
       }
       if (res.get("iva_devueltos").toString().equals("")) {
         ivaenviar = formatoMoneda.format(iva);
@@ -902,7 +905,7 @@ public class CreditoController implements Initializable {
                 + " MXN"; // REDONDEAR A DOS DECIMALES
 
       } else if (opcion == 2) {
-        capenviar = formatoMoneda.format(capital);
+
         moneyAsWords =
             converter
                     .asWords(BigDecimal.valueOf(abonoTotal).setScale(2, RoundingMode.HALF_UP))

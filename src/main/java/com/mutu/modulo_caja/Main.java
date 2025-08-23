@@ -53,7 +53,7 @@ public class Main extends Application {
 		stage.getIcons().add(icon);
 		stage.setAlwaysOnTop(false);
 		stage.setScene(scene);
-		stage.setResizable(false);
+		stage.setResizable(true);
 		stage.centerOnScreen();
 		stage.show();
 	}
