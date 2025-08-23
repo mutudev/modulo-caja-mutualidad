@@ -86,6 +86,7 @@ public class CreditoController implements Initializable {
   NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
 
   // Lista de cuotas
+
   List<Object[]> cuotas = null;
 
   @Override
