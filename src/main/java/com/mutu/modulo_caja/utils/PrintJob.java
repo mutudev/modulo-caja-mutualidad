@@ -229,7 +229,7 @@ public class PrintJob {
       String psnguenviar,
       String psmutenviar,
       String saldoenviar,
-      String interesbonif) {
+      String interessinbonif) {
     int numchar = moneyAsWords.length();
     PrinterMatrix printer = new PrinterMatrix();
 
@@ -237,7 +237,7 @@ public class PrintJob {
     String tipoCuenta = "ABONO A CREDITO TIPO: " + tipocredito;
     String iva = "IVA. NETO: " + ivaenviar;
     String mora = "MORA: " + moraenviar;
-    String capital = "CAPITAL: " + capenviar +" INTERES: " + interesbonif;
+    String capital = "CAPITAL: " + capenviar +" INTERES: " + interessinbonif;
     String bonif =  " BONIF: " + bonifenviar;
     String interesbonificado = "INTERES BONIFICADO: " + interesenviar;
     String total = "TOTAL PAGADO: " + totalCuota;

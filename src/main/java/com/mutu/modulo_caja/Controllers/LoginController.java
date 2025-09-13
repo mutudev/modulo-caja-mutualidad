@@ -133,7 +133,6 @@ public class LoginController implements Initializable {
 
   @FXML
   public void validarLogin() {
-
     Map<String, Object> result =
         usuarioService.validarLogin(txtUsuario.getText().trim(), txtPass.getText().trim(), "", 0);
     if (validator.validate() && result.get("Resultado").toString().equals("CORRECTO")) {

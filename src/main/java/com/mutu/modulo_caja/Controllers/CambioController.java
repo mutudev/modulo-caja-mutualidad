@@ -106,16 +106,17 @@ public class CambioController implements Initializable {
 
   @FXML
   public void cerrar() {
-    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    alert.setTitle("CIERRE DE VENTANA");
-    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-    alert.setContentText("SI LA CIERRA, EL TOTAL DE SUS OPERACIONES SE REINICIARÁ A $0.00");
-    Optional<ButtonType> result = alert.showAndWait();
-    if (result.isPresent() && result.get() == ButtonType.OK) {
-      CajeroController.bufferOperaciones = 0;
-      Stage ventanaActual = (Stage) btnCerrar.getScene().getWindow();
-      ventanaActual.close();
-    }
+//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+//    alert.setTitle("CIERRE DE VENTANA");
+//    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+//    alert.setContentText("SI LA CIERRA, EL TOTAL DE SUS OPERACIONES SE REINICIARÁ A $0.00");
+//    Optional<ButtonType> result = alert.showAndWait();
+//    if (result.isPresent() && result.get() == ButtonType.OK) {
+//
+//    }
+    CajeroController.bufferOperaciones = 0;
+    Stage ventanaActual = (Stage) btnCerrar.getScene().getWindow();
+    ventanaActual.close();
   }
 
   @FXML

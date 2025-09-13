@@ -347,6 +347,14 @@ public class Servicio {
     return repoCredito.cuotaAnteriorXCredito(credito_id, status);
   }
 
+  public Object[] traerUltimaCuotaNoPagada(int credito_id, int status) {
+    return repoCredito.cuotaAnteriorNoPagada(credito_id, status);
+  }
+
+  public Object[] traerUltimaCuotaConNum(int credito_id, int status, int num_cuota) {
+    return repoCredito.cuotaAnteriorConNum(credito_id, status, num_cuota);
+  }
+
   @Transactional
   public Map<String, Object> pa_PagarCredito(
       int opcion,

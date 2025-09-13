@@ -54,31 +54,7 @@ public class ElegirController implements Initializable {
   @FXML
   public void cambiarConTecla(KeyEvent event) {
     if (event.getCode().equals(KeyCode.ENTER)) {
-      try {
-        Stage ventanaActual = (Stage) lblTitulo.getScene().getWindow();
-        Stage nuevaVentana = new Stage();
-        FXMLLoader fxml = new FXMLLoader(getClass().getResource("/com/java/fx/abonoCredito.fxml"));
-        fxml.setControllerFactory(Main.context::getBean);
-        Scene nuevaEscena = new Scene(fxml.load());
-        // CajeroController controlador = fxml.getController();
-        // controlador.setUsuario(txtUsuario.getText().trim());
-        nuevaEscena
-            .getStylesheets()
-            .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());
-        JMetro jMetro = new JMetro(Style.LIGHT);
-        jMetro.setScene(nuevaEscena);
-        nuevaVentana.setTitle("INICIO - CAJERO");
-        Image icon = new Image(getClass().getResourceAsStream("/assets/images/logo.png"));
-        nuevaVentana.getIcons().add(icon);
-        nuevaVentana.setScene(nuevaEscena);
-        nuevaVentana.setResizable(false);
-        nuevaVentana.centerOnScreen();
-        nuevaVentana.initModality(Modality.APPLICATION_MODAL);
-        nuevaVentana.show();
-        ventanaActual.close();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+      cambiarConBoton();
     } else if (event.getCode().equals(KeyCode.CONTROL)) {
       Stage ventanaActual = (Stage) lblTitulo.getScene().getWindow();
       ventanaActual.close();
@@ -89,6 +65,12 @@ public class ElegirController implements Initializable {
   public void cambiarConBoton() {
     try {
       Object[] selectedRow = (Object[]) tablePrestamos.getSelectionModel().getSelectedItem();
+
+      if (selectedRow == null && !tablePrestamos.getItems().isEmpty()) {
+        selectedRow = (Object[]) tablePrestamos.getItems().get(0);
+      } else if (selectedRow == null && tablePrestamos.getItems().isEmpty()) {
+        return;
+      }
 
       String numSocio = String.valueOf(selectedRow[5]);
       String nomSocio = (String) selectedRow[6];
@@ -111,12 +93,12 @@ public class ElegirController implements Initializable {
       fxml.setControllerFactory(Main.context::getBean);
       Scene nuevaEscena = new Scene(fxml.load());
       CreditoController controlador = fxml.getController();
-      controlador.setDatos(numSocio, nomSocio, numCredito, plazos, tasa, mora, iva, tipoCredito, codigoSistema, fechaDesembolso, capital, bonifAplicable);
+      controlador.setDatos(numSocio, nomSocio, numCredito, plazos, tasa, mora, iva, tipoCredito, codigoSistema, fechaDesembolso, capital, bonifAplicable, 3);
       nuevaEscena
           .getStylesheets()
           .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());
       JMetro jMetro = new JMetro(Style.LIGHT);
-      jMetro.setScene(nuevaEscena);
+      //jMetro.setScene(nuevaEscena);
       nuevaVentana.setTitle("INICIO - CAJERO");
       Image icon = new Image(getClass().getResourceAsStream("/assets/images/logo.png"));
       nuevaVentana.getIcons().add(icon);

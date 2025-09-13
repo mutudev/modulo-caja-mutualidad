@@ -28,7 +28,6 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 @Component
@@ -237,52 +236,55 @@ public class OperacionesController implements Initializable {
 
   public void cierreDeVentana(Event event) {
     event.consume();
-    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    alert.setTitle("CIERRE DE VENTANA");
-    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-    alert.setContentText(
-        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-
-    Optional<ButtonType> result = alert.showAndWait();
-    if (result.isPresent() && result.get() == ButtonType.OK) {
-      Stage ventanaActual = (Stage) cmbEmpresa.getScene().getWindow();
-      ventanaActual.close();
-    }
+//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+//    alert.setTitle("CIERRE DE VENTANA");
+//    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+//    alert.setContentText(
+//        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+//            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+//
+//    Optional<ButtonType> result = alert.showAndWait();
+//    if (result.isPresent() && result.get() == ButtonType.OK) {
+//
+//    }
+    Stage ventanaActual = (Stage) cmbEmpresa.getScene().getWindow();
+    ventanaActual.close();
   }
 
   @FXML
   public void cerrarConTecla(KeyEvent event) {
     if (event.getCode().equals(KeyCode.CONTROL)) {
-      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-      alert.setTitle("CIERRE DE VENTANA");
-      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-      alert.setContentText(
-          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-
-      Optional<ButtonType> result = alert.showAndWait();
-      if (result.isPresent() && result.get() == ButtonType.OK) {
-        Stage ventanaActual = (Stage) cmbEmpresa.getScene().getWindow();
-        ventanaActual.close();
-      }
+//      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+//      alert.setTitle("CIERRE DE VENTANA");
+//      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+//      alert.setContentText(
+//          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+//              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+//
+//      Optional<ButtonType> result = alert.showAndWait();
+//      if (result.isPresent() && result.get() == ButtonType.OK) {
+//
+//      }
+      Stage ventanaActual = (Stage) cmbEmpresa.getScene().getWindow();
+      ventanaActual.close();
     }
   }
 
   @FXML
   public void cerrarConBoton() {
-    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    alert.setTitle("CIERRE DE VENTANA");
-    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-    alert.setContentText(
-        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-
-    Optional<ButtonType> result = alert.showAndWait();
-    if (result.isPresent() && result.get() == ButtonType.OK) {
-      Stage ventanaActual = (Stage) cmbEmpresa.getScene().getWindow();
-      ventanaActual.close();
-    }
+//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+//    alert.setTitle("CIERRE DE VENTANA");
+//    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+//    alert.setContentText(
+//        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+//            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+//
+//    Optional<ButtonType> result = alert.showAndWait();
+//    if (result.isPresent() && result.get() == ButtonType.OK) {
+//
+//    }
+    Stage ventanaActual = (Stage) cmbEmpresa.getScene().getWindow();
+    ventanaActual.close();
   }
 
   @FXML

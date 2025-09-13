@@ -57,7 +57,7 @@ public interface CreditoRepository extends JpaRepository<ModelCredito, Integer> 
       int socio, int status, double monto, String empresa);
 
   @Query(
-      value = "SELECT TOP 3 * FROM VW_CUOTAS_CREDITO WHERE CREDITO_ID = :credito_id AND STATUS = :status ORDER BY ID ASC",
+      value = "SELECT TOP 18 * FROM VW_CUOTAS_CREDITO WHERE CREDITO_ID = :credito_id AND STATUS = :status ORDER BY ID ASC",
       nativeQuery = true)
   List<Object[]> cuotasInmediatasXCredito(@Param("credito_id") int credito_id, @Param("status") int status);
 
@@ -65,4 +65,14 @@ public interface CreditoRepository extends JpaRepository<ModelCredito, Integer> 
           value = "SELECT TOP 1 * FROM VW_CUOTAS_CREDITO WHERE CREDITO_ID = :credito_id AND STATUS = :status ORDER BY ID DESC",
           nativeQuery = true)
   Object[] cuotaAnteriorXCredito(@Param("credito_id") int credito_id, @Param("status") int status);
+
+  @Query(
+          value = "SELECT TOP 1 * FROM VW_CUOTAS_CREDITO WHERE CREDITO_ID = :credito_id AND STATUS = :status ORDER BY ID ASC",
+          nativeQuery = true)
+  Object[] cuotaAnteriorNoPagada(@Param("credito_id") int credito_id, @Param("status") int status);
+
+  @Query(
+          value = "SELECT TOP 1 * FROM VW_CUOTAS_CREDITO WHERE CREDITO_ID = :credito_id AND STATUS = :status AND NUM_CUOTA = :num_cuota",
+          nativeQuery = true)
+  Object[] cuotaAnteriorConNum(@Param("credito_id") int credito_id, @Param("status") int status, @Param("num_cuota") int num_cuota);
 }
