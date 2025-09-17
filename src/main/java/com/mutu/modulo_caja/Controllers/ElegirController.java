@@ -93,7 +93,7 @@ public class ElegirController implements Initializable {
       fxml.setControllerFactory(Main.context::getBean);
       Scene nuevaEscena = new Scene(fxml.load());
       CreditoController controlador = fxml.getController();
-      controlador.setDatos(numSocio, nomSocio, numCredito, plazos, tasa, mora, iva, tipoCredito, codigoSistema, fechaDesembolso, capital, bonifAplicable, 3);
+      controlador.setDatos(numSocio, nomSocio, numCredito, plazos, tasa, mora, iva, tipoCredito, codigoSistema, fechaDesembolso, capital, bonifAplicable, 3, turno);
       nuevaEscena
           .getStylesheets()
           .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());
@@ -413,8 +413,9 @@ public class ElegirController implements Initializable {
     this.opcion = opcion;
   }
 
-  public void setSocio(int socio) {
+  public void setSocio(int socio, String turno) {
     this.socio = socio;
+    this.turno = turno;
     if (tablePrestamos != null) {
       colCredito.setCellValueFactory(
           cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[0])));

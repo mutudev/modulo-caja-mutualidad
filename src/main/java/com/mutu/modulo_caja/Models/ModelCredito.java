@@ -48,6 +48,7 @@ import java.util.Date;
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "empresa", type = String.class ),
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "hora", type = String.class ),
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "num_socio", type = Integer.class ),
+                @StoredProcedureParameter(mode = ParameterMode.IN, name = "turno", type = String.class ),
                 @StoredProcedureParameter(mode = ParameterMode.OUT, name = "transaccion_id", type = Integer.class ),
                 @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Resultado", type = String.class ),
                 @StoredProcedureParameter(mode = ParameterMode.OUT, name = "saldo_ticket", type = String.class ),

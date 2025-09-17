@@ -88,7 +88,7 @@ public class CajeroController implements Initializable {
   public String turno = "";
   public List<Object[]> CierreMUT = null;
   public List<Object[]> CierreNGU = null;
-  public static double bufferOperaciones = 100;
+  public static double bufferOperaciones = 0;
 
   @Autowired private Servicio servicio;
 
@@ -791,7 +791,7 @@ public class CajeroController implements Initializable {
             Integer.parseInt(txtNumeroSocio.getText()), txtNombreCargado.getText(), usuario);
       } else if (ruta.contains("elegirPrestamo") || ruta.endsWith("elegirPrestamo.fxml")) {
         ElegirController controller = fxml.getController();
-        controller.setSocio(Integer.parseInt(txtNumeroSocio.getText().toString()));
+        controller.setSocio(Integer.parseInt(txtNumeroSocio.getText().toString()), turno);
       } else if (ruta.contains("desembolso") || ruta.endsWith("desembolso.fxml")) {
         DesembolsoController controller = fxml.getController();
         controller.setDatos(Integer.parseInt(txtNumeroSocio.getText().trim()), usuario);
@@ -1118,9 +1118,7 @@ public class CajeroController implements Initializable {
   }
 
   @FXML
-  public void pruebaCierre() {
-    System.out.println(((0.02 * 12) / 360) * 24 * 9728.00);
-//    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+  public void pruebaCierre() {//    Alert alert = new Alert(Alert.AlertType.INFORMATION);
 //    alert.setTitle("CIERRE HECHO CORRECTAMENTE");
 //    alert.setHeaderText("CIERRE EXITOSO");
 //    alert.setContentText(

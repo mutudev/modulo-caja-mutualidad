@@ -46,6 +46,7 @@ public interface CreditoRepository extends JpaRepository<ModelCredito, Integer> 
           String empresa,
           String hora,
           int num_socio,
+          String turno,
           int transaccion_id,
           String Resultado,
           String saldo_ticket, String intereses_devueltos, String mora_devueltos, String iva_devueltos, String capital_devueltos
