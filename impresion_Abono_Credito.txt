@@ -2,22 +2,22 @@
  MUTUALIDAD DOCE DE AGOSTO S.C. DE R.L. DE C.V.             
  RFC: MDA770513NH8                                          
  CALLE 23 No. 100-B ENTRE 18 Y 20 COL. CENTRO               
- FECHA: 17/09/2025                                          
- SOCIO: 100                   FOLIO: 1                      
- NOMBRE: LORENZO LORENZO CETINA UC                          
- No. CUENTA: 0010012100                                     
- TIPO DE CUENTA: AHORRO   -   ABONO AHORRO                  
-                                                            
- ABONO: $100.00                                             
- CIEN CON 00/100 MXN                                        
-                                                            
+ FECHA: 17/09/2025 11:15:24 FOLIO: 3                        
+ SOCIO 100 LORENZO LORENZO CETINA UC                        
+ ABONO A CREDITO TIPO: CT2                                  
+ CAPITAL: $2,711.11 INTERES: $0.00                          
+              BONIF: $0.00                                  
+ INTERES BONIFICADO: $0.00                                  
+               MORA: $0.00                                  
+          IVA. NETO: $0.00                                  
+       TOTAL PAGADO: $0.00                                  
+ CERO CON 00/100 MXN                                        
  ___________________________________                        
  NOMBRE: LORENZO LORENZO CETINA UC                          
  LA NO OBJECION A ESTE COMPROBANTE                          
  IMPLICA SU ACEPTACION                                      
- HORA: 17:52:59 USUARIO: JMEX                               
- AHORRO: $172,480.77                                        
-                                                            
+ CREDITO $47,788.89 CAPITAL DE CREDITO MAS INTERESES        
+ PS MUT: $1,000.00 PS NGU: $0.00                            
                                                             
                                                             
                                                             
