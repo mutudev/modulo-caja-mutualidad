@@ -4,6 +4,7 @@ import com.mutu.modulo_caja.Models.*;
 import com.mutu.modulo_caja.Repository.TrasladoRepository;
 import com.mutu.modulo_caja.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -339,9 +340,9 @@ public class Servicio {
     return repoCredito.findBySocioAndStatusAndMontoAndEmpresa(socio, status, monto, empresa);
   }
 
-  public List<Object[]> traerCuotasxCredito(int credito_id, int status) {
-    return repoCredito.cuotasInmediatasXCredito(credito_id, status);
-  }
+//  public List<Object[]> traerCuotasxCredito(int credito_id, int status) {
+//    return repoCredito.cuotasInmediatasXCredito(credito_id, status);
+//  }
 
   public Object[] traerUltimaCuotaPagada(int credito_id, int status) {
     return repoCredito.cuotaAnteriorXCredito(credito_id, status);
@@ -353,6 +354,14 @@ public class Servicio {
 
   public Object[] traerUltimaCuotaConNum(int credito_id, int status, int num_cuota) {
     return repoCredito.cuotaAnteriorConNum(credito_id, status, num_cuota);
+  }
+
+  public List<Object[]> traerCuotasPrueba(int credito_id, int status, Pageable limit) {
+    return repoCredito.cuotasInmediatasXCredito(credito_id, status, limit);
+  }
+
+  public int obtenerPlazoCredito(int id) {
+    return repoCredito.obtenerPlazo(id);
   }
 
   @Transactional

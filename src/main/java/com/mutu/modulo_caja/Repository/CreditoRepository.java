@@ -1,6 +1,7 @@
 package com.mutu.modulo_caja.Repository;
 
 import com.mutu.modulo_caja.Models.ModelCredito;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
@@ -57,10 +58,22 @@ public interface CreditoRepository extends JpaRepository<ModelCredito, Integer> 
   ModelCredito findBySocioAndStatusAndMontoAndEmpresa(
       int socio, int status, double monto, String empresa);
 
+//  @Query(
+//      value = "SELECT TOP 18 * FROM VW_CUOTAS_CREDITO WHERE CREDITO_ID = :credito_id AND STATUS = :status ORDER BY ID ASC",
+//      nativeQuery = true)
+//  List<Object[]> cuotasInmediatasXCredito(@Param("credito_id") int credito_id, @Param("status") int status);
+
   @Query(
-      value = "SELECT TOP 18 * FROM VW_CUOTAS_CREDITO WHERE CREDITO_ID = :credito_id AND STATUS = :status ORDER BY ID ASC",
-      nativeQuery = true)
-  List<Object[]> cuotasInmediatasXCredito(@Param("credito_id") int credito_id, @Param("status") int status);
+          value = "SELECT * FROM VW_CUOTAS_CREDITO WHERE CREDITO_ID = :credito_id AND STATUS = :status ORDER BY ID ASC",
+          nativeQuery = true)
+  List<Object[]> cuotasInmediatasXCredito(
+          @Param("credito_id") int credito_id,
+          @Param("status") int status,
+          Pageable pageable);
+
+  @Query(value = "SELECT PLAZO FROM CAT_CREDITOS WHERE ID = :id", nativeQuery = true)
+  int obtenerPlazo(@Param("id") int id);
+
 
   @Query(
           value = "SELECT TOP 1 * FROM VW_CUOTAS_CREDITO WHERE CREDITO_ID = :credito_id AND STATUS = :status ORDER BY ID DESC",

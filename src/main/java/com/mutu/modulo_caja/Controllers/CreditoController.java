@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 import net.synedra.validatorfx.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import javax.print.*;
@@ -63,6 +64,7 @@ public class CreditoController implements Initializable {
   @FXML
   private TableColumn<Object[], String> cuota, fecha, colcap, ord, colmora, coliva, bonif, tot;
 
+
   // Variables de datos básicos
   String numSocio = "";
   String nomSocio = "";
@@ -84,6 +86,8 @@ public class CreditoController implements Initializable {
   double interesBuffer = 0;
   boolean bonifAplicable;
   int cuotasAprocesar = 0;
+  BigDecimal totalCuotas = BigDecimal.valueOf(0);
+  BigDecimal devolver = BigDecimal.valueOf(0);
 
   // Formatters
   DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -138,6 +142,7 @@ public class CreditoController implements Initializable {
     // Configuración de columnas
     configurarColumnas();
   }
+
 
   private void configurarColumnas() {
     cuota.setCellValueFactory(
@@ -494,9 +499,12 @@ public class CreditoController implements Initializable {
         // YA LISTO)
         if (fechaHoy.isAfter(fechaPagoDate)) {
           if (validador) {
-            return ((interesAcumulado + (dias * factordiario)));
+            devolver = BigDecimal.valueOf(interesAcumulado + (dias * factordiario)).setScale(2, RoundingMode.HALF_UP);
+
+            return (devolver.doubleValue());
           }
-          return (Math.round(calcularInteresPorDias(capital, dias) * 100.0) / 100.0);
+          devolver = BigDecimal.valueOf(interesAcumulado + (dias * factordiario)).setScale(2, RoundingMode.HALF_UP);
+          return devolver.doubleValue() ;
         } else {
           return 0;
         }
@@ -527,7 +535,8 @@ public class CreditoController implements Initializable {
               interesAcumulado = Double.parseDouble(cuota[15].toString());
               dias = ChronoUnit.DAYS.between(fechaPagoDate, fechaHoy);
               double factordiario = (((tasaInteres / 100) * 12) / 360) * capital;
-              return ((interesAcumulado + (dias * factordiario)));
+              devolver = BigDecimal.valueOf((interesAcumulado + (dias * factordiario))).setScale(2, RoundingMode.HALF_UP);
+              return devolver.doubleValue();
             }
           }
         }
@@ -535,7 +544,8 @@ public class CreditoController implements Initializable {
         interesAcumulado = Double.parseDouble(cuota[15].toString());
         dias = ChronoUnit.DAYS.between(fechaPagoDate, fechaHoy);
         double factordiario = (((tasaInteres / 100) * 12) / 360) * capital;
-        return ((interesAcumulado + (dias * factordiario)));
+        devolver = BigDecimal.valueOf((interesAcumulado + (dias * factordiario))).setScale(2, RoundingMode.HALF_UP);
+        return devolver.doubleValue();
       }
     } else {
       if (cuota[12] != null) {
@@ -545,22 +555,25 @@ public class CreditoController implements Initializable {
           interesAcumulado = Double.parseDouble(cuota[15].toString());
           capital = parseMoneda(cuota[10].toString());
           dias = ChronoUnit.DAYS.between(fechaPagoDate, fechaHoy);
-          return calcularInteresPorDias(capital, dias) + interesAcumulado;
+          devolver = BigDecimal.valueOf(calcularInteresPorDias(capital, dias) + interesAcumulado).setScale(2, RoundingMode.HALF_UP);
+          return devolver.doubleValue();
         } else {
           capital = parseMoneda(cuota[10].toString());
           dias = ChronoUnit.DAYS.between(fechaPagoDate, fechaHoy);
-          return calcularInteresPorDias(capital, dias);
+          devolver = BigDecimal.valueOf(calcularInteresPorDias(capital, dias)).setScale(2, RoundingMode.HALF_UP);
+          return devolver.doubleValue();
         }
       } else {
         dias = ChronoUnit.DAYS.between(fechaDesembolsoDate, fechaHoy);
-        return calcularInteresPorDias(capitalInicial, dias);
+        devolver = BigDecimal.valueOf(calcularInteresPorDias(capitalInicial, dias)).setScale(2, RoundingMode.HALF_UP);
+        return devolver.doubleValue();
       }
     }
   }
 
   private double calcularInteresPorDias(double saldoCredito, long dias) {
-    double resultado = (((tasaInteres / 100) * 12) / 360) * dias * saldoCredito;
-    return resultado * 100 / 100;
+    devolver = BigDecimal.valueOf((((tasaInteres / 100) * 12) / 360) * dias * saldoCredito).setScale(2, RoundingMode.HALF_UP);
+    return devolver.doubleValue();
   }
 
   private double aplicarBonificacion(
@@ -573,10 +586,12 @@ public class CreditoController implements Initializable {
     double resultado;
     if (fechaHoy.isBefore(fechaVencimiento)) {
       double factorBonificacion = (tasaInteres == 1.1) ? 0.7 : 0.9;
-      resultado = (interesOrdinario * factorBonificacion);
+      devolver = BigDecimal.valueOf((interesOrdinario * factorBonificacion)).setScale(2, RoundingMode.HALF_UP);
+      resultado = devolver.doubleValue();
     } else if (fechaHoy.isEqual(fechaVencimiento)) {
       double factorBonificacion = (tasaInteres == 1.1) ? 0.8 : 0.99;
-      resultado = (interesOrdinario * factorBonificacion);
+      devolver = BigDecimal.valueOf((interesOrdinario * factorBonificacion)).setScale(2, RoundingMode.HALF_UP);
+      resultado = devolver.doubleValue();
     } else {
       resultado = interesOrdinario;
     }
@@ -599,16 +614,18 @@ public class CreditoController implements Initializable {
         if (fechaHoy.isAfter(fechaVencimiento.plusDays(29))) {
           long diasMora = ChronoUnit.DAYS.between(fechaVencimiento, fechaHoy);
           double interesOrdinario = calcularInteresOrdinario(cuota);
-          double resultado = (((moraaplicar) * 12) / 360) * diasMora * interesOrdinario;
-          return (Math.round(resultado * 100.0) / 100.0);
+          devolver = BigDecimal.valueOf((((moraaplicar) * 12) / 360) * diasMora * interesOrdinario).setScale(2, RoundingMode.HALF_UP);
+          return devolver.doubleValue();
+
         }
       } else {
         LocalDate nuevaFechaPago = LocalDate.parse(fechaPagoActualizado, formatter);
         if (fechaHoy.isAfter(nuevaFechaPago.plusDays(29))) {
           long diasMora = ChronoUnit.DAYS.between(nuevaFechaPago, fechaHoy);
           double interesOrdinario = calcularInteresOrdinario(cuota);
-          double resultado = (((moraaplicar) * 12) / 360) * diasMora * interesOrdinario;
-          return (Math.round(resultado * 100.0) / 100.0);
+          devolver = BigDecimal.valueOf((((moraaplicar) * 12) / 360) * diasMora * interesOrdinario).setScale(2, RoundingMode.HALF_UP);
+
+          return devolver.doubleValue();
         }
       }
 
@@ -631,11 +648,12 @@ public class CreditoController implements Initializable {
       }
 
       if (existenActuales) {
+
         ivaCubierto = Double.parseDouble(String.valueOf(cuota[17]));
       }
+      devolver = BigDecimal.valueOf((interesOrdinario * ivaaplicar) -ivaCubierto ).setScale(2, RoundingMode.HALF_UP);
 
-      double resultado = interesOrdinario * ivaaplicar;
-      return resultado - ivaCubierto;
+      return devolver.doubleValue();
     } catch (Exception e) {
       e.printStackTrace();
       return 0;
@@ -655,14 +673,12 @@ public class CreditoController implements Initializable {
       double interesOrdinario = calcularInteresOrdinario(cuota);
       double interesConBonificacion =
           aplicarBonificacion(interesOrdinario, fechaHoy, fechaVencimiento);
-
-      double resultado = interesOrdinario - interesConBonificacion;
-
-      if (resultado < 0) {
+      devolver = BigDecimal.valueOf(interesOrdinario - interesConBonificacion).setScale(2, RoundingMode.HALF_UP);
+      if (devolver.doubleValue() < 0) {
         return 0;
       }
 
-      return Math.round(resultado * 100.0) / 100.0;
+      return devolver.doubleValue();
     } catch (Exception e) {
       e.printStackTrace();
       return 0;
@@ -673,16 +689,27 @@ public class CreditoController implements Initializable {
     try {
       double capital = parseMoneda((String) cuota[4]);
       double interes = calcularInteresOrdinario(cuota);
+      System.out.println("Interes: " + interes);
+      System.out.println("Capital: " + capital);
+
       LocalDate fechaHoy = LocalDate.now();
       LocalDate fechaVencimiento = LocalDate.parse((String) cuota[3], formatter);
 
       double interesConBonificacion = aplicarBonificacion(interes, fechaHoy, fechaVencimiento);
-      double mora = calcularMora(cuota);
-      double iva = interesConBonificacion * ivaaplicar;
+      System.out.println("Int bonif: " + interesConBonificacion);
 
-      // Redondear el total final
-      double resultado = capital + interesConBonificacion + mora + iva;
-      return Math.round(resultado * 100.0) / 100.0;
+      double mora = calcularMora(cuota);
+      System.out.println("Mora: " + mora);
+
+      double iva  = BigDecimal.valueOf(interesConBonificacion * ivaaplicar).setScale(2, RoundingMode.HALF_UP).doubleValue();
+      System.out.println("iva: " + iva);
+
+
+      devolver = BigDecimal.valueOf(capital + interesConBonificacion + mora + iva).setScale(2, RoundingMode.HALF_UP);
+
+      System.out.println("Resultado: " + devolver.doubleValue());
+
+      return devolver.doubleValue();
     } catch (Exception e) {
       e.printStackTrace();
       return 0;
@@ -704,14 +731,16 @@ public class CreditoController implements Initializable {
 
           double interesConBonificacion = aplicarBonificacion(interes, fechaHoy, fechaVencimiento);
           double mora = calcularMora(cuota);
-          double iva = interesConBonificacion * ivaaplicar;
+          devolver = BigDecimal.valueOf(interesConBonificacion * ivaaplicar).setScale(2, RoundingMode.HALF_UP);
+
+
 
           // Usar BigDecimal para cálculos precisos
           BigDecimal totalCuotaIndividual =
               BigDecimal.valueOf(capital)
                   .add(BigDecimal.valueOf(interesConBonificacion))
                   .add(BigDecimal.valueOf(mora))
-                  .add(BigDecimal.valueOf(iva))
+                  .add(BigDecimal.valueOf(devolver.doubleValue()))
                   .setScale(2, RoundingMode.HALF_UP);
 
           totalTresCuotas = totalTresCuotas.add(totalCuotaIndividual);
@@ -723,6 +752,9 @@ public class CreditoController implements Initializable {
       txtInmediatas.setText(formatoMoneda.format(totalTresCuotas.doubleValue()));
     }
   }
+
+//AQUI ME QUEDE
+
 
   private double parseMoneda(String moneda) {
     try {
@@ -761,6 +793,12 @@ public class CreditoController implements Initializable {
           alert.showAndWait();
           Stage ventanaActual = (Stage) txtMonto.getScene().getWindow();
           ventanaActual.close();
+        }else{
+          Alert alert = new Alert(Alert.AlertType.ERROR);
+          alert.setTitle("ERROR");
+          alert.setHeaderText("NO SE PUEDE PAGAR MAS DEL TOTAL DEL CREDITO");
+          alert.setContentText("INGRESE UN VALOR MENOR AL TOTAL.");
+          alert.showAndWait();
         }
         break;
       case F2:
@@ -769,16 +807,15 @@ public class CreditoController implements Initializable {
         if (!validador) {
           Alert alert = new Alert(Alert.AlertType.ERROR);
           alert.setTitle("ERROR");
-          alert.setHeaderText("EL INTERES ES MAYOR A LO QUE DESEA PAGAR");
-          alert.setContentText("INGRESE UN VALOR QUE SALDE LOS INTERESES.");
+          alert.setHeaderText("NO SE PUEDE PAGAR MAS DEL TOTAL DEL CREDITO");
+          alert.setContentText("INGRESE UN VALOR MENOR AL TOTAL.");
           alert.showAndWait();
-
-        } else {
+        }else{
           Alert alert = new Alert(Alert.AlertType.INFORMATION);
           alert.setTitle("PAGO EXITOSO");
-          alert.setHeaderText("PAGO CON TODO Y EL INTERÉS APLICADO CORRECTAMENTE");
+          alert.setHeaderText("PAGO CON TODO Y EL INTERES APLICADO CORRECTAMENTE");
           alert.setContentText(
-              "ABONO DE CRÉDITO AL SOCIO: " + lblNumSocio.getText() + " HECHO CORRECTAMENTE.");
+                  "ABONO DE CRÉDITO AL SOCIO: " + lblNumSocio.getText() + " HECHO CORRECTAMENTE.");
           alert.showAndWait();
           Stage ventanaActual = (Stage) txtMonto.getScene().getWindow();
           ventanaActual.close();
@@ -799,6 +836,8 @@ public class CreditoController implements Initializable {
     double montoPagado = Double.parseDouble(txtMonto.getText().trim());
 
     if (montoPagado == 0) {
+      return false;
+    }else if(montoPagado > parseMoneda(txtSaldoCredito.getText())){
       return false;
     }
 
@@ -827,15 +866,19 @@ public class CreditoController implements Initializable {
     String horaFormateada = hora.format(formatterHora);
 
     double capital = 0;
+    double capcuota = parseMoneda(colcap.getCellData(filaSeleccionada));
     switch (opcion) {
+
       case 1:
         {
           abonoTotal = montoPagado + pagoAntesCapital;
 
-          double capcuota = parseMoneda(colcap.getCellData(filaSeleccionada));
-
           if (capcuota < montoPagado) {
             montoPagado = capcuota;
+          }
+          if(abonoTotal > totalCuotas.doubleValue()){
+
+            return false;
           }
           res =
               servicio.pa_PagarCredito(
@@ -869,10 +912,22 @@ public class CreditoController implements Initializable {
       case 2:
         {
           //          capital = parseMoneda(colcap.getCellData(filaSeleccionada));
-          capital = montoPagado - intereses - mora - iva;
+
+
+          if (totalCuota < montoPagado) {
+            capital = capcuota;
+          }else {
+            capital = montoPagado - intereses - mora - iva;
+          }
           if (capital < 0) {
             capital = 0;
           }
+
+          if(montoPagado > totalCuotas.doubleValue()){
+            return  false;
+          }
+
+
           res =
               servicio.pa_PagarCredito(
                   1,
@@ -900,8 +955,6 @@ public class CreditoController implements Initializable {
                   "",
                   "");
           CajeroController.bufferOperaciones += montoPagado;
-
-
           break;
         }
       default:
@@ -1041,6 +1094,7 @@ public class CreditoController implements Initializable {
     return false;
   }
 
+
   public void setDatos(
       String numSocio,
       String nomSocio,
@@ -1084,11 +1138,40 @@ public class CreditoController implements Initializable {
     lblCodigo.setText("Código Sistema: " + codigoSistema);
     lblInmediatas.setText("Total " + cuotasAprocesar + " Cuotas Inmediatas:");
 
-    cuotas = servicio.traerCuotasxCredito(Integer.parseInt(numCredito), 2);
+    //cuotas = servicio.traerCuotasxCredito(Integer.parseInt(numCredito), 2);
+    int plazo = servicio.obtenerPlazoCredito(Integer.parseInt(numCredito));
+    PageRequest limit = PageRequest.of(0, plazo);
+    cuotas = servicio.traerCuotasPrueba(Integer.parseInt(numCredito), 2, limit);
     ObservableList<Object[]> datosCuotas = FXCollections.observableArrayList();
     NumberFormat formato = NumberFormat.getCurrencyInstance(Locale.US);
+
+
+    //Sttear todas las cuotas por pagar primero
+    for (Object[] resultado : cuotas) {
+      datosCuotas.add(resultado);
+    }
+
+    tablaCuotas.setItems(datosCuotas);
+
+    double totalDouble = 0;
+
+    for (int i = 0; i < tablaCuotas.getItems().size(); i++) {
+      totalDouble += parseMoneda(tot.getCellData(i));
+    }
+
+     totalCuotas =
+            BigDecimal.valueOf(totalDouble).setScale(2, RoundingMode.HALF_UP);
+
+    tablaCuotas.getItems().clear();
+
+    //Faltar consultar directo desde bd
+    limit = PageRequest.of(0, 3);
+    cuotas = servicio.traerCuotasPrueba(Integer.parseInt(numCredito), 2, limit);
+
+
     int indice = 0;
     for (Object[] resultado : cuotas) {
+
       if (indice == 0) {
         int numeroCuota = Integer.parseInt(resultado[2].toString());
         if (numeroCuota == 1) {
@@ -1115,10 +1198,20 @@ public class CreditoController implements Initializable {
             }
           }
         }
+
         indice++;
       }
       datosCuotas.add(resultado);
     }
+
+//    int plazoCopia = servicio.obtenerPlazoCredito(Integer.parseInt(numCredito));
+//    PageRequest limitCopia = PageRequest.of(0, plazoCopia);
+//    cuotas = servicio.traerCuotasPrueba(Integer.parseInt(numCredito), 2, limitCopia);
+//    for (Object[] resultado : cuotas) {
+//      datosCuotasCopia.add(resultado);
+//    }
+//
+//    tablaCuotasCopia.setItems(datosCuotasCopia);
     tablaCuotas.setItems(datosCuotas);
     calcularTresCuotasInmediatas();
   }
@@ -1144,6 +1237,8 @@ public class CreditoController implements Initializable {
   public void cerrarConTecla(KeyEvent event) {
     if (event.getCode().equals(KeyCode.ESCAPE)) {
       mostrarDialogoCierre();
+    } else if (event.getCode().equals(KeyCode.F12)) {
+      System.out.println(totalCuotas);
     }
   }
 
