@@ -876,6 +876,7 @@ public class CreditoController implements Initializable {
           if (capcuota < montoPagado) {
             montoPagado = capcuota;
           }
+          //validacion para evitar pagar demas del credito
           if(abonoTotal > totalCuotas.doubleValue()){
 
             return false;
@@ -922,7 +923,7 @@ public class CreditoController implements Initializable {
           if (capital < 0) {
             capital = 0;
           }
-
+          //validacion para evitar pagar demas del credito
           if(montoPagado > totalCuotas.doubleValue()){
             return  false;
           }
