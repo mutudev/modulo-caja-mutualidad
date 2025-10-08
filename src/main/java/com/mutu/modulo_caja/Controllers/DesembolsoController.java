@@ -196,9 +196,10 @@ public class DesembolsoController implements Initializable {
           String moneyAsWords = converter.asWords(BigDecimal.valueOf(monto)).toUpperCase() + " MXN";
           isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
           ModelCredito credito = servicio.traerDatosCredito(Integer.parseInt(colCredito));
-          String ord = String.valueOf(credito.getOrdinarios()) + " %";
-          String mor = String.valueOf(credito.getMoratorios()) + " %";
-          String fechvenc = String.valueOf(credito.getFecha_venci());
+          String asesor = credito.getAsesor();
+          String ord = String.valueOf(credito.getTasa()) + " %";
+          String mor = String.valueOf(credito.getMora()) + " %";
+          String fechvenc = String.valueOf(credito.getFv());
           isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
           Map pars = new HashMap<>();
           pars.put("Empresa", nombreEmpresa);
@@ -211,6 +212,7 @@ public class DesembolsoController implements Initializable {
           pars.put("Folio", folio);
           pars.put("NumSocio", String.valueOf(socio));
           pars.put("NombreSocio", nomsocio);
+          pars.put("ASESOR", asesor);
 
           pars.put("IntOrd", ord);
           pars.put("IntMora", mor);

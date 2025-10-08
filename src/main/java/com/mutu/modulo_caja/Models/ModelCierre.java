@@ -21,7 +21,8 @@ import java.time.LocalDate;
       @StoredProcedureParameter(mode = ParameterMode.IN, name = "sobrante", type = Double.class),
       @StoredProcedureParameter(mode = ParameterMode.IN, name = "turno", type = String.class),
       @StoredProcedureParameter(mode = ParameterMode.IN, name = "empresa", type = String.class),
-      @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Resultado", type = String.class)
+            @StoredProcedureParameter(mode = ParameterMode.IN, name = "monto_fis", type = Double.class),
+            @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Resultado", type = String.class)
     })
 @NamedStoredProcedureQuery(
     name = "Cierre_Cajero.pa_CierreDeCajero",
@@ -37,7 +38,9 @@ import java.time.LocalDate;
           name = "cuenta_cajeroNgu",
           type = Integer.class),
       @StoredProcedureParameter(mode = ParameterMode.IN, name = "fecha", type = String.class),
-      @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Resultado", type = String.class)
+            @StoredProcedureParameter(mode = ParameterMode.IN, name = "saldo_fisico", type = Double.class),
+      @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Resultado", type = String.class),
+            @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Cierre_id", type = Integer.class),
     })
 public class ModelCierre {
 

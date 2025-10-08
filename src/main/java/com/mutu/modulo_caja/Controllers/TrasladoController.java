@@ -63,7 +63,7 @@ public class TrasladoController implements Initializable {
         .withMethod(
             c -> {
               String texto = c.get("input");
-              if (texto == null || texto.equals("") || Integer.parseInt(texto) == 0) {
+              if (texto == null || texto.equals("") || Double.parseDouble(texto) == 0) {
                 c.error("Ingrese un valor mayor a cero");
                 lblError.setText("Ingrese un valor mayor a cero");
               } else {
@@ -74,11 +74,16 @@ public class TrasladoController implements Initializable {
         .immediate();
 
     txtCantidad.setTextFormatter(
-        new TextFormatter<>(
-            change -> {
-              change.setText(change.getText().replaceAll("[^0-9]", ""));
-              return change;
-            }));
+            new TextFormatter<>(change -> {
+              String newText = change.getControlNewText();
+              // Permitir solo dígitos y un punto decimal
+              if (newText.matches("\\d*(\\.\\d*)?")) {
+                return change;
+              } else {
+                return null; // Rechaza el cambio
+              }
+            })
+    );
 
     Platform.runLater(
         () -> {

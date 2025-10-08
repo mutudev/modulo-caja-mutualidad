@@ -303,7 +303,11 @@ public class OperacionesController implements Initializable {
     String interes_pagado = "";
     String mora_pagada = "";
     String iva_pagado = "";
+    String saldo_credito = "";
+    String tipo_credito = "";
+    String cuota_afectada = "";
     String bonif_aplicada = "";
+    String hora = "";
     boolean validador = false;
     String empresa =
         cmbEmpresa
@@ -372,6 +376,10 @@ public class OperacionesController implements Initializable {
         interes_pagado = (String) selectedRow[14];
         mora_pagada = (String) selectedRow[15];
         iva_pagado = (String) selectedRow[16];
+        saldo_credito = (String) selectedRow[18];
+        tipo_credito = (String) selectedRow[19];
+        cuota_afectada = String.valueOf(Integer.parseInt(selectedRow[20].toString()));
+        hora = (String) selectedRow[6];
         bonif_aplicada = (String) selectedRow[17];
       }
     }
@@ -393,7 +401,7 @@ public class OperacionesController implements Initializable {
             monto,
             nombre_socio,
             tipo_operacion,
-            turno,nombre_usuario,this);
+            turno,nombre_usuario,this, hora, capital_pagado, interes_pagado, mora_pagada, iva_pagado, bonif_aplicada, saldo_credito, tipo_credito, cuota_afectada);
       } else {
         controller.setDatosTraslados(
             id_traslado,

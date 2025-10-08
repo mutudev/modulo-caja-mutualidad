@@ -28,6 +28,8 @@ public interface TrasladoRepository extends JpaRepository<ModelTraslado, Integer
 
   ModelTraslado findByCuentaOrigen(String cuenta);
 
+  ModelTraslado findByCuentaDestino(String cuenta);
+
   @Query(
       value =
           "SELECT * FROM VW_HISTORIAL_TRASLADOS WHERE USUARIO_ID = :usuario AND TIPO_TRASLADO = :tipo AND ESTADO = :estado AND FECHA = :fecha AND TURNO = :turno AND EMPRESA = :empresa",

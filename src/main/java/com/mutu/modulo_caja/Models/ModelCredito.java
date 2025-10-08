@@ -3,11 +3,12 @@ package com.mutu.modulo_caja.Models;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
 @Data
-@Table(name = "CUENTA_CREDITO")
+@Table(name = "CAT_CREDITOS")
 @NamedStoredProcedureQuery(
     name = "Cuenta_Credito.pa_ProcesarDesembolso",
     procedureName = "pa_ProcesarDesembolso",
@@ -70,7 +71,7 @@ public class ModelCredito {
   private int id;
 
   @Column(name = "ASESOR")
-  private int asesor;
+  private String asesor;
 
   @Column(name = "SOCIO")
   private int socio;
@@ -87,20 +88,17 @@ public class ModelCredito {
   @Column(name = "PLAZO")
   private int plazo;
 
-  @Column(name = "FC")
-  private Date fc;
+  @Column(name = "FD")
+  private LocalDate fd;
 
-  @Column(name = "FECHA_VENCI")
-  private Date fecha_venci;
+  @Column(name = "FV")
+  private LocalDate fv;
 
-  @Column(name = "ORDINARIOS")
-  private float ordinarios;
+  @Column(name = "TASA")
+  private float tasa;
 
-  @Column(name = "MORATORIOS")
-  private float moratorios;
-
-  @Column(name = "BONIFICACION")
-  private float bonificacion;
+  @Column(name = "MORA")
+  private float mora;
 
   @Column(name = "IVA")
   private float iva;

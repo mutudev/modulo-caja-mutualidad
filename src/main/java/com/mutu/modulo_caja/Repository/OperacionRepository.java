@@ -19,4 +19,23 @@ public interface OperacionRepository extends JpaRepository<ModelOperaciones, Int
                                  int id_transaccion, double monto, String empresa, String turno ,
                                  String Resultado);
 
+    @Procedure(name = "Operacion.pa_CancelarAbonoCredito")
+    String pa_CancelarAbonoCredito(
+            double capital_transaccion,
+            double interes_transaccion,
+            double mora_transaccion,
+            double iva_transaccion,
+            double bonif_transaccion,
+            double saldo_credito_transaccion,
+            double pago_total_transaccion,
+            String tipo_credito_transaccion,
+            int transaccion_id,
+            String cod_empresa,
+            String turno,
+            String fecha_transaccion,
+            String hora_transaccion,
+            int cuota_id,
+            String nom_usuario,
+            String Resultado
+    );
 }

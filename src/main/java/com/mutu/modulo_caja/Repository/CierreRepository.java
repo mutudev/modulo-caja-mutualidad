@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CierreRepository extends JpaRepository<ModelCierre, Integer> {
 
@@ -17,10 +18,12 @@ public interface CierreRepository extends JpaRepository<ModelCierre, Integer> {
       double sobrante,
       String turno,
       String empresa,
+      double monto_fis,
       String Resultado);
 
   @Procedure(name = "Cierre_Cajero.pa_CierreDeCajero")
-  String procesarCierre(int cuenta_cajeroMut, int cuenta_cajeroNgu, String fecha, String Resultado);
+  Map<String, Object> procesarCierre(int cuenta_cajeroMut, int cuenta_cajeroNgu, String fecha, double saldo_fisico, String Resultado,
+                                     int Cierre_id);
 
   @Query (value = "SELECT * FROM CIERRE_CAJERO WHERE ID = :id", nativeQuery = true)
   Object[] traerCierreCajero(@Param("id") int id);

@@ -111,12 +111,12 @@
             <Font size="12.0" />
          </font>
       </Label>
-      <Label fx:id="lblPlazo1" alignment="CENTER" layoutX="30.0" layoutY="348.0" prefHeight="17.0" prefWidth="175.0" style="-fx-text-fill: #39577C;" text="[F1] CON TODO Y EL INTERÉS">
+      <Label fx:id="lblPlazo1" alignment="CENTER" layoutX="30.0" layoutY="350.0" prefHeight="17.0" prefWidth="143.0" style="-fx-text-fill: #39577C;" text="[F1] APARTE EL INTERÉS">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Label>
-      <Label fx:id="lblPlazo11" alignment="CENTER" layoutX="223.0" layoutY="348.0" prefHeight="17.0" prefWidth="175.0" style="-fx-text-fill: #39577C;" text="[F2] APARTE EL INTERÉS">
+      <Label fx:id="lblPlazo11" alignment="CENTER" layoutX="230.0" layoutY="350.0" prefHeight="17.0" prefWidth="175.0" style="-fx-text-fill: #39577C;" text="[F2] CON TODO Y EL INTERÉS">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
@@ -126,7 +126,7 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </Label>
-      <Label fx:id="lblPlazo1111" alignment="CENTER" layoutX="223.0" layoutY="369.0" prefHeight="17.0" prefWidth="196.0" style="-fx-text-fill: #39577C;">
+      <Label fx:id="lblPlazo1111" alignment="CENTER" layoutX="236.0" layoutY="369.0" prefHeight="17.0" prefWidth="175.0" style="-fx-text-fill: #39577C;">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>

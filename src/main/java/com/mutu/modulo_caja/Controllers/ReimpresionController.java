@@ -35,8 +35,29 @@ import java.util.*;
 public class ReimpresionController {
 
   @FXML
-  private TextField txtSocio, txtID, txtOperacion, txtEmpresa, txtFecha, txtMonto, txtNomSocio, txtCapital, txtInteres, txtMora, txtIva, txtBonif;
-  @FXML private Label lblTitulo, lblEmpresa, lblSocio, lblOperacion, lblNombre, lblCapital, lblInteres, lblMora, lblIva, lblBonif;
+  private TextField txtSocio,
+      txtID,
+      txtOperacion,
+      txtEmpresa,
+      txtFecha,
+      txtMonto,
+      txtNomSocio,
+      txtCapital,
+      txtInteres,
+      txtMora,
+      txtIva,
+      txtBonif;
+  @FXML
+  private Label lblTitulo,
+      lblEmpresa,
+      lblSocio,
+      lblOperacion,
+      lblNombre,
+      lblCapital,
+      lblInteres,
+      lblMora,
+      lblIva,
+      lblBonif;
   @FXML private Button btnReimprimir, btnRegresar;
   String capital_pagado = "";
   String interes_pagado = "";
@@ -45,9 +66,11 @@ public class ReimpresionController {
   String bonif_aplicada = "";
   String saldo_credito = "";
   String tipo_credito = "";
+  String cuota_afectada = "";
+  NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
 
   public OperacionesController controller;
-  public  HistorialController controllerhisto;
+  public HistorialController controllerhisto;
 
   public String nombre,
       usuario,
@@ -113,18 +136,19 @@ public class ReimpresionController {
     btnReimprimir.setText("CANCELAR");
   }
 
-
   public void setDatosTrasladosHistorial(
-          String id,
-          String usuario,
-          String monto,
-          String tipo_traslado,
-          String cuenta_origen,
-          String cuenta_destino,
-          String fecha,
-          int operacionreimpresion,
-          HistorialController controller,
-          String turno,String empresa,String hora) {
+      String id,
+      String usuario,
+      String monto,
+      String tipo_traslado,
+      String cuenta_origen,
+      String cuenta_destino,
+      String fecha,
+      int operacionreimpresion,
+      HistorialController controller,
+      String turno,
+      String empresa,
+      String hora) {
     this.id = id;
     this.operaciontipo = operacionreimpresion;
     this.usuario = usuario;
@@ -169,7 +193,14 @@ public class ReimpresionController {
       String monto,
       String nombre,
       int operaciontipo,
-      String hora, String capital_pagado, String interes_pagado, String mora_pagada, String iva_pagado, String bonif_aplicada, String saldo_credito, String tipo_credito) {
+      String hora,
+      String capital_pagado,
+      String interes_pagado,
+      String mora_pagada,
+      String iva_pagado,
+      String bonif_aplicada,
+      String saldo_credito,
+      String tipo_credito) {
     this.nombre = nombre;
     this.capital_pagado = capital_pagado;
     this.interes_pagado = interes_pagado;
@@ -229,13 +260,31 @@ public class ReimpresionController {
       int opcion,
       String turno,
       String usuario,
-      OperacionesController controller) {
+      OperacionesController controller,
+      String hora,
+      String capital_pagado,
+      String interes_pagado,
+      String mora_pagada,
+      String iva_pagado,
+      String bonif_aplicada,
+      String saldo_credito,
+      String tipo_credito,
+      String cuota_afectada) {
     this.nombre = nombre;
     this.socio = socio;
+    this.capital_pagado = capital_pagado;
     this.usuario = usuario;
     this.id = id;
     this.operacion = operacion;
     this.empresa = empresa;
+    this.hora = hora;
+    this.cuota_afectada = cuota_afectada;
+    this.interes_pagado = interes_pagado;
+    this.mora_pagada = mora_pagada;
+    this.iva_pagado = iva_pagado;
+    this.bonif_aplicada = bonif_aplicada;
+    this.saldo_credito = saldo_credito;
+    this.tipo_credito = tipo_credito;
     this.fecha = fecha;
     this.monto = monto;
     this.opcion = opcion;
@@ -250,6 +299,23 @@ public class ReimpresionController {
     txtNomSocio.setText(nombre);
     lblTitulo.setText("CANCELACIÓN DE OPERACIONES");
     btnReimprimir.setText("CANCELAR");
+    if (opcion == 2) {
+      txtCapital.setText(capital_pagado);
+      txtInteres.setText(interes_pagado);
+      txtMora.setText(mora_pagada);
+      txtIva.setText(iva_pagado);
+      txtBonif.setText(bonif_aplicada);
+      txtCapital.setVisible(true);
+      txtInteres.setVisible(true);
+      txtMora.setVisible(true);
+      txtIva.setVisible(true);
+      txtBonif.setVisible(true);
+      lblCapital.setVisible(true);
+      lblInteres.setVisible(true);
+      lblMora.setVisible(true);
+      lblIva.setVisible(true);
+      lblBonif.setVisible(true);
+    }
   }
 
   public void cancelarOperacion() {
@@ -465,17 +531,39 @@ public class ReimpresionController {
                 servicio.traerCuentaPS(Integer.parseInt(socio), empresa).getMontoAsignado();
             break;
         }
-        String Result =
-            servicio.pa_CancelarOperacion(
-                opcion,
-                usuario,
-                Integer.parseInt(socio),
-                Integer.parseInt(txtID.getText().trim()),
-                montoExtraido,
-                empresa,
-                turno,
-                "");
-
+        String Result = "";
+        if (opcion != 2) {
+          Result =
+              servicio.pa_CancelarOperacion(
+                  opcion,
+                  usuario,
+                  Integer.parseInt(socio),
+                  Integer.parseInt(txtID.getText().trim()),
+                  montoExtraido,
+                  empresa,
+                  turno,
+                  "");
+        } else {
+          // Cancelar abonos a crédito
+          Result =
+              servicio.pa_CancelarAbonoCredito(
+                  parseMoneda(capital_pagado),
+                  parseMoneda(interes_pagado),
+                  parseMoneda(mora_pagada),
+                  parseMoneda(iva_pagado),
+                  parseMoneda(bonif_aplicada),
+                  parseMoneda(saldo_credito),
+                  parseMoneda(monto),
+                  tipo_credito,
+                  Integer.parseInt(txtID.getText().trim()),
+                  empresa,
+                  turno,
+                  fecha,
+                  hora,
+                  Integer.parseInt(cuota_afectada),
+                  usuario,
+                  "");
+        }
 
         if (Result.equals("CORRECTO")) {
 
@@ -537,6 +625,11 @@ public class ReimpresionController {
                       horaFormateada);
               break;
 
+            case 2:
+              //Imprimir ticket de crédito
+              return;
+
+
             case 3:
               try {
 
@@ -550,9 +643,10 @@ public class ReimpresionController {
                 String fechaVencticket = fechaVenc.format(formatter);
                 isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
                 ModelCredito credito = servicio.traerDatosCredito(colCredito);
-                String ord = String.valueOf(credito.getOrdinarios()) + " %";
-                String mor = String.valueOf(credito.getMoratorios()) + " %";
-                String fechvenc = String.valueOf(credito.getFecha_venci());
+                String ord = String.valueOf(credito.getTasa()) + " %";
+                String mor = String.valueOf(credito.getMora()) + " %";
+                String fechvenc = String.valueOf(credito.getFv());
+                String asesor = credito.getAsesor();
                 isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
                 Map pars = new HashMap<>();
                 pars.put("Empresa", nombreEmpresa);
@@ -565,6 +659,7 @@ public class ReimpresionController {
                 pars.put("Folio", id);
                 pars.put("NumSocio", String.valueOf(socio));
                 pars.put("NombreSocio", nomsocio);
+                pars.put("ASESOR", asesor);
 
                 pars.put("IntOrd", ord);
                 pars.put("IntMora", mor);
@@ -818,9 +913,8 @@ public class ReimpresionController {
       cancelarOperacion();
     } else {
 
-      if(operaciontipo == 6 || operaciontipo == 7){
-        
-      }
+      if (operaciontipo == 6 || operaciontipo == 7) {}
+
       NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
       try {
         Number numero = formatoMoneda.parse(txtMonto.getText().trim());
@@ -872,47 +966,61 @@ public class ReimpresionController {
                   hora,
                   totalhorro);
           break;
-       case 2:
-         double bonifrestar=0, interes=0,psngu = 0, psmut = 0;
+        case 2:
+          double bonifrestar = 0, interes = 0, psngu = 0, psmut = 0;
 
-        try {
+          try {
 
-           abono = formatoMoneda.parse(monto).doubleValue();
-           interes = formatoMoneda.parse(txtInteres.getText().toString()).doubleValue();
-           bonifrestar = formatoMoneda.parse(bonif_aplicada).doubleValue();
-
-
+            abono = formatoMoneda.parse(monto).doubleValue();
+            interes = formatoMoneda.parse(txtInteres.getText().toString()).doubleValue();
+            bonifrestar = formatoMoneda.parse(bonif_aplicada).doubleValue();
 
           } catch (ParseException e) {
-          e.printStackTrace();
-        }
-         if (servicio.traerCuentasCS(Integer.parseInt(socio)).size() == 1) {
-           psmut = servicio.traerCuentasCS(Integer.parseInt(socio)).getFirst().getMonto_cubierto();
-         } else {
-           psmut = servicio.traerCuentasCS(Integer.parseInt(socio)).getFirst().getMonto_cubierto();
-           psngu = servicio.traerCuentasCS(Integer.parseInt(socio)).get(1).getMonto_cubierto();
-         }
+            e.printStackTrace();
+          }
+          if (servicio.traerCuentasCS(Integer.parseInt(socio)).size() == 1) {
+            psmut = servicio.traerCuentasCS(Integer.parseInt(socio)).getFirst().getMonto_cubierto();
+          } else {
+            psmut = servicio.traerCuentasCS(Integer.parseInt(socio)).getFirst().getMonto_cubierto();
+            psngu = servicio.traerCuentasCS(Integer.parseInt(socio)).get(1).getMonto_cubierto();
+          }
 
-         interes += bonifrestar;
-         String psnguenviar = formatoMoneda.format(psngu);
-         String psmutenviar = formatoMoneda.format(psmut);
-         String interesconbonif=formatoMoneda.format(interes);
+          interes += bonifrestar;
+          String psnguenviar = formatoMoneda.format(psngu);
+          String psmutenviar = formatoMoneda.format(psmut);
+          String interesconbonif = formatoMoneda.format(interes);
 
+          moneyAsWords = converter.asWords(BigDecimal.valueOf(abono)).toUpperCase() + " MXN";
 
-        moneyAsWords = converter.asWords(BigDecimal.valueOf(abono)).toUpperCase() + " MXN";
-
-                    printer =
-                            impresora.imprimirAbonoACredito(nombreEmpresa,rfcEmpresa,direcEmpresa,socio, id,nombre,
-                                    fecha,hora,LoginController.usuarioLoggeado,capital_pagado,moneyAsWords,monto,tipo_credito,
-                                    mora_pagada,interes_pagado,bonif_aplicada,iva_pagado,psnguenviar,psmutenviar,saldo_credito,interesconbonif);
+          printer =
+              impresora.imprimirAbonoACredito(
+                  nombreEmpresa,
+                  rfcEmpresa,
+                  direcEmpresa,
+                  socio,
+                  id,
+                  nombre,
+                  fecha,
+                  hora,
+                  LoginController.usuarioLoggeado,
+                  capital_pagado,
+                  moneyAsWords,
+                  monto,
+                  tipo_credito,
+                  mora_pagada,
+                  interes_pagado,
+                  bonif_aplicada,
+                  iva_pagado,
+                  psnguenviar,
+                  psmutenviar,
+                  saldo_credito,
+                  interesconbonif);
           break;
         case 3:
-          int cuentaCredito=
-                  servicio
-                          .traerDatosDesembolsoCancelado(
-                                  Integer.parseInt(socio), 2, montoExtraido, "0002")
-                          .getId();
-
+          int cuentaCredito =
+              servicio
+                  .traerDatosDesembolsoCancelado(Integer.parseInt(socio), 2, montoExtraido, "0002")
+                  .getId();
 
           try {
 
@@ -920,24 +1028,27 @@ public class ReimpresionController {
 
             String montoenviar = txtMonto.getText();
 
-            String letras = converter.asWords(BigDecimal.valueOf(montoExtraido)).toUpperCase() + " MXN";
+            String letras =
+                converter.asWords(BigDecimal.valueOf(montoExtraido)).toUpperCase() + " MXN";
             isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
             ModelCredito credito = servicio.traerDatosCredito(cuentaCredito);
-            String ord = String.valueOf(credito.getOrdinarios()) + " %";
-            String mor = String.valueOf(credito.getMoratorios()) + " %";
-            String fechvenc = String.valueOf(credito.getFecha_venci());
+            String ord = String.valueOf(credito.getTasa()) + " %";
+            String asesor = credito.getAsesor();
+            String mor = String.valueOf(credito.getMora()) + " %";
+            String fechvenc = String.valueOf(credito.getFv());
             isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
             Map pars = new HashMap<>();
             pars.put("Empresa", nombreEmpresa);
             pars.put("Logo", isLogo);
             pars.put("RFC", rfcEmpresa);
             pars.put("Direccion", direcEmpresa);
-            pars.put("Numcredito",  Integer.toString(cuentaCredito));
+            pars.put("Numcredito", Integer.toString(cuentaCredito));
             pars.put("Titulo", "REPORTE DE DESEMBOLSO DE CRÉDITO");
             pars.put("Fecha", txtFecha.getText());
             pars.put("Folio", folio);
             pars.put("NumSocio", txtSocio.getText());
             pars.put("NombreSocio", txtNomSocio.getText());
+            pars.put("ASESOR", asesor);
 
             pars.put("IntOrd", ord);
             pars.put("IntMora", mor);
@@ -949,18 +1060,23 @@ public class ReimpresionController {
             pars.put("Hora", hora);
             pars.put("LogoImg", isLogo);
             pars.put(
-                    "Descripcion",
-                    "Recibí de " + nombreEmpresa + " la cantidad de "+ montoenviar +
-                            " ("+letras +
-                            ") recibido en efectivo a mi entera satisfacción. Así mismo, manifiesto conocer y apegarme al " +
-                            "cumplimiento del acuerdo 2 de la Asamblea General efectuada el 22 de Julio de 2011," +
-                            " el cual menciona que todo socio que realice un crédito por sus ahorros o menos y que " +
-                            "en seis meses consecutivos no realice abono alguno a su crédito, será dado de baja con el fin " +
-                            "de evitar el incremento de su deuda y la cartera vencida.");
+                "Descripcion",
+                "Recibí de "
+                    + nombreEmpresa
+                    + " la cantidad de "
+                    + montoenviar
+                    + " ("
+                    + letras
+                    + ") recibido en efectivo a mi entera satisfacción. Así mismo, manifiesto conocer y apegarme al "
+                    + "cumplimiento del acuerdo 2 de la Asamblea General efectuada el 22 de Julio de 2011,"
+                    + " el cual menciona que todo socio que realice un crédito por sus ahorros o menos y que "
+                    + "en seis meses consecutivos no realice abono alguno a su crédito, será dado de baja con el fin "
+                    + "de evitar el incremento de su deuda y la cartera vencida.");
 
             InputStream isRepo = getClass().getResourceAsStream("/Reports/desembolso.jasper");
             JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
-            JasperPrint jpRepo = JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
+            JasperPrint jpRepo =
+                JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
 
             JasperViewer viewer = new JasperViewer(jpRepo, false);
 
@@ -976,23 +1092,22 @@ public class ReimpresionController {
           break;
 
         case 4:
-
           try {
 
             ModelAhorro ahororoactual = servicio.traerCuentaAhorroPorSocio(Integer.parseInt(socio));
             String numcuenta = ahororoactual.getNum_cuenta();
             String nomsocio = txtNomSocio.getText();
-            String montoanterior = formatoMoneda.format(ahororoactual.getSaldo() + montoExtraido );
-            String folio =txtID.getText();
-            String montoactual =formatoMoneda.format(ahororoactual.getSaldo());
+            String montoanterior = formatoMoneda.format(ahororoactual.getSaldo() + montoExtraido);
+            String folio = txtID.getText();
+            String montoactual = formatoMoneda.format(ahororoactual.getSaldo());
             String montoretirado = txtMonto.getText();
-            String letras = converter.asWords(BigDecimal.valueOf(montoExtraido)).toUpperCase() + " MXN";
+            String letras =
+                converter.asWords(BigDecimal.valueOf(montoExtraido)).toUpperCase() + " MXN";
             if (empresa.equals("0001")) {
               isLogo = getClass().getResourceAsStream("/assets/images/logo-mut.png");
             } else {
               isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
             }
-
 
             Map pars = new HashMap<>();
             pars.put("Empresa", nombreEmpresa);
@@ -1007,26 +1122,36 @@ public class ReimpresionController {
             pars.put("Nombresocio", nomsocio);
             pars.put("Numcuenta", numcuenta);
             pars.put("Montoretirado", montoretirado);
-            pars.put("Montorestante", montoactual  );
-            pars.put("Montoletras",letras);
+            pars.put("Montorestante", montoactual);
+            pars.put("Montoletras", letras);
             pars.put("Cajero", LoginController.usuarioLoggeado);
             pars.put("Hora", hora);
             if (empresa.equals("0001")) {
               pars.put(
-                      "Descripcion",
-                      "Recibí de la " + nombreEmpresa + " la cantidad de " + montoretirado
-                              + " (" +letras +") por concepto de RETIRO DE CUENTA DE AHORRO.");
+                  "Descripcion",
+                  "Recibí de la "
+                      + nombreEmpresa
+                      + " la cantidad de "
+                      + montoretirado
+                      + " ("
+                      + letras
+                      + ") por concepto de RETIRO DE CUENTA DE AHORRO.");
             } else {
               pars.put(
-                      "Descripcion",
-                      "Recibí de " + nombreEmpresa + " la cantidad de " + montoretirado
-                              + " (" + letras +") por concepto de RETIRO DE CUENTA DE AHORRO.");
-
+                  "Descripcion",
+                  "Recibí de "
+                      + nombreEmpresa
+                      + " la cantidad de "
+                      + montoretirado
+                      + " ("
+                      + letras
+                      + ") por concepto de RETIRO DE CUENTA DE AHORRO.");
             }
 
             InputStream isRepo = getClass().getResourceAsStream("/Reports/retiro.jasper");
             JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
-            JasperPrint jpRepo = JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
+            JasperPrint jpRepo =
+                JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
 
             JasperViewer viewer = new JasperViewer(jpRepo, false);
 
@@ -1079,24 +1204,22 @@ public class ReimpresionController {
                   psnguEnviar);
           break;
         case 6:
-
-
           try {
-            String protesonom="";
-            String desc="";
-
+            String protesonom = "";
+            String desc = "";
 
             if (empresacod.equals("0001")) {
-              protesonom ="CONT.PRIV. MARIA CARMINIA MONTERO QUINTAL";
+              protesonom = "CONT.PRIV. MARIA CARMINIA MONTERO QUINTAL";
               isLogo = getClass().getResourceAsStream("/assets/images/logo-mut.png");
               desc = "NOMBRE Y FIRMA DE LA PROTESORERA";
             } else {
-              protesonom ="CASIMIRO UITZ VILLANUEVA";
+              protesonom = "CASIMIRO UITZ VILLANUEVA";
               isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
               desc = "NOMBRE Y FIRMA DEL PROTESORERO";
             }
 
-            String letras = converter.asWords(BigDecimal.valueOf(montoExtraido)).toUpperCase() + " MXN";
+            String letras =
+                converter.asWords(BigDecimal.valueOf(montoExtraido)).toUpperCase() + " MXN";
             String nomcajero = servicio.traerCajeroPorUsuario(LoginController.usuarioLoggeado);
             Map pars = new HashMap<>();
             pars.put("Empresa", nombreEmpresa);
@@ -1121,14 +1244,22 @@ public class ReimpresionController {
             pars.put("DescProteso", desc);
 
             pars.put(
-                    "Descripcion",
-                    "TRASLADO DE APERTURA realizado por "+ txtMonto.getText() + " (" + letras  +
-                            ") efectuado en la sucursal de " +
-                            "UMAN por "+nomcajero+ " y autorizado por " + protesonom);
+                "Descripcion",
+                "TRASLADO DE APERTURA realizado por "
+                    + txtMonto.getText()
+                    + " ("
+                    + letras
+                    + ") efectuado en la sucursal de "
+                    + "UMAN por "
+                    + nomcajero
+                    + " y autorizado por "
+                    + protesonom);
 
-            InputStream isRepo = getClass().getResourceAsStream("/Reports/traslado_apertura.jasper");
+            InputStream isRepo =
+                getClass().getResourceAsStream("/Reports/traslado_apertura.jasper");
             JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
-            JasperPrint jpRepo = JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
+            JasperPrint jpRepo =
+                JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
 
             JasperViewer viewer = new JasperViewer(jpRepo, false);
 
@@ -1145,20 +1276,20 @@ public class ReimpresionController {
         case 7:
           try {
 
-            String protesonom="";
-            String desc="";
-
+            String protesonom = "";
+            String desc = "";
 
             if (empresacod.equals("0001")) {
-              protesonom ="CONT.PRIV. MARIA CARMINIA MONTERO QUINTAL";
+              protesonom = "CONT.PRIV. MARIA CARMINIA MONTERO QUINTAL";
               isLogo = getClass().getResourceAsStream("/assets/images/logo-mut.png");
               desc = "NOMBRE Y FIRMA DE LA PROTESORERA";
             } else {
-              protesonom ="CASIMIRO UITZ VILLANUEVA";
+              protesonom = "CASIMIRO UITZ VILLANUEVA";
               isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
               desc = "NOMBRE Y FIRMA DEL PROTESORERO";
             }
-            String letras = converter.asWords(BigDecimal.valueOf(montoExtraido)).toUpperCase() + " MXN";
+            String letras =
+                converter.asWords(BigDecimal.valueOf(montoExtraido)).toUpperCase() + " MXN";
             String nomcajero = servicio.traerCajeroPorUsuario(LoginController.usuarioLoggeado);
 
             Map pars = new HashMap<>();
@@ -1173,7 +1304,7 @@ public class ReimpresionController {
             pars.put("Turno", turno);
 
             pars.put("Origen", "CUENTA DE CAJERO " + cuenta_origen);
-            pars.put("Destino",  cuenta_destino);
+            pars.put("Destino", cuenta_destino);
             pars.put("Monto", txtMonto.getText());
             pars.put("Montoletras", letras);
             pars.put("DescProteso", desc);
@@ -1184,14 +1315,21 @@ public class ReimpresionController {
             pars.put("Protesonom", protesonom);
 
             pars.put(
-                    "Descripcion",
-                    "TRASLADO DE CIERRE realizado por "+ txtMonto.getText() + " (" + letras +
-                            ") efectuado en la sucursal de " +
-                            "UMAN por "+nomcajero+ " y autorizado por " + protesonom);
+                "Descripcion",
+                "TRASLADO DE CIERRE realizado por "
+                    + txtMonto.getText()
+                    + " ("
+                    + letras
+                    + ") efectuado en la sucursal de "
+                    + "UMAN por "
+                    + nomcajero
+                    + " y autorizado por "
+                    + protesonom);
 
             InputStream isRepo = getClass().getResourceAsStream("/Reports/traslado_cierre.jasper");
             JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
-            JasperPrint jpRepo = JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
+            JasperPrint jpRepo =
+                JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
 
             JasperViewer viewer = new JasperViewer(jpRepo, false);
 
@@ -1232,7 +1370,7 @@ public class ReimpresionController {
           break;
       }
       System.out.println("SOY INFIEEEEL: " + operaciontipo);
-      if (operaciontipo == 1 ||operaciontipo ==2 || operaciontipo == 5 || operaciontipo == 10) {
+      if (operaciontipo == 1 || operaciontipo == 2 || operaciontipo == 5 || operaciontipo == 10) {
         System.out.println("ME EJECUTE");
         printer.toFile("Reimpresion.txt");
 
@@ -1278,6 +1416,16 @@ public class ReimpresionController {
       alert.showAndWait();
       Stage ventanaActual = (Stage) txtMonto.getScene().getWindow();
       ventanaActual.close();
+    }
+  }
+
+  private double parseMoneda(String moneda) {
+    try {
+      Number numero = formatoMoneda.parse(moneda);
+      return numero.doubleValue();
+    } catch (ParseException e) {
+      e.printStackTrace();
+      return 0;
     }
   }
 }

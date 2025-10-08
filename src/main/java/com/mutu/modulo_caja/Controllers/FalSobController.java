@@ -43,7 +43,7 @@ public class FalSobController implements Initializable {
         .withMethod(
             c -> {
               String texto = c.get("input");
-              if (texto == null || texto.equals("") || Integer.parseInt(texto) == 0) {
+              if (texto == null || texto.equals("") || Double.parseDouble(texto) == 0) {
                 c.error("Ingrese un valor mayor a cero");
                 lblError.setText("Ingrese un valor mayor a cero");
               } else {
@@ -54,11 +54,17 @@ public class FalSobController implements Initializable {
         .immediate();
 
     txtSaldoFis.setTextFormatter(
-        new TextFormatter<>(
-            change -> {
-              change.setText(change.getText().replaceAll("[^0-9]", ""));
-              return change;
-            }));
+            new TextFormatter<>(change -> {
+              String newText = change.getControlNewText();
+              // Permitir solo dígitos y un punto decimal
+              if (newText.matches("\\d*(\\.\\d*)?")) {
+                return change;
+              } else {
+                return null; // Rechaza el cambio
+              }
+            })
+    );
+
 
     Platform.runLater(
         () -> {
@@ -112,6 +118,8 @@ public class FalSobController implements Initializable {
       e.printStackTrace();
     }
 
+    double saldoFis = Double.parseDouble(txtSaldoFis.getText().trim());
+
     String res = "";
 
     if (empresa.equals("MUTUALIDAD 12 DE AGOSTO, S.C. DE R.L. DE C.V.")) {
@@ -123,13 +131,13 @@ public class FalSobController implements Initializable {
     if (lblTipo.getText().equals("SOBRANTE:")) {
       res =
           servicio.procesarAjuste(
-              LoginController.usuarioLoggeado, 0, valorNumerico, turno, empresa, "");
+              LoginController.usuarioLoggeado, 0, valorNumerico, turno, empresa, saldoFis, "");
     } else if (lblTipo.getText().equals("SIN AJUSTE")) {
-      res = servicio.procesarAjuste(LoginController.usuarioLoggeado, 0, 0, turno, empresa, "");
+      res = servicio.procesarAjuste(LoginController.usuarioLoggeado, 0, 0, turno, empresa, saldoFis, "");
     } else {
       res =
           servicio.procesarAjuste(
-              LoginController.usuarioLoggeado, valorNumerico, 0, turno, empresa, "");
+              LoginController.usuarioLoggeado, valorNumerico, 0, turno, empresa, saldoFis, "");
     }
 
     if (res.equals("CORRECTO")) {

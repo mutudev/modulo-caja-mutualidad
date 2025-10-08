@@ -730,10 +730,9 @@ public class CreditoController implements Initializable {
       }
 
       if (existenActuales) {
-
-        ivaCubierto = Double.parseDouble(String.valueOf(cuota[17]));
+          ivaCubierto = parseMoneda(cuota[6].toString());
       }
-      devolver = BigDecimal.valueOf((interesOrdinario * ivaaplicar) -ivaCubierto ).setScale(2, RoundingMode.HALF_UP);
+      devolver = BigDecimal.valueOf((interesOrdinario * ivaaplicar) - ivaCubierto ).setScale(2, RoundingMode.HALF_UP);
 
       return devolver.doubleValue();
     } catch (Exception e) {
@@ -861,7 +860,7 @@ public class CreditoController implements Initializable {
           double interesConBonificacion = aplicarBonificacion(interes, fechaHoy, fechaVencimiento);
           double mora = calcularMora(cuota);
           devolver =
-              BigDecimal.valueOf(interesConBonificacion * ivaaplicar)
+              BigDecimal.valueOf((interesConBonificacion + mora) * ivaaplicar)
                   .setScale(2, RoundingMode.HALF_UP);
 
           // Usar BigDecimal para cálculos precisos

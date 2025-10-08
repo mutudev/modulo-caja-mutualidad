@@ -246,8 +246,9 @@ public class Servicio {
       double sobrante,
       String turno,
       String empresa,
+      double monto_fis,
       String Resultado) {
-    return repoCierre.procesarAjuste(nombre_usuario, faltante, sobrante, turno, empresa, Resultado);
+    return repoCierre.procesarAjuste(nombre_usuario, faltante, sobrante, turno, empresa, monto_fis, Resultado);
   }
 
   @Transactional
@@ -266,9 +267,9 @@ public class Servicio {
   }
 
   @Transactional
-  public String pa_procesarCierre(
-      int cuenta_cajeroMut, int cuenta_cajeroNgu, String fecha, String Resultado) {
-    return repoCierre.procesarCierre(cuenta_cajeroMut, cuenta_cajeroNgu, fecha, Resultado);
+  public Map<String, Object> pa_procesarCierre(
+      int cuenta_cajeroMut, int cuenta_cajeroNgu, String fecha, double saldo_fisico, String Resultado, int Cierre_id) {
+    return repoCierre.procesarCierre(cuenta_cajeroMut, cuenta_cajeroNgu, fecha, saldo_fisico, Resultado, Cierre_id);
   }
 
   public List<ModelUsuario> traerCajero(int rol) {
@@ -282,6 +283,8 @@ public class Servicio {
   public List<ModelEmpresa> traerEmpresas() {
     return repoEmpresa.findAll();
   }
+
+  public ModelTraslado traerTrasladoApertura(String cuentaDestino){return repoTraslado.findByCuentaDestino(cuentaDestino);}
 
   public List<Object[]> historialTraslados(
       int usuario, int tipo, int estado, String fecha, String turno, String empresa) {
@@ -363,6 +366,47 @@ public class Servicio {
   public int obtenerPlazoCredito(int id) {
     return repoCredito.obtenerPlazo(id);
   }
+
+  @Transactional
+  public String pa_CancelarAbonoCredito(
+          double capital_transaccion,
+          double interes_transaccion,
+          double mora_transaccion,
+          double iva_transaccion,
+          double bonif_transaccion,
+          double saldo_credito_transaccion,
+          double pago_total_transaccion,
+          String tipo_credito_transaccion,
+          int transaccion_id,
+          String cod_empresa,
+          String turno,
+          String fecha_transaccion,
+          String hora_transaccion,
+          int cuota_id,
+          String nom_usuario,
+          String Resultado
+  ) {
+    return repoOperaciones.pa_CancelarAbonoCredito(
+            capital_transaccion,
+            interes_transaccion,
+            mora_transaccion,
+            iva_transaccion,
+            bonif_transaccion,
+            saldo_credito_transaccion,
+            pago_total_transaccion,
+            tipo_credito_transaccion,
+            transaccion_id,
+            cod_empresa,
+            turno,
+            fecha_transaccion,
+            hora_transaccion,
+            cuota_id,
+            nom_usuario,
+            Resultado
+    );
+  }
+
+
 
   @Transactional
   public Map<String, Object> pa_PagarCredito(
