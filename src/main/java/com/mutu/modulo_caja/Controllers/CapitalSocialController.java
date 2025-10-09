@@ -87,7 +87,8 @@ public class CapitalSocialController implements Initializable {
         .immediate();
 
     txtMontoP.setTextFormatter(
-            new TextFormatter<>(change -> {
+        new TextFormatter<>(
+            change -> {
               String newText = change.getControlNewText();
               // Permitir solo dígitos y un punto decimal
               if (newText.matches("\\d*(\\.\\d*)?")) {
@@ -95,8 +96,7 @@ public class CapitalSocialController implements Initializable {
               } else {
                 return null; // Rechaza el cambio
               }
-            })
-    );
+            }));
 
     Platform.runLater(
         () -> {
@@ -107,17 +107,17 @@ public class CapitalSocialController implements Initializable {
 
   public void cierreDeVentana(Event event) {
     event.consume();
-//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//    alert.setTitle("CIERRE DE VENTANA");
-//    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//    alert.setContentText(
-//        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//    Optional<ButtonType> result = alert.showAndWait();
-//    if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//    }
+    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    //    alert.setTitle("CIERRE DE VENTANA");
+    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+    //    alert.setContentText(
+    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+    //
+    //    Optional<ButtonType> result = alert.showAndWait();
+    //    if (result.isPresent() && result.get() == ButtonType.OK) {
+    //
+    //    }
     validator = new Validator();
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
@@ -125,41 +125,64 @@ public class CapitalSocialController implements Initializable {
 
   @FXML
   public void cerrarConTecla(KeyEvent event) {
-    if (event.getCode().equals(KeyCode.CONTROL)) {
-//      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//      alert.setTitle("CIERRE DE VENTANA");
-//      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//      alert.setContentText(
-//          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//      Optional<ButtonType> result = alert.showAndWait();
-//      if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//      }
+    if (event.getCode().equals(KeyCode.ESCAPE)) {
+      //      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+      //      alert.setTitle("CIERRE DE VENTANA");
+      //      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+      //      alert.setContentText(
+      //          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+      //              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+      //
+      //      Optional<ButtonType> result = alert.showAndWait();
+      //      if (result.isPresent() && result.get() == ButtonType.OK) {
+      //
+      //      }
       validator = new Validator();
       Stage ventanaActual = (Stage) txtMontoP.getScene().getWindow();
       ventanaActual.close();
     }
 
-    if(event.getCode().equals(KeyCode.ENTER)){
+    if (event.getCode().equals(KeyCode.ENTER)) {
       abonarCapitalSocial();
     }
   }
 
+
+  @FXML
+  public void cerrarConTeclafocus(KeyEvent event) {
+    if (event.getCode().equals(KeyCode.ESCAPE)) {
+      //      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+      //      alert.setTitle("CIERRE DE VENTANA");
+      //      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+      //      alert.setContentText(
+      //          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+      //              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+      //
+      //      Optional<ButtonType> result = alert.showAndWait();
+      //      if (result.isPresent() && result.get() == ButtonType.OK) {
+      //
+      //      }
+      validator = new Validator();
+      Stage ventanaActual = (Stage) txtMontoP.getScene().getWindow();
+      ventanaActual.close();
+    }
+  }
+
+
+
   @FXML
   public void cerrarConBoton() {
-//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//    alert.setTitle("CIERRE DE VENTANA");
-//    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//    alert.setContentText(
-//        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//    Optional<ButtonType> result = alert.showAndWait();
-//    if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//    }
+    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    //    alert.setTitle("CIERRE DE VENTANA");
+    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+    //    alert.setContentText(
+    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+    //
+    //    Optional<ButtonType> result = alert.showAndWait();
+    //    if (result.isPresent() && result.get() == ButtonType.OK) {
+    //
+    //    }
     validator = new Validator();
     Stage ventanaActual = (Stage) txtMontoP.getScene().getWindow();
     ventanaActual.close();
@@ -183,8 +206,8 @@ public class CapitalSocialController implements Initializable {
       String horaFormateada = hora.format(formatterHora);
       double montoP = Double.parseDouble(txtMontoP.getText().trim());
       Map<String, Object> res =
-          servicio.AbonarCapitalSocial(socio, empresaCod, horaFormateada,montoP, usuario,"",
-                  0,0 , 0);
+          servicio.AbonarCapitalSocial(
+              socio, empresaCod, horaFormateada, montoP, usuario, "", 0, 0, 0);
 
       if (res.get("Resultado").toString().equals("ACTUALIZADO")
           || res.get("Resultado").toString().equals("ABONADO")) {

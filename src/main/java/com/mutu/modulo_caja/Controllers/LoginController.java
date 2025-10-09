@@ -183,6 +183,7 @@ public class LoginController implements Initializable {
       ventanaActual.close();
     }
   }
+
   @FXML
   public void EntrarConBoton(KeyEvent event) {
     if (event.getCode().equals(KeyCode.ENTER)) {

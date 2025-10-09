@@ -43,8 +43,8 @@ public class CierreController implements Initializable {
 
   public int cuentCajaMutu = 0;
   public int cuentaCajaNgu = 0;
-  double salfisicoMUT = 0 ;
-  double salfisicoNGU = 0 ;
+  double salfisicoMUT = 0;
+  double salfisicoNGU = 0;
   String turno = "";
   List<Object[]> cuentaMUT1;
   List<Object[]> cuentaNGU1;
@@ -60,25 +60,26 @@ public class CierreController implements Initializable {
 
   public void cierreDeVentana(Event event) {
     event.consume();
-//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//    alert.setTitle("CIERRE DE VENTANA");
-//    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//    alert.setContentText(
-//        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//    Optional<ButtonType> result = alert.showAndWait();
-//    if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//    }
+    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    //    alert.setTitle("CIERRE DE VENTANA");
+    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+    //    alert.setContentText(
+    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+    //
+    //    Optional<ButtonType> result = alert.showAndWait();
+    //    if (result.isPresent() && result.get() == ButtonType.OK) {
+    //
+    //    }
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
   }
 
-  public void setDatos(List<Object[]> cuentaMUT, List<Object[]> cuentaNGU, Label lbl, String turno) {
+  public void setDatos(
+      List<Object[]> cuentaMUT, List<Object[]> cuentaNGU, Label lbl, String turno) {
     this.lblParaCerrarLaPrincipal = lbl;
     this.turno = turno;
-    this.cuentaMUT1 =cuentaMUT;
+    this.cuentaMUT1 = cuentaMUT;
     this.cuentaNGU1 = cuentaNGU;
 
     NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
@@ -147,28 +148,29 @@ public class CierreController implements Initializable {
       LocalDate fecha = LocalDate.now();
 
       Map<String, Object> resMutu =
-          servicio.pa_procesarCierre(cuentCajaMutu, 0, fecha.toString(), salfisicoMUT,"",0);
+          servicio.pa_procesarCierre(cuentCajaMutu, 0, fecha.toString(), salfisicoMUT, "", 0);
 
-      Map<String, Object>  resNgu =
-              servicio.pa_procesarCierre(0, cuentaCajaNgu, fecha.toString(), salfisicoNGU,"",0);
+      Map<String, Object> resNgu =
+          servicio.pa_procesarCierre(0, cuentaCajaNgu, fecha.toString(), salfisicoNGU, "", 0);
 
-      boolean valido = isValido(resMutu.get("Resultado").toString(), resNgu.get("Resultado").toString());
+      boolean valido =
+          isValido(resMutu.get("Resultado").toString(), resNgu.get("Resultado").toString());
 
       if (valido) {
         try {
           Alert alert = new Alert(Alert.AlertType.INFORMATION);
           alert.setTitle("CIERRE HECHO CORRECTAMENTE");
           alert.setHeaderText("CIERRE EXITOSO");
-          alert.setContentText(
-                  "CIERRE EXITOSO DEL CAJERO: " + LoginController.usuarioLoggeado);
+          alert.setContentText("CIERRE EXITOSO DEL CAJERO: " + LoginController.usuarioLoggeado);
           alert.showAndWait();
 
           String mutNombre = "MUTUALIDAD DOCE DE AGOSTO S.C. DE R.L. DE C.V.";
           String nguNombre = "NUEVA GENERACIÓN DE UMÁN. AC.";
 
-
-          Object[] datos = servicio.traerCierreCajero(Integer.parseInt(resMutu.get("Cierre_id").toString()));
-          Object[] datosNGU = servicio.traerCierreCajero(Integer.parseInt(resNgu.get("Cierre_id").toString()));
+          Object[] datos =
+              servicio.traerCierreCajero(Integer.parseInt(resMutu.get("Cierre_id").toString()));
+          Object[] datosNGU =
+              servicio.traerCierreCajero(Integer.parseInt(resNgu.get("Cierre_id").toString()));
           String folio = "";
           String fechad = "";
           String hora = "";
@@ -178,10 +180,14 @@ public class CierreController implements Initializable {
           InputStream isLogo = null;
           InputStream isLogo2 = null;
 
-          ModelTraslado trasladoCMut = servicio.traerTrasladoCajero(cuentaMUT1.get(0)[0].toString());
-          ModelTraslado trasladoCNgu = servicio.traerTrasladoCajero(cuentaNGU1.get(0)[0].toString());
-          ModelTraslado trasladoAMut = servicio.traerTrasladoApertura(cuentaMUT1.get(0)[0].toString());
-          ModelTraslado trasladoANgu = servicio.traerTrasladoApertura(cuentaNGU1.get(0)[0].toString());
+          ModelTraslado trasladoCMut =
+              servicio.traerTrasladoCajero(cuentaMUT1.get(0)[0].toString());
+          ModelTraslado trasladoCNgu =
+              servicio.traerTrasladoCajero(cuentaNGU1.get(0)[0].toString());
+          ModelTraslado trasladoAMut =
+              servicio.traerTrasladoApertura(cuentaMUT1.get(0)[0].toString());
+          ModelTraslado trasladoANgu =
+              servicio.traerTrasladoApertura(cuentaNGU1.get(0)[0].toString());
 
           String nomcajero = "";
           String ahorros = "";
@@ -204,12 +210,12 @@ public class CierreController implements Initializable {
           double sobranteCant = 0;
           String faltante = "";
           double faltanteCant = 0;
-          String total="";
-          double totalcant=0;
+          String total = "";
+          double totalcant = 0;
           String saldoFisicoMut = "";
           double cantSaldoFisicoMut = 0;
 
-          //NGU var
+          // NGU var
           String ahorrosNGU = "";
           double ahorrosCantNGU = 0;
           String creditosNGU = "";
@@ -230,12 +236,12 @@ public class CierreController implements Initializable {
           double sobranteCantNGU = 0;
           String faltanteNGU = "";
           double faltanteCantNGU = 0;
-          String totalNGU="";
-          double totalcantNGU=0;
+          String totalNGU = "";
+          double totalcantNGU = 0;
           String saldoFisicoNgu = "";
           double cantSaldoFisicoNgu = 0;
 
-          //Totales
+          // Totales
           String ahorrosTOT = "";
           double ahorrosCantTOT = 0;
           String creditosTOT = "";
@@ -256,25 +262,25 @@ public class CierreController implements Initializable {
           double sobranteCantTOT = 0;
           String faltanteTOT = "";
           double faltanteCantTOT = 0;
-          String totalTOT ="";
+          String totalTOT = "";
           double totalcantTOT = 0;
           String totSaldoFisicoAmbas = "";
           double cantTotSaldoFisicoAmbas = 0;
 
-
-
-
           NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
 
-          folio = "MUT" + resMutu.get("Cierre_id").toString() + "-" + "NGU" + resNgu.get("Cierre_id").toString();
-
+          folio =
+              "MUT"
+                  + resMutu.get("Cierre_id").toString()
+                  + "-"
+                  + "NGU"
+                  + resNgu.get("Cierre_id").toString();
 
           for (Object filaObj : datos) {
             if (filaObj instanceof Object[]) {
               Object[] fila = (Object[]) filaObj;
 
               hora = fila[14].toString();
-
 
               nomcajero = servicio.traerCajeroPorUsuario(LoginController.usuarioLoggeado);
               ahorrosCant = Double.parseDouble(String.valueOf(fila[2]));
@@ -310,12 +316,19 @@ public class CierreController implements Initializable {
               cantSaldoFisicoMut = Double.parseDouble(String.valueOf(fila[12]));
               saldoFisicoMut = formatoMoneda.format(cantSaldoFisicoMut);
 
-              totalcant = creditosCant + ahorrosCant - retirosCant -desembolsosCant + csCant +
-                      presocCant + aperturaCant + sobranteCant -faltanteCant;
+              totalcant =
+                  creditosCant
+                      + ahorrosCant
+                      - retirosCant
+                      - desembolsosCant
+                      + csCant
+                      + presocCant
+                      + aperturaCant
+                      + sobranteCant
+                      - faltanteCant;
               total = formatoMoneda.format(totalcant);
             }
           }
-
 
           for (Object filaObj : datosNGU) {
             if (filaObj instanceof Object[]) {
@@ -354,13 +367,19 @@ public class CierreController implements Initializable {
               cantSaldoFisicoNgu = Double.parseDouble(String.valueOf(fila[12]));
               saldoFisicoNgu = formatoMoneda.format(cantSaldoFisicoNgu);
 
-              totalcantNGU = creditosCantNGU + ahorrosCantNGU - retirosCantNGU - desembolsosCantNGU + csCantNGU +
-                      presocCantNGU + aperturaCantNGU + sobranteCantNGU - faltanteCantNGU;
+              totalcantNGU =
+                  creditosCantNGU
+                      + ahorrosCantNGU
+                      - retirosCantNGU
+                      - desembolsosCantNGU
+                      + csCantNGU
+                      + presocCantNGU
+                      + aperturaCantNGU
+                      + sobranteCantNGU
+                      - faltanteCantNGU;
               totalNGU = formatoMoneda.format(totalcantNGU);
-
             }
           }
-
 
           ahorrosCantTOT = ahorrosCant + ahorrosCantNGU;
           ahorrosTOT = formatoMoneda.format(ahorrosCantTOT);
@@ -395,11 +414,17 @@ public class CierreController implements Initializable {
           cantTotSaldoFisicoAmbas = cantSaldoFisicoMut + cantSaldoFisicoNgu;
           totSaldoFisicoAmbas = formatoMoneda.format(cantTotSaldoFisicoAmbas);
 
-          totalcantTOT = creditosCantTOT + ahorrosCantTOT - retirosCantTOT - desembolsosCantTOT + csCantTOT +
-                  presocCantTOT + aperturaCantTOT + sobranteCantTOT - faltanteCantTOT;
+          totalcantTOT =
+              creditosCantTOT
+                  + ahorrosCantTOT
+                  - retirosCantTOT
+                  - desembolsosCantTOT
+                  + csCantTOT
+                  + presocCantTOT
+                  + aperturaCantTOT
+                  + sobranteCantTOT
+                  - faltanteCantTOT;
           totalTOT = formatoMoneda.format(totalcantTOT);
-
-
 
           isLogo = getClass().getResourceAsStream("/assets/images/logo-mut.png");
           isLogo2 = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
@@ -458,15 +483,15 @@ public class CierreController implements Initializable {
             pars.put("FALTANTE_TOT", faltanteTOT);
             pars.put("TOTAL_F", cierreTOT);
 
-            //pars.put("TOTAL_E" , cierreTOT);
-            pars.put("TOTAL_FISI",saldoFisicoMut);
+            // pars.put("TOTAL_E" , cierreTOT);
+            pars.put("TOTAL_FISI", saldoFisicoMut);
             pars.put("TOTAL_FISI_NGU", saldoFisicoNgu);
             pars.put("TOTAL_FISI_TOT", totSaldoFisicoAmbas);
 
-
             InputStream isRepo = getClass().getResourceAsStream("/Reports/cierrefinal.jasper");
             JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
-            JasperPrint jpRepo = JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
+            JasperPrint jpRepo =
+                JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
 
             JasperViewer viewer = new JasperViewer(jpRepo, false);
 
@@ -486,8 +511,8 @@ public class CierreController implements Initializable {
           fxml.setControllerFactory(Main.context::getBean);
           Scene nuevaEscena = new Scene(fxml.load());
           nuevaEscena
-                  .getStylesheets()
-                  .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());
+              .getStylesheets()
+              .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());
           nuevaVentana.setTitle("AUTENTICACIÓN DE USUARIO");
           Image icon = new Image(getClass().getResourceAsStream("/assets/images/logo.png"));
           nuevaVentana.getIcons().add(icon);
@@ -510,17 +535,18 @@ public class CierreController implements Initializable {
       Alert alert = new Alert(Alert.AlertType.INFORMATION);
       alert.setTitle("CIERRE DE CAJERO REALIZADO CORRECTAMENTE");
       alert.setHeaderText("CIERRE EXITOSO");
-      alert.setContentText("EL CIERRE DEL CAJERO: " + LoginController.usuarioLoggeado + " FUE EXITOSO.");
+      alert.setContentText(
+          "EL CIERRE DEL CAJERO: " + LoginController.usuarioLoggeado + " FUE EXITOSO.");
       alert.showAndWait();
       valido = true;
     } else {
       String error = "";
       if (resMutu.equals("CORRECTO") && !resNgu.equals("CORRECTO")) {
-          error = resNgu.toUpperCase();
-      } else if(!resMutu.equals("CORRECTO") && resNgu.equals("CORRECTO")){
-          error = resMutu.toUpperCase();
+        error = resNgu.toUpperCase();
+      } else if (!resMutu.equals("CORRECTO") && resNgu.equals("CORRECTO")) {
+        error = resMutu.toUpperCase();
       } else {
-          error = resMutu.toUpperCase();
+        error = resMutu.toUpperCase();
       }
       Alert alert = new Alert(Alert.AlertType.ERROR);
       alert.setTitle("ERROR AL REALIZAR EL CIERRE DE CAJERO");
@@ -534,17 +560,17 @@ public class CierreController implements Initializable {
   @FXML
   public void cerrarConTecla(KeyEvent event) {
     if (event.getCode().equals(KeyCode.CONTROL)) {
-//      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//      alert.setTitle("CIERRE DE VENTANA");
-//      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//      alert.setContentText(
-//          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//      Optional<ButtonType> result = alert.showAndWait();
-//      if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//      }
+      //      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+      //      alert.setTitle("CIERRE DE VENTANA");
+      //      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+      //      alert.setContentText(
+      //          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+      //              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+      //
+      //      Optional<ButtonType> result = alert.showAndWait();
+      //      if (result.isPresent() && result.get() == ButtonType.OK) {
+      //
+      //      }
       Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
       ventanaActual.close();
     }
@@ -552,17 +578,17 @@ public class CierreController implements Initializable {
 
   @FXML
   public void cerrarConBoton() {
-//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//    alert.setTitle("CIERRE DE VENTANA");
-//    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//    alert.setContentText(
-//        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//    Optional<ButtonType> result = alert.showAndWait();
-//    if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//    }
+    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    //    alert.setTitle("CIERRE DE VENTANA");
+    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+    //    alert.setContentText(
+    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+    //
+    //    Optional<ButtonType> result = alert.showAndWait();
+    //    if (result.isPresent() && result.get() == ButtonType.OK) {
+    //
+    //    }
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
   }

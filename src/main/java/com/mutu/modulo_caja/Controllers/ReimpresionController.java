@@ -7,6 +7,8 @@ import com.mutu.modulo_caja.utils.PrintJob;
 import com.tenpisoft.n2w.MoneyConverters;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -240,6 +242,27 @@ public class ReimpresionController {
       lblMora.setVisible(true);
       lblIva.setVisible(true);
       lblBonif.setVisible(true);
+    }
+  }
+
+
+  @FXML
+  public void cerrarConTecla(KeyEvent event) {
+    if (event.getCode().equals(KeyCode.ESCAPE)) {
+      //      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+      //      alert.setTitle("CIERRE DE VENTANA");
+      //      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+      //      alert.setContentText(
+      //          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+      //              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+      //
+      //      Optional<ButtonType> result = alert.showAndWait();
+      //      if (result.isPresent() && result.get() == ButtonType.OK) {
+      //
+      //      }
+      cerrar();
+    }else if(event.getCode().equals(KeyCode.ENTER)){
+      filtrarOpcion();
     }
   }
 
@@ -626,9 +649,29 @@ public class ReimpresionController {
               break;
 
             case 2:
-              //Imprimir ticket de crédito
-              return;
+              // Imprimir ticket de crédito
+              String psngu1 = "", psmut1 = "";
 
+              if (servicio.traerCuentasCS(Integer.parseInt(socio)).size() == 1) {
+                psmut1 = formatoMoneda.format(servicio.traerCuentasCS(Integer.parseInt(socio)).getFirst().getMonto_cubierto());
+              } else {
+                psmut1 = formatoMoneda.format(servicio.traerCuentasCS(Integer.parseInt(socio)).getFirst().getMonto_cubierto());
+                psngu1 = formatoMoneda.format(servicio.traerCuentasCS(Integer.parseInt(socio)).get(1).getMonto_cubierto());
+              }
+
+              String interessinbonfienviar =
+                      formatoMoneda.format(
+                              parseMoneda(txtInteres.getText()) +  parseMoneda(txtBonif.getText()));
+
+              String saldoactual =
+                      formatoMoneda.format(
+                              parseMoneda(saldo_credito) +  parseMoneda(txtCapital.getText()));
+              printer =
+                      impresora.imprimirCancelacionAbonoACredito(nombreEmpresa,rfcEmpresa,direcEmpresa,socio, idoperacion,
+                      fechaTicket,horaFormateada, nombre,LoginController.usuarioLoggeado,txtCapital.getText(),moneyAsWords,
+                              monto,tipo_credito,txtMora.getText(),txtInteres.getText(),txtBonif.getText(),txtIva.getText(),psngu1,
+                              psmut1,saldoactual,interessinbonfienviar);
+              break;
 
             case 3:
               try {
@@ -854,7 +897,7 @@ public class ReimpresionController {
                       fechaTicket,
                       horaFormateada);
           }
-          if (opcion == 1 || opcion == 5 || opcion == 10) {
+          if (opcion == 1 ||opcion ==2|| opcion == 5 || opcion == 10) {
             printer.toFile("Cancelacion.txt");
 
             InputStream inputStream = null;
@@ -899,7 +942,7 @@ public class ReimpresionController {
         } else {
           Alert alert2 = new Alert(Alert.AlertType.ERROR);
           alert2.setTitle("ERROR CANCELANDO LA OPERACIÓN");
-          alert2.setHeaderText("ERROR CANCELANDO EL TRASLADO");
+          alert2.setHeaderText(Result.toUpperCase());
           alert2.setContentText("ERROR AL TRATAR DE CANCELAR");
           alert2.showAndWait();
         }

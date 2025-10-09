@@ -10,7 +10,7 @@
 
 <AnchorPane onKeyPressed="#handlerKeyPressed" onMousePressed="#handlerDeClicks" prefHeight="626.0" prefWidth="1124.0" style="-fx-background-color: #ffffff;" stylesheets="@/assets/css/estilos.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.CajeroController">
    <children>
-      <TextField fx:id="txtNumeroSocio" layoutX="402.0" layoutY="29.0" prefHeight="45.0" prefWidth="365.0" promptText="Ingrese el número de socio..." style="-fx-background-color: #39577C; -fx-text-fill: white; -fx-prompt-text-fill: white; -fx-font-weight: bold; -fx-hgap: 20px; -vx-padding: 10px; -fx-background-radius: 50px; -fx-border-radius: 50px; -fx-border-width: 2px; -fx-border-color: white;" styleClass="camposTexto">
+      <TextField fx:id="txtNumeroSocio" layoutX="402.0" layoutY="29.0" onKeyPressed="#reestablecerCambio" prefHeight="45.0" prefWidth="365.0" promptText="Ingrese el número de socio..." style="-fx-background-color: #39577C; -fx-text-fill: white; -fx-prompt-text-fill: white; -fx-font-weight: bold; -fx-hgap: 20px; -vx-padding: 10px; -fx-background-radius: 50px; -fx-border-radius: 50px; -fx-border-width: 2px; -fx-border-color: white;" styleClass="camposTexto">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
@@ -201,6 +201,5 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Label>
-      <Button layoutX="670.0" layoutY="499.0" mnemonicParsing="false" onAction="#pruebaCierre" text="Button" />
    </children>
 </AnchorPane>

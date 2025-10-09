@@ -156,6 +156,36 @@ public class CajeroController implements Initializable {
   }
 
   @FXML
+  public void reestablecerCambio(KeyEvent event) {
+    if (event.getCode() == KeyCode.CONTROL) {
+
+      if (CambioController.operacionesAnterior != 0) {
+        bufferOperaciones = CambioController.operacionesAnterior;
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("SALDO INMEDIATO REESTABLECIDO");
+        alert.setHeaderText("SALDO INMEDIATO REESTABLECIDO");
+        alert.setContentText("SE HA REESTABLECIDO SU SALDO DE OPERACIONES");
+        alert.showAndWait();
+      }
+      return;
+      //txtNumeroSocio.setText(txtNumeroSocio.getText());
+    } else if(event.getCode() == KeyCode.ESCAPE){
+      if (!apertura) {
+        mostrarError("APERTURA");
+        return;
+      }
+
+      if (txtNombreCargado.isVisible()) {
+        cargarSocio(false);
+        txtNumeroSocio.setText("");
+      }
+    }
+
+    return;
+
+  }
+
+  @FXML
   public void handlerKeyPressed(KeyEvent event) {
     String ruta = "";
     String titulo = "";
@@ -195,17 +225,7 @@ public class CajeroController implements Initializable {
         }
         break;
 
-      case KeyCode.CONTROL:
-        if (!apertura) {
-          mostrarError("APERTURA");
-          return;
-        }
 
-        if (txtNombreCargado.isVisible()) {
-          cargarSocio(false);
-          txtNumeroSocio.setText("");
-        }
-        break;
 
       case KeyCode.ALT:
         if (!apertura) {
@@ -221,9 +241,7 @@ public class CajeroController implements Initializable {
           cargarSocio(true);
         }
         break;
-      case KeyCode.ESCAPE:
-        cerrarSesion();
-        break;
+
       case KeyCode.F2:
         if (!apertura) {
           mostrarError("APERTURA");
@@ -350,12 +368,6 @@ public class CajeroController implements Initializable {
           String empresa_cod = "0001";
           String empresa_cod2 = "0002";
           LocalDate fecha = LocalDate.now();
-          System.out.println(turno);
-          System.out.println(empresa_cod);
-          System.out.println(empresa_cod2);
-          System.out.println(fecha);
-
-
 
           List<Object[]> cuentaMUT =
               servicio.CuentasdeCierre(
@@ -633,7 +645,7 @@ public class CajeroController implements Initializable {
         String empresa_cod = "0001";
         String empresa_cod2 = "0002";
         LocalDate fecha = LocalDate.now();
-        //Aqui el error
+        // Aqui el error
         List<Object[]> cuentaMUT =
             servicio.CuentasdeCierre(
                 LoginController.usuarioLoggeado, fecha.toString(), 0, turno, empresa_cod, 0);
@@ -1127,6 +1139,4 @@ public class CajeroController implements Initializable {
       }
     }
   }
-
-
 }

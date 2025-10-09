@@ -26,7 +26,7 @@
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <TextField fx:id="txtMonto" layoutX="153.0" layoutY="216.0" prefHeight="41.0" prefWidth="521.0" style="-fx-border-color: #000000;" />
+      <TextField fx:id="txtMonto" layoutX="153.0" layoutY="216.0" onKeyPressed="#cerrarConTeclaFocus" prefHeight="41.0" prefWidth="521.0" style="-fx-border-color: #000000;" />
 
       <Label fx:id="lblNumSocio" layoutX="152.0" layoutY="109.0" prefHeight="27.0" prefWidth="116.0" style="-fx-border-color: #000000; -fx-padding: 2 0 2 10; -fx-background-color: #E1E1E1;">
          <font>

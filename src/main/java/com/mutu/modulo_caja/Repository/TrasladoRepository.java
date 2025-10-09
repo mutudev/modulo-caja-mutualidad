@@ -23,6 +23,7 @@ public interface TrasladoRepository extends JpaRepository<ModelTraslado, Integer
       String empresa,
       String hora,
       String turno,
+      int validar,
       String Resultado,
       int transaccion_id);
 

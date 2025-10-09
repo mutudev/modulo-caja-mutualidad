@@ -6,7 +6,7 @@
 
 <AnchorPane onKeyPressed="#cerrarConTecla" prefHeight="495.0" prefWidth="873.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.PrevisionController">
     <children>
-        <TextField fx:id="txtMontoP" layoutX="210.0" layoutY="328.0" prefHeight="39.0" prefWidth="347.0" />
+        <TextField fx:id="txtMontoP" layoutX="210.0" layoutY="328.0" onKeyPressed="#cerrarConTecla" prefHeight="39.0" prefWidth="347.0" />
         <Label layoutX="300.0" layoutY="38.0" style="-fx-text-fill: #39577c;" text="PAGO DE PREVISION SOCIAL">
             <font>
                 <Font name="System Bold" size="24.0" />

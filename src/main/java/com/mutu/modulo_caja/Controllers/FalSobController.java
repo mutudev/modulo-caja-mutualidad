@@ -30,7 +30,7 @@ public class FalSobController implements Initializable {
   @FXML private Label lblTipo, lblError;
   public String empresa, turno;
 
-  public  Validator validator = new Validator();
+  public Validator validator = new Validator();
 
   @Autowired public Servicio servicio;
 
@@ -54,7 +54,8 @@ public class FalSobController implements Initializable {
         .immediate();
 
     txtSaldoFis.setTextFormatter(
-            new TextFormatter<>(change -> {
+        new TextFormatter<>(
+            change -> {
               String newText = change.getControlNewText();
               // Permitir solo dígitos y un punto decimal
               if (newText.matches("\\d*(\\.\\d*)?")) {
@@ -62,9 +63,7 @@ public class FalSobController implements Initializable {
               } else {
                 return null; // Rechaza el cambio
               }
-            })
-    );
-
+            }));
 
     Platform.runLater(
         () -> {
@@ -103,8 +102,21 @@ public class FalSobController implements Initializable {
       txtAjuste.setText(valorFormateado);
       txtSaldoFis.setDisable(true);
       btnRegistrar.setDisable(false);
+    }else if(event.getCode().equals(KeyCode.ESCAPE)){
+      cerrarConBoton();
     }
   }
+
+  @FXML
+  public void focus(KeyEvent event) {
+    if(event.getCode().equals(KeyCode.ENTER)
+            && event != null
+            && !txtAjuste.getText().isEmpty()){
+      procesarAjuste();
+
+    }
+  }
+
 
   @FXML
   public void procesarAjuste() {
@@ -133,7 +145,9 @@ public class FalSobController implements Initializable {
           servicio.procesarAjuste(
               LoginController.usuarioLoggeado, 0, valorNumerico, turno, empresa, saldoFis, "");
     } else if (lblTipo.getText().equals("SIN AJUSTE")) {
-      res = servicio.procesarAjuste(LoginController.usuarioLoggeado, 0, 0, turno, empresa, saldoFis, "");
+      res =
+          servicio.procesarAjuste(
+              LoginController.usuarioLoggeado, 0, 0, turno, empresa, saldoFis, "");
     } else {
       res =
           servicio.procesarAjuste(
@@ -204,17 +218,17 @@ public class FalSobController implements Initializable {
 
   public void cierreDeVentana(Event event) {
     event.consume();
-//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//    alert.setTitle("CIERRE DE VENTANA");
-//    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//    alert.setContentText(
-//        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//    Optional<ButtonType> result = alert.showAndWait();
-//    if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//    }
+    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    //    alert.setTitle("CIERRE DE VENTANA");
+    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+    //    alert.setContentText(
+    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+    //
+    //    Optional<ButtonType> result = alert.showAndWait();
+    //    if (result.isPresent() && result.get() == ButtonType.OK) {
+    //
+    //    }
     validator = new Validator();
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
@@ -222,38 +236,37 @@ public class FalSobController implements Initializable {
 
   @FXML
   public void cerrarConTecla(KeyEvent event) {
-    if (event.getCode().equals(KeyCode.CONTROL)) {
-//      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//      alert.setTitle("CIERRE DE VENTANA");
-//      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//      alert.setContentText(
-//          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//      Optional<ButtonType> result = alert.showAndWait();
-//      if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//      }
+    if (event.getCode().equals(KeyCode.ESCAPE)) {
+      //      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+      //      alert.setTitle("CIERRE DE VENTANA");
+      //      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+      //      alert.setContentText(
+      //          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+      //              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+      //
+      //      Optional<ButtonType> result = alert.showAndWait();
+      //      if (result.isPresent() && result.get() == ButtonType.OK) {
+      //
+      //      }
       validator = new Validator();
       Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
       ventanaActual.close();
     }
-
   }
 
   @FXML
   public void cerrarConBoton() {
-//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//    alert.setTitle("CIERRE DE VENTANA");
-//    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//    alert.setContentText(
-//        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//    Optional<ButtonType> result = alert.showAndWait();
-//    if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//    }
+    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    //    alert.setTitle("CIERRE DE VENTANA");
+    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+    //    alert.setContentText(
+    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+    //
+    //    Optional<ButtonType> result = alert.showAndWait();
+    //    if (result.isPresent() && result.get() == ButtonType.OK) {
+    //
+    //    }
     validator = new Validator();
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();

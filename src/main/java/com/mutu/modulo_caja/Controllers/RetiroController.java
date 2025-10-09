@@ -68,17 +68,17 @@ public class RetiroController implements Initializable {
 
   public void cierreDeVentana(Event event) {
     event.consume();
-//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//    alert.setTitle("CIERRE DE VENTANA");
-//    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//    alert.setContentText(
-//        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//    Optional<ButtonType> result = alert.showAndWait();
-//    if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//    }
+    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    //    alert.setTitle("CIERRE DE VENTANA");
+    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+    //    alert.setContentText(
+    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+    //
+    //    Optional<ButtonType> result = alert.showAndWait();
+    //    if (result.isPresent() && result.get() == ButtonType.OK) {
+    //
+    //    }
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
   }
@@ -113,18 +113,18 @@ public class RetiroController implements Initializable {
 
   @FXML
   public void cerrarConTecla(KeyEvent event) {
-    if (event.getCode().equals(KeyCode.CONTROL)) {
-//      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//      alert.setTitle("CIERRE DE VENTANA");
-//      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//      alert.setContentText(
-//          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//      Optional<ButtonType> result = alert.showAndWait();
-//      if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//      }
+    if (event.getCode().equals(KeyCode.ESCAPE)) {
+      //      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+      //      alert.setTitle("CIERRE DE VENTANA");
+      //      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+      //      alert.setContentText(
+      //          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+      //              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+      //
+      //      Optional<ButtonType> result = alert.showAndWait();
+      //      if (result.isPresent() && result.get() == ButtonType.OK) {
+      //
+      //      }
       Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
       ventanaActual.close();
     }
@@ -135,17 +135,17 @@ public class RetiroController implements Initializable {
 
   @FXML
   public void cerrarConBoton() {
-//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//    alert.setTitle("CIERRE DE VENTANA");
-//    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//    alert.setContentText(
-//        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//    Optional<ButtonType> result = alert.showAndWait();
-//    if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//    }
+    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    //    alert.setTitle("CIERRE DE VENTANA");
+    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+    //    alert.setContentText(
+    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+    //
+    //    Optional<ButtonType> result = alert.showAndWait();
+    //    if (result.isPresent() && result.get() == ButtonType.OK) {
+    //
+    //    }
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
   }
@@ -169,7 +169,16 @@ public class RetiroController implements Initializable {
 
       int id = Integer.parseInt(txtIdentificador.getText().trim());
       Map<String, Object> result =
-          servicio.ProcesarRetiro(id, socio, LoginController.usuarioLoggeado, monto, empresa, fechaTicket, turno, 0, "");
+          servicio.ProcesarRetiro(
+              id,
+              socio,
+              LoginController.usuarioLoggeado,
+              monto,
+              empresa,
+              fechaTicket,
+              turno,
+              0,
+              "");
 
       if (result.get("Resultado").toString().equals("CORRECTO")) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -207,7 +216,6 @@ public class RetiroController implements Initializable {
             isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
           }
 
-
           Map pars = new HashMap<>();
           pars.put("Empresa", nombreEmpresa);
           pars.put("Logo", isLogo);
@@ -227,15 +235,24 @@ public class RetiroController implements Initializable {
           pars.put("Hora", horaFormateada);
           if (empresa.equals("0001")) {
             pars.put(
-                    "Descripcion",
-                    "Recibí de la " + nombreEmpresa + " la cantidad de " + montoretirado
-                            + " (" + moneyAsWords +") por concepto de RETIRO DE CUENTA DE AHORRO.");
+                "Descripcion",
+                "Recibí de la "
+                    + nombreEmpresa
+                    + " la cantidad de "
+                    + montoretirado
+                    + " ("
+                    + moneyAsWords
+                    + ") por concepto de RETIRO DE CUENTA DE AHORRO.");
           } else {
             pars.put(
-                    "Descripcion",
-                    "Recibí de " + nombreEmpresa + " la cantidad de " + montoretirado
-                            + " (" + moneyAsWords +") por concepto de RETIRO DE CUENTA DE AHORRO.");
-
+                "Descripcion",
+                "Recibí de "
+                    + nombreEmpresa
+                    + " la cantidad de "
+                    + montoretirado
+                    + " ("
+                    + moneyAsWords
+                    + ") por concepto de RETIRO DE CUENTA DE AHORRO.");
           }
 
           InputStream isRepo = getClass().getResourceAsStream("/Reports/retiro.jasper");

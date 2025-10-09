@@ -90,35 +90,35 @@ public class DesembolsoController implements Initializable {
 
   public void cierreDeVentana(Event event) {
     event.consume();
-//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//    alert.setTitle("CIERRE DE VENTANA");
-//    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//    alert.setContentText(
-//        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//    Optional<ButtonType> result = alert.showAndWait();
-//    if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//    }
+    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    //    alert.setTitle("CIERRE DE VENTANA");
+    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+    //    alert.setContentText(
+    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+    //
+    //    Optional<ButtonType> result = alert.showAndWait();
+    //    if (result.isPresent() && result.get() == ButtonType.OK) {
+    //
+    //    }
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
   }
 
   @FXML
   public void cerrarConTecla(KeyEvent event) {
-    if (event.getCode().equals(KeyCode.CONTROL)) {
-//      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//      alert.setTitle("CIERRE DE VENTANA");
-//      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//      alert.setContentText(
-//          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//      Optional<ButtonType> result = alert.showAndWait();
-//      if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//      }
+    if (event.getCode().equals(KeyCode.ESCAPE)) {
+      //      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+      //      alert.setTitle("CIERRE DE VENTANA");
+      //      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+      //      alert.setContentText(
+      //          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+      //              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+      //
+      //      Optional<ButtonType> result = alert.showAndWait();
+      //      if (result.isPresent() && result.get() == ButtonType.OK) {
+      //
+      //      }
       Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
       ventanaActual.close();
     }
@@ -129,17 +129,17 @@ public class DesembolsoController implements Initializable {
 
   @FXML
   public void cerrarConBoton() {
-//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//    alert.setTitle("CIERRE DE VENTANA");
-//    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//    alert.setContentText(
-//        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//    Optional<ButtonType> result = alert.showAndWait();
-//    if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//    }
+    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    //    alert.setTitle("CIERRE DE VENTANA");
+    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+    //    alert.setContentText(
+    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+    //
+    //    Optional<ButtonType> result = alert.showAndWait();
+    //    if (result.isPresent() && result.get() == ButtonType.OK) {
+    //
+    //    }
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
   }
@@ -168,15 +168,16 @@ public class DesembolsoController implements Initializable {
       String horaticket = hora.format(formatterHora);
 
       Map<String, Object> result =
-          servicio.ProcesarDesembolso(Integer.parseInt(colCredito), usuario, monto, horaticket, "",0);
+          servicio.ProcesarDesembolso(
+              Integer.parseInt(colCredito), usuario, monto, horaticket, "", 0);
 
-      if  (result.get("Resultado").toString().equals("CORRECTO")) {
+      if (result.get("Resultado").toString().equals("CORRECTO")) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("DESEMBOLSO PROCESADO CON ÉXITO");
         alert.setHeaderText("DESEMBOLSO PROCESADO CON ÉXITO");
         alert.setContentText(
             "DESEMBOLSO DEL SOCIO: " + socio + " POR: " + montoString + " HECHO CON EXITO");
-          alert.showAndWait();
+        alert.showAndWait();
         String empresa = servicio.traerEmpresa("0002").getCodigo();
 
         try {
@@ -225,13 +226,17 @@ public class DesembolsoController implements Initializable {
           pars.put("LogoImg", isLogo);
           pars.put(
               "Descripcion",
-              "Recibí de " + nombreEmpresa + " la cantidad de "+ montoenviar +
-                      " ("+moneyAsWords +
-                      ") recibido en efectivo a mi entera satisfacción. Así mismo, manifiesto conocer y apegarme al " +
-                      "cumplimiento del acuerdo 2 de la Asamblea General efectuada el 22 de Julio de 2011," +
-                      " el cual menciona que todo socio que realice un crédito por sus ahorros o menos y que " +
-                      "en seis meses consecutivos no realice abono alguno a su crédito, será dado de baja con el fin " +
-                      "de evitar el incremento de su deuda y la cartera vencida.");
+              "Recibí de "
+                  + nombreEmpresa
+                  + " la cantidad de "
+                  + montoenviar
+                  + " ("
+                  + moneyAsWords
+                  + ") recibido en efectivo a mi entera satisfacción. Así mismo, manifiesto conocer y apegarme al "
+                  + "cumplimiento del acuerdo 2 de la Asamblea General efectuada el 22 de Julio de 2011,"
+                  + " el cual menciona que todo socio que realice un crédito por sus ahorros o menos y que "
+                  + "en seis meses consecutivos no realice abono alguno a su crédito, será dado de baja con el fin "
+                  + "de evitar el incremento de su deuda y la cartera vencida.");
 
           InputStream isRepo = getClass().getResourceAsStream("/Reports/desembolso.jasper");
           JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);

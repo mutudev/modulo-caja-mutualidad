@@ -200,7 +200,8 @@ public class OperacionesController implements Initializable {
     List<Object[]> operaciones;
 
     if (tipo_operacion == 6 || tipo_operacion == 7) {
-      operaciones = servicio.historialTraslados(usuario_id, tipo_operacion, 1, fechaEnviar, turno, empresa);
+      operaciones =
+          servicio.historialTraslados(usuario_id, tipo_operacion, 1, fechaEnviar, turno, empresa);
       tablaOperaciones.setVisible(false);
       tableTraslados.setVisible(true);
     } else {
@@ -232,39 +233,37 @@ public class OperacionesController implements Initializable {
     traerOperaciones();
   }
 
-
-
   public void cierreDeVentana(Event event) {
     event.consume();
-//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//    alert.setTitle("CIERRE DE VENTANA");
-//    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//    alert.setContentText(
-//        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//    Optional<ButtonType> result = alert.showAndWait();
-//    if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//    }
+    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    //    alert.setTitle("CIERRE DE VENTANA");
+    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+    //    alert.setContentText(
+    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+    //
+    //    Optional<ButtonType> result = alert.showAndWait();
+    //    if (result.isPresent() && result.get() == ButtonType.OK) {
+    //
+    //    }
     Stage ventanaActual = (Stage) cmbEmpresa.getScene().getWindow();
     ventanaActual.close();
   }
 
   @FXML
   public void cerrarConTecla(KeyEvent event) {
-    if (event.getCode().equals(KeyCode.CONTROL)) {
-//      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//      alert.setTitle("CIERRE DE VENTANA");
-//      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//      alert.setContentText(
-//          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//      Optional<ButtonType> result = alert.showAndWait();
-//      if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//      }
+    if (event.getCode().equals(KeyCode.ESCAPE)) {
+      //      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+      //      alert.setTitle("CIERRE DE VENTANA");
+      //      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+      //      alert.setContentText(
+      //          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+      //              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+      //
+      //      Optional<ButtonType> result = alert.showAndWait();
+      //      if (result.isPresent() && result.get() == ButtonType.OK) {
+      //
+      //      }
       Stage ventanaActual = (Stage) cmbEmpresa.getScene().getWindow();
       ventanaActual.close();
     }
@@ -272,17 +271,17 @@ public class OperacionesController implements Initializable {
 
   @FXML
   public void cerrarConBoton() {
-//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//    alert.setTitle("CIERRE DE VENTANA");
-//    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//    alert.setContentText(
-//        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//    Optional<ButtonType> result = alert.showAndWait();
-//    if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//    }
+    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    //    alert.setTitle("CIERRE DE VENTANA");
+    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+    //    alert.setContentText(
+    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+    //
+    //    Optional<ButtonType> result = alert.showAndWait();
+    //    if (result.isPresent() && result.get() == ButtonType.OK) {
+    //
+    //    }
     Stage ventanaActual = (Stage) cmbEmpresa.getScene().getWindow();
     ventanaActual.close();
   }
@@ -358,7 +357,7 @@ public class OperacionesController implements Initializable {
         }
         id_traslado = (String) String.valueOf(selectedRow[0]);
         monto = (String) selectedRow[3];
-        fecha= (String) selectedRow[7];
+        fecha = (String) selectedRow[7];
         nombre_usuario = (String) selectedRow[1];
       }
     } else {
@@ -372,15 +371,18 @@ public class OperacionesController implements Initializable {
         monto = (String) selectedRow[3];
         fecha = (String) selectedRow[2];
         nombre_socio = (String) selectedRow[1];
-        capital_pagado = (String) selectedRow[13];
-        interes_pagado = (String) selectedRow[14];
-        mora_pagada = (String) selectedRow[15];
-        iva_pagado = (String) selectedRow[16];
-        saldo_credito = (String) selectedRow[18];
-        tipo_credito = (String) selectedRow[19];
-        cuota_afectada = String.valueOf(Integer.parseInt(selectedRow[20].toString()));
+        if(tipo_operacion ==2){
+          capital_pagado = (String) selectedRow[13];
+          interes_pagado = (String) selectedRow[14];
+          mora_pagada = (String) selectedRow[15];
+          iva_pagado = (String) selectedRow[16];
+          saldo_credito = (String) selectedRow[18];
+          tipo_credito = (String) selectedRow[19];
+          cuota_afectada = String.valueOf(Integer.parseInt(selectedRow[20].toString()));
+          bonif_aplicada = (String) selectedRow[17];
+        }
         hora = (String) selectedRow[6];
-        bonif_aplicada = (String) selectedRow[17];
+
       }
     }
 
@@ -401,7 +403,18 @@ public class OperacionesController implements Initializable {
             monto,
             nombre_socio,
             tipo_operacion,
-            turno,nombre_usuario,this, hora, capital_pagado, interes_pagado, mora_pagada, iva_pagado, bonif_aplicada, saldo_credito, tipo_credito, cuota_afectada);
+            turno,
+            nombre_usuario,
+            this,
+            hora,
+            capital_pagado,
+            interes_pagado,
+            mora_pagada,
+            iva_pagado,
+            bonif_aplicada,
+            saldo_credito,
+            tipo_credito,
+            cuota_afectada);
       } else {
         controller.setDatosTraslados(
             id_traslado,
@@ -411,7 +424,9 @@ public class OperacionesController implements Initializable {
             cuenta_origen,
             cuenta_destino,
             fecha,
-            tipo_operacion, this, turno);
+            tipo_operacion,
+            this,
+            turno);
       }
 
       nuevaEscena
@@ -427,6 +442,7 @@ public class OperacionesController implements Initializable {
       e.printStackTrace();
     }
   }
+
   @FXML
   public void detectarClicks(MouseEvent event) {
     if (event.getClickCount() == 2) {

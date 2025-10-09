@@ -85,20 +85,32 @@ public class ElegirController implements Initializable {
       String capital = String.valueOf(selectedRow[3]);
       boolean bonifAplicable = (Boolean) selectedRow[13];
 
-
-
       Stage ventanaActual = (Stage) lblTitulo.getScene().getWindow();
       Stage nuevaVentana = new Stage();
       FXMLLoader fxml = new FXMLLoader(getClass().getResource("/com/java/fx/abonoCredito.fxml"));
       fxml.setControllerFactory(Main.context::getBean);
       Scene nuevaEscena = new Scene(fxml.load());
       CreditoController controlador = fxml.getController();
-      controlador.setDatos(numSocio, nomSocio, numCredito, plazos, tasa, mora, iva, tipoCredito, codigoSistema, fechaDesembolso, capital, bonifAplicable, 3, turno);
+      controlador.setDatos(
+          numSocio,
+          nomSocio,
+          numCredito,
+          plazos,
+          tasa,
+          mora,
+          iva,
+          tipoCredito,
+          codigoSistema,
+          fechaDesembolso,
+          capital,
+          bonifAplicable,
+          3,
+          turno);
       nuevaEscena
           .getStylesheets()
           .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());
       JMetro jMetro = new JMetro(Style.LIGHT);
-      //jMetro.setScene(nuevaEscena);
+      // jMetro.setScene(nuevaEscena);
       nuevaVentana.setTitle("INICIO - CAJERO");
       Image icon = new Image(getClass().getResourceAsStream("/assets/images/logo.png"));
       nuevaVentana.getIcons().add(icon);
@@ -478,15 +490,16 @@ public class ElegirController implements Initializable {
 
   @FXML
   public void cerrarConTecla(KeyEvent event) {
-    if (event.getCode().equals(KeyCode.CONTROL)) {
+    if (event.getCode().equals(KeyCode.ESCAPE)) {
       Stage ventanaActual = (Stage) lblTitulo.getScene().getWindow();
       ventanaActual.close();
     }
     if (event.getCode().equals(KeyCode.ENTER)) {
       cambiar();
     }
-
   }
+
+
 
   @FXML
   public void cerrarConBoton() {

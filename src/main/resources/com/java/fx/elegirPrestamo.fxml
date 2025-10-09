@@ -11,7 +11,7 @@
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <TableView fx:id="tablePrestamos" layoutX="31.0" layoutY="93.0" prefHeight="336.0" prefWidth="942.0">
+      <TableView fx:id="tablePrestamos" layoutX="31.0" layoutY="93.0" onKeyPressed="#cerrarConTecla" prefHeight="336.0" prefWidth="942.0">
         <columns>
           <TableColumn fx:id="colCredito" minWidth="0.0" prefWidth="147.0" text="CRÉDITO" />
           <TableColumn fx:id="colTipo" prefWidth="149.0" text="TIPO" />
@@ -20,7 +20,7 @@
             <TableColumn fx:id="colEmpresa" prefWidth="179.0" text="EMPRESA" />
         </columns>
       </TableView>
-       <Button fx:id="btnCancelar" layoutX="300.0" layoutY="467.0" onAction="#cerrarConBoton" prefHeight="39.0" prefWidth="203.0" style="-fx-background-color: #C0392B; -fx-text-fill: white; -fx-font-weight: bold;" text="CANCELAR" />
+       <Button fx:id="btnCancelar" layoutX="259.0" layoutY="467.0" onAction="#cerrarConBoton" prefHeight="39.0" prefWidth="203.0" style="-fx-background-color: #C0392B; -fx-text-fill: white; -fx-font-weight: bold;" text="CANCELAR" />
 
        <Button fx:id="btnAbonar" layoutX="544.0" layoutY="467.0" onAction="#cambiarConBoton" prefHeight="39.0" prefWidth="203.0" style="-fx-background-color: #39577C; -fx-text-fill: white; -fx-font-weight: bold;" text="ELEGIR" />
    </children>

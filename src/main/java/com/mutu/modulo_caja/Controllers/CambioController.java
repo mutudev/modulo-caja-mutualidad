@@ -1,6 +1,5 @@
 package com.mutu.modulo_caja.Controllers;
 
-
 import br.com.adilson.util.PrinterMatrix;
 import com.mutu.modulo_caja.Services.Servicio;
 import com.mutu.modulo_caja.utils.PrintJob;
@@ -37,13 +36,14 @@ public class CambioController implements Initializable {
   @Autowired public Servicio servicio;
 
   public double totalOperaciones;
-  public static double operacionesAnterior;
+  public static double operacionesAnterior = 0;
   NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     txtRecibido.setTextFormatter(
-            new TextFormatter<>(change -> {
+        new TextFormatter<>(
+            change -> {
               String newText = change.getControlNewText();
               // Permitir solo dígitos y un punto decimal
               if (newText.matches("\\d*(\\.\\d*)?")) {
@@ -51,14 +51,13 @@ public class CambioController implements Initializable {
               } else {
                 return null; // Rechaza el cambio
               }
-            })
-    );
+            }));
 
     Platform.runLater(
-            () -> {
-              Stage stage = (Stage) btnCerrar.getScene().getWindow();
-              stage.setOnCloseRequest(event -> cerrar());
-            });
+        () -> {
+          Stage stage = (Stage) btnCerrar.getScene().getWindow();
+          stage.setOnCloseRequest(event -> cerrar());
+        });
   }
 
   public void setDatos(double totalOperaciones) {
@@ -112,14 +111,14 @@ public class CambioController implements Initializable {
 
   @FXML
   public void cerrar() {
-//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//    alert.setTitle("CIERRE DE VENTANA");
-//    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//    alert.setContentText("SI LA CIERRA, EL TOTAL DE SUS OPERACIONES SE REINICIARÁ A $0.00");
-//    Optional<ButtonType> result = alert.showAndWait();
-//    if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//    }
+    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    //    alert.setTitle("CIERRE DE VENTANA");
+    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+    //    alert.setContentText("SI LA CIERRA, EL TOTAL DE SUS OPERACIONES SE REINICIARÁ A $0.00");
+    //    Optional<ButtonType> result = alert.showAndWait();
+    //    if (result.isPresent() && result.get() == ButtonType.OK) {
+    //
+    //    }
     CajeroController.bufferOperaciones = 0;
     operacionesAnterior = totalOperaciones;
     Stage ventanaActual = (Stage) btnCerrar.getScene().getWindow();
@@ -148,13 +147,12 @@ public class CambioController implements Initializable {
     String cambio = txtCambio.getText();
     String recibido = formatoMoneda.format(Double.parseDouble(txtRecibido.getText()));
 
-
     PrintService services = PrintServiceLookup.lookupDefaultPrintService();
     if (services != null) {
       PrintJob impresion = new PrintJob();
 
       PrinterMatrix printer =
-              impresion.imprimirCambio(nombre, totalop, cambio, recibido, fechaTicket, horaFormateada);
+          impresion.imprimirCambio(nombre, totalop, cambio, recibido, fechaTicket, horaFormateada);
 
       printer.toFile("impresion_Cambio.txt");
 
@@ -203,6 +201,4 @@ public class CambioController implements Initializable {
       alert2.showAndWait();
     }
   }
-
-
 }

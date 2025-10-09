@@ -171,10 +171,11 @@ public class Servicio {
       String empresa,
       String hora,
       String turno,
+      int validar,
       String Resultado,
       int transaccion_id) {
     return repoTraslado.pa_ProcesarTraslado(
-        nombre_usuario, monto_trasladar, tipo, empresa, hora, turno, Resultado, transaccion_id);
+        nombre_usuario, monto_trasladar, tipo, empresa, hora, turno, validar, Resultado, transaccion_id);
   }
 
   public List<Object[]> buscarSocioPorNombre(String nombreCompleto) {

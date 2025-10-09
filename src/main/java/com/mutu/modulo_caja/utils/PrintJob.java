@@ -207,6 +207,107 @@ public class PrintJob {
 
     return printer;
   }
+  public PrinterMatrix imprimirCancelacionAbonoACredito(
+          String empresa,
+          String rfc,
+          String direc,
+          String numsocio,
+          String folio,
+          String nomsocio,
+          String fecha,
+          String hora,
+          String usuario,
+          String capenviar,
+          String moneyAsWords,
+          String totalCuota,
+          String tipocredito,
+          String moraenviar,
+          String interesenviar,
+          String bonifenviar,
+          String ivaenviar,
+          String psnguenviar,
+          String psmutenviar,
+          String saldoenviar,
+          String interessinbonif) {
+    int numchar = moneyAsWords.length();
+    PrinterMatrix printer = new PrinterMatrix();
+
+    String nombre = "NOMBRE: " + nomsocio;
+    String tipoCuenta = "CANCELACION ABONO A CREDITO TIPO: " + tipocredito;
+    String iva = "IVA. NETO: " + ivaenviar;
+    String mora = "MORA: " + moraenviar;
+    String capital = "CAPITAL: " + capenviar +" INTERES: " + interessinbonif;
+    String bonif =  " BONIF: " + bonifenviar;
+    String interesbonificado = "INTERES BONIFICADO: " + interesenviar;
+    String total = "TOTAL PAGADO: " + totalCuota;
+    String descripcion1 = "LA NO OBJECION A ESTE COMPROBANTE";
+    String descripcion2 = "IMPLICA SU ACEPTACION";
+
+    String creditosaldo = "CREDITO ACTUAL " + saldoenviar + " CAPITAL DE CREDITO MAS INTERESES";
+
+
+    Extenso e = new Extenso();
+    e.setNumber(21.59);
+    printer.setOutSize(30, 60);
+    printer.printTextWrap(1, 2, 1, 60, empresa); // Columna 1
+
+    printer.printTextWrap(2, 3, 1, 60, "RFC: " + rfc); // Columna 2
+    printer.printTextWrap(3, 4, 1, 60, direc); // Columna 3
+
+    printer.printTextWrap(
+            4, 5, 1, 60, "FECHA: " + fecha + " " + hora + " FOLIO: " + folio); // Columna 4
+
+    printer.printTextWrap(5, 6, 1, 60, "SOCIO " + numsocio +" " +nomsocio );
+    printer.printTextWrap(6, 7, 1, 60, tipoCuenta);
+
+    printer.printTextWrap(7, 8, 1, 60, capital);
+    printer.printTextWrap(8, 9, 13, 60, bonif);
+
+
+    printer.printTextWrap(9, 10, 1, 60, interesbonificado );
+
+    printer.printTextWrap(10, 11, 15, 60, mora);
+    printer.printTextWrap(11, 12, 10, 60, iva);
+    printer.printTextWrap(12, 13, 7, 60, total);
+    if (numchar <= 43) {
+      printer.printTextWrap(13, 14, 1, 60, moneyAsWords);
+      printer.printTextWrap(14, 15, 1, 60, "___________________________________");
+      printer.printTextWrap(15, 16, 1, 60, nombre);
+      printer.printTextWrap(16, 17, 1, 60, descripcion1);
+      printer.printTextWrap(17, 18, 1, 60, descripcion2);
+      printer.printTextWrap(18, 19, 1, 60, creditosaldo);
+      if (empresa.equals("NUEVA GENERACION DE UMAN AC")) {
+        printer.printTextWrap(19, 20, 1, 60, "PS NGU: " + psnguenviar);
+      } else {
+        printer.printTextWrap(19, 20, 1, 60,  "PS MUT: " + psmutenviar + " PS NGU: " + psnguenviar);
+
+      }
+
+    } else {
+      String primeralinea = "";
+      String segundalinea = "";
+      String[] partes = moneyAsWords.split("(?i)\\s*CON\\s*");
+      if (partes.length >= 2) {
+        primeralinea = partes[0];
+        segundalinea = "CON " + partes[1];
+      }
+      printer.printTextWrap(13, 14, 1, 60, primeralinea);
+      printer.printTextWrap(14, 15, 1, 60, segundalinea);
+      printer.printTextWrap(15, 16, 1, 60, "___________________________________");
+      printer.printTextWrap(16, 17, 1, 60, nombre);
+      printer.printTextWrap(17, 18, 1, 60, descripcion1);
+      printer.printTextWrap(18, 19, 1, 60, descripcion2);
+      printer.printTextWrap(19, 20, 1, 60, creditosaldo);
+      if (empresa.equals("NUEVA GENERACION DE UMAN AC")) {
+        printer.printTextWrap(20, 21, 1, 60, "PS NGU: " + psnguenviar);
+      } else {
+        printer.printTextWrap(20, 21, 1, 60, "PS MUT: " + psmutenviar + " PS NGU: " + psnguenviar);
+
+      }
+
+    }
+    return printer;
+  }
 
   public PrinterMatrix imprimirAbonoACredito(
       String empresa,

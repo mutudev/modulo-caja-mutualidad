@@ -74,7 +74,8 @@ public class TrasladoController implements Initializable {
         .immediate();
 
     txtCantidad.setTextFormatter(
-            new TextFormatter<>(change -> {
+        new TextFormatter<>(
+            change -> {
               String newText = change.getControlNewText();
               // Permitir solo dígitos y un punto decimal
               if (newText.matches("\\d*(\\.\\d*)?")) {
@@ -82,8 +83,7 @@ public class TrasladoController implements Initializable {
               } else {
                 return null; // Rechaza el cambio
               }
-            })
-    );
+            }));
 
     Platform.runLater(
         () -> {
@@ -94,17 +94,17 @@ public class TrasladoController implements Initializable {
 
   public void cierreDeVentana(Event event) {
     event.consume();
-//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//    alert.setTitle("CIERRE DE VENTANA");
-//    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//    alert.setContentText(
-//        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//    Optional<ButtonType> result = alert.showAndWait();
-//    if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//    }
+    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    //    alert.setTitle("CIERRE DE VENTANA");
+    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+    //    alert.setContentText(
+    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+    //
+    //    Optional<ButtonType> result = alert.showAndWait();
+    //    if (result.isPresent() && result.get() == ButtonType.OK) {
+    //
+    //    }
     validator = new Validator();
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
@@ -121,40 +121,41 @@ public class TrasladoController implements Initializable {
 
   @FXML
   public void cerrarConTecla(KeyEvent event) {
-    if (event.getCode().equals(KeyCode.CONTROL)) {
-//      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//      alert.setTitle("CIERRE DE VENTANA");
-//      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//      alert.setContentText(
-//          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//      Optional<ButtonType> result = alert.showAndWait();
-//      if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//      }
+    if (event.getCode().equals(KeyCode.ESCAPE)) {
+      //      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+      //      alert.setTitle("CIERRE DE VENTANA");
+      //      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+      //      alert.setContentText(
+      //          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+      //              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+      //
+      //      Optional<ButtonType> result = alert.showAndWait();
+      //      if (result.isPresent() && result.get() == ButtonType.OK) {
+      //
+      //      }
       validator = new Validator();
       Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
       ventanaActual.close();
     }
     if (event.getCode().equals(KeyCode.ENTER)) {
+      event.consume();
       trasladar();
     }
   }
 
   @FXML
   public void cerrarConBoton() {
-//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//    alert.setTitle("CIERRE DE VENTANA");
-//    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-//    alert.setContentText(
-//        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-//            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-//
-//    Optional<ButtonType> result = alert.showAndWait();
-//    if (result.isPresent() && result.get() == ButtonType.OK) {
-//
-//    }
+    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    //    alert.setTitle("CIERRE DE VENTANA");
+    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
+    //    alert.setContentText(
+    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
+    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
+    //
+    //    Optional<ButtonType> result = alert.showAndWait();
+    //    if (result.isPresent() && result.get() == ButtonType.OK) {
+    //
+    //    }
     validator = new Validator();
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
@@ -163,10 +164,11 @@ public class TrasladoController implements Initializable {
   @FXML
   public void trasladar() {
 
+
     if (validator.validate()) {
       String nom_empresa = txtEmpresa.getText().trim();
       String cod_empresa = "";
-      String cod_boveda="";
+      String cod_boveda = "";
 
       switch (nom_empresa) {
         case "MUTUALIDAD 12 DE AGOSTO, S.C. DE R.L. DE C.V.":
@@ -201,7 +203,6 @@ public class TrasladoController implements Initializable {
       String horaticket = hora.format(formatterHora);
       if (opcion == 7) {
 
-
         List<Object[]> permisoTraslado =
             servicio.traerCuentaCajero(
                 LoginController.usuarioLoggeado, fecha.toString(), 1, turno, cod_empresa);
@@ -209,18 +210,38 @@ public class TrasladoController implements Initializable {
         for (Object[] fila : permisoTraslado) {
           if (Integer.parseInt(fila[8].toString()) == 1
               || Integer.parseInt(fila[8].toString()) == 2) {
-            Alert alert2 = new Alert(Alert.AlertType.ERROR);
-            alert2.setTitle("ERROR AL PROCESAR EL TRASLADO DE CIERRE");
-            alert2.setHeaderText("ERROR AL INTENTAR TRASLADAR PARA CERRAR");
-            alert2.setContentText("AÚN NO HA REALIZADO SU AJUSTE DE SOBRANTES Y FALTANTES.");
-            alert2.showAndWait();
-            return;
+            Alert alert2 = new Alert(Alert.AlertType.CONFIRMATION);
+            alert2.setTitle("CONFIRMAR TRASLADO HACIA BÓVEDA");
+            alert2.setHeaderText("AJUSTE DE SOBRANTES Y FALTANTES NO REALIZADO");
+            alert2.setContentText(
+                    "AÚN NO HA REALIZADO SU AJUSTE DE SOBRANTES Y FALTANTES.\n" +
+                            "¿ESTÁ SEGURO DE QUE DESEA SEGUIR TRASLADANDO?"
+            );
+
+            Optional<ButtonType> result = alert2.showAndWait();
+
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+              continue;
+            } else {
+              // Usuario cancela
+              return;
+            }
+
           }
         }
       }
 
       Map<String, Object> res =
-          servicio.procesarTraslado(LoginController.usuarioLoggeado, monto_trasladar, opcion, cod_empresa,horaticket, turno, "",0);
+          servicio.procesarTraslado(
+              LoginController.usuarioLoggeado,
+              monto_trasladar,
+              opcion,
+              cod_empresa,
+              horaticket,
+              turno,
+              0,
+              "",
+              0);
       boolean procesar = true;
       boolean permitir = false;
       int userid = servicio.traerDatosUsuario(LoginController.usuarioLoggeado).getId();
@@ -233,28 +254,51 @@ public class TrasladoController implements Initializable {
       String nombreEmpresa = servicio.traerEmpresa(cod_empresa).getRazonSocial();
       String rfcEmpresa = servicio.traerEmpresa(cod_empresa).getRfc();
       String direcEmpresa =
-              servicio.traerEmpresa(cod_empresa).getCalle()
-                      + " "
-                      + servicio.traerEmpresa(cod_empresa).getCruzamiento()
-                      + " COL. CENTRO";
-
-
+              STR."\{servicio.traerEmpresa(cod_empresa).getCalle()} \{servicio.traerEmpresa(cod_empresa).getCruzamiento()} COL. CENTRO";
 
       String folio = res.get("transaccion_id").toString();
-      if(folio.equals("0")){
-        Alert alert2 = new Alert(Alert.AlertType.ERROR);
-        alert2.setTitle("ERROR AL PROCESAR EL TRASLADO DEL CAJERO");
-        alert2.setHeaderText("ERROR AL INTENTAR LA OPERACIÓN DESEADA");
+      if (folio.equals("0")) {
+        Alert alert2 = new Alert(Alert.AlertType.CONFIRMATION);
+        alert2.setTitle("CONFIRMAR OPERACIÓN");
+        alert2.setHeaderText("¿DESEA CONTINUAR CON LA OPERACIÓN?");
         alert2.setContentText(res.get("Resultado").toString().toUpperCase());
-        alert2.showAndWait();
-        return;
-
+        Optional<ButtonType> result = alert2.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+          //Volvemos a ejecutar el traslado
+          res =
+                  servicio.procesarTraslado(
+                          LoginController.usuarioLoggeado,
+                          monto_trasladar,
+                          opcion,
+                          cod_empresa,
+                          horaticket,
+                          turno,
+                          1,
+                          "",
+                          0);
+          procesar = true;
+          permitir = false;
+          userid = servicio.traerDatosUsuario(LoginController.usuarioLoggeado).getId();
+          nomcajero = servicio.traerCajeroPorUsuario(LoginController.usuarioLoggeado);
+          alert = new Alert(Alert.AlertType.INFORMATION);
+          isLogo = null;
+          protesonom = "";
+          horaFormateada = hora.format(formatterHora);
+          nombreEmpresa = servicio.traerEmpresa(cod_empresa).getRazonSocial();
+          rfcEmpresa = servicio.traerEmpresa(cod_empresa).getRfc();
+          direcEmpresa =
+                  STR."\{servicio.traerEmpresa(cod_empresa).getCalle()} \{servicio.traerEmpresa(cod_empresa).getCruzamiento()} COL. CENTRO";
+          folio = res.get("transaccion_id").toString();
+        } else {
+          return;
+        }
       }
 
       NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
       String montotraslado = formatoMoneda.format(monto_trasladar);
       MoneyConverters converter = MoneyConverters.SPANISH_BANKING_MONEY_VALUE;
-      String moneyAsWords = converter.asWords(BigDecimal.valueOf(monto_trasladar)).toUpperCase() + " MXN";
+      String moneyAsWords =
+              STR."\{converter.asWords(BigDecimal.valueOf(monto_trasladar)).toUpperCase()} MXN";
       int codcaja = 0;
       String desc = "";
       if (cod_empresa.equals("0001")) {
@@ -266,14 +310,11 @@ public class TrasladoController implements Initializable {
       }
       switch (res.get("Resultado").toString()) {
         case "APERTURA":
-          codcaja = servicio.traerDatosCaja(userid,turno,cod_empresa,1).getId();
+          codcaja = servicio.traerDatosCaja(userid, turno, cod_empresa, 1).getId();
           alert.setTitle("APERTURA EXITOSA");
           alert.setHeaderText("APERTURA REALIZADA CORRECTAMENTE");
           alert.setContentText(
-              "EL CAJERO: "
-                  + LoginController.usuarioLoggeado
-                  + " AHORA ESTÁ LISTO PARA REALIZAR SUS OPERACIONES EN: "
-                  + nom_empresa);
+                  STR."EL CAJERO: \{LoginController.usuarioLoggeado} AHORA ESTÁ LISTO PARA REALIZAR SUS OPERACIONES EN: \{nom_empresa}");
           alert.showAndWait();
           try {
 
@@ -294,30 +335,29 @@ public class TrasladoController implements Initializable {
             pars.put("Montoletras", moneyAsWords);
             pars.put("DescProteso", desc);
 
-
             pars.put("Cajerouser", LoginController.usuarioLoggeado);
             pars.put("Cajeronom", nomcajero);
             pars.put("Hora", horaFormateada);
             if (cod_empresa.equals("0001")) {
-              protesonom ="CONT.PRIV. MARIA CARMINIA MONTERO QUINTAL";
+              protesonom = "CONT.PRIV. MARIA CARMINIA MONTERO QUINTAL";
             } else {
-              protesonom ="CASIMIRO UITZ VILLANUEVA";
+              protesonom = "CASIMIRO UITZ VILLANUEVA";
             }
             pars.put("Protesonom", protesonom);
 
             pars.put(
-                      "Descripcion",
-                      "TRASLADO DE APERTURA realizado por "+ montotraslado+ " (" +moneyAsWords +
-                            ") efectuado en la sucursal de " +
-                              "UMAN por "+nomcajero+ " y autorizado por " + protesonom);
+                "Descripcion",
+                    STR."TRASLADO DE APERTURA realizado por \{montotraslado} (\{moneyAsWords}) efectuado en la sucursal de UMAN por \{nomcajero} y autorizado por \{protesonom}");
 
-            InputStream isRepo = getClass().getResourceAsStream("/Reports/traslado_apertura.jasper");
+            InputStream isRepo =
+                getClass().getResourceAsStream("/Reports/traslado_apertura.jasper");
             JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
-            JasperPrint jpRepo = JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
+            JasperPrint jpRepo =
+                JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
 
             JasperViewer viewer = new JasperViewer(jpRepo, false);
 
-            //viewer.setAlwaysOnTop(true);
+            // viewer.setAlwaysOnTop(true);
             viewer.setSize(800, 600);
             viewer.setLocationRelativeTo(null);
             viewer.setTitle("REPORTE DE TRASLADO");
@@ -327,19 +367,22 @@ public class TrasladoController implements Initializable {
             e.printStackTrace();
           }
 
-
-
           permitir = true;
           break;
         case "CIERRE":
           alert.setTitle("TRASLADO DE CIERRE EXITOSO");
           alert.setHeaderText("TRASLADO DE CIERRE REALIZADO CORRECTAMENTE");
           alert.setContentText(
-              "EL CAJERO: " + LoginController.usuarioLoggeado + " AHORA ESTÁ LISTO PARA CERRAR EN: " + nom_empresa);
+                  STR."EL CAJERO: \{LoginController.usuarioLoggeado} AHORA ESTÁ LISTO PARA CERRAR EN: \{nom_empresa}");
           alert.showAndWait();
-          codcaja = servicio.traerDatosCaja(userid,turno,cod_empresa,0).getId();
-          try {
 
+          if (servicio.traerDatosCaja(userid, turno, cod_empresa, 0) != null) {
+            codcaja = servicio.traerDatosCaja(userid, turno, cod_empresa, 0).getId();
+          } else {
+            codcaja = servicio.traerDatosCaja(userid, turno, cod_empresa, 1).getId();
+          }
+
+          try {
 
             Map pars = new HashMap<>();
             pars.put("Empresa", nombreEmpresa);
@@ -353,7 +396,7 @@ public class TrasladoController implements Initializable {
             pars.put("Turno", turno);
 
             pars.put("Origen", "CUENTA DE CAJERO " + codcaja);
-            pars.put("Destino",  cod_boveda);
+            pars.put("Destino", cod_boveda);
             pars.put("Monto", montotraslado);
             pars.put("Montoletras", moneyAsWords);
             pars.put("DescProteso", desc);
@@ -362,21 +405,20 @@ public class TrasladoController implements Initializable {
             pars.put("Cajeronom", nomcajero);
             pars.put("Hora", horaFormateada);
             if (cod_empresa.equals("0001")) {
-              protesonom ="CONT.PRIV. MARIA CARMINIA MONTERO QUINTAL";
+              protesonom = "CONT.PRIV. MARIA CARMINIA MONTERO QUINTAL";
             } else {
-              protesonom ="CASIMIRO UITZ VILLANUEVA";
+              protesonom = "CASIMIRO UITZ VILLANUEVA";
             }
             pars.put("Protesonom", protesonom);
 
             pars.put(
-                    "Descripcion",
-                    "TRASLADO DE CIERRE realizado por "+ montotraslado+ " (" +moneyAsWords +
-                            ") efectuado en la sucursal de " +
-                            "UMAN por "+nomcajero+ " y autorizado por " + protesonom);
+                "Descripcion",
+                    STR."TRASLADO DE CIERRE realizado por \{montotraslado} (\{moneyAsWords}) efectuado en la sucursal de UMAN por \{nomcajero} y autorizado por \{protesonom}");
 
             InputStream isRepo = getClass().getResourceAsStream("/Reports/traslado_cierre.jasper");
             JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
-            JasperPrint jpRepo = JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
+            JasperPrint jpRepo =
+                JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
 
             JasperViewer viewer = new JasperViewer(jpRepo, false);
 

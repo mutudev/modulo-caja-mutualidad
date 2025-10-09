@@ -6,7 +6,7 @@
 
 <AnchorPane onKeyPressed="#cerrarConTecla" prefHeight="445.0" prefWidth="780.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.TrasladoController">
    <children>
-       <TextField fx:id="txtCantidad" layoutX="232.0" layoutY="252.0" prefHeight="39.0" prefWidth="493.0" />
+       <TextField fx:id="txtCantidad" layoutX="232.0" layoutY="252.0" onKeyPressed="#cerrarConTecla" prefHeight="39.0" prefWidth="493.0" />
       <Label layoutX="245.0" layoutY="24.0" style="-fx-text-fill: #39577C;" text="PROCESO DE TRASLADOS">
          <font>
             <Font name="System Bold" size="24.0" />
