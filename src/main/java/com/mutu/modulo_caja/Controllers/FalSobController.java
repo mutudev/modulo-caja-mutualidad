@@ -30,7 +30,7 @@ public class FalSobController implements Initializable {
   @FXML private Label lblTipo, lblError;
   public String empresa, turno;
 
-  public final Validator validator = new Validator();
+  public  Validator validator = new Validator();
 
   @Autowired public Servicio servicio;
 
@@ -215,6 +215,7 @@ public class FalSobController implements Initializable {
 //    if (result.isPresent() && result.get() == ButtonType.OK) {
 //
 //    }
+    validator = new Validator();
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
   }
@@ -233,6 +234,7 @@ public class FalSobController implements Initializable {
 //      if (result.isPresent() && result.get() == ButtonType.OK) {
 //
 //      }
+      validator = new Validator();
       Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
       ventanaActual.close();
     }
@@ -252,6 +254,7 @@ public class FalSobController implements Initializable {
 //    if (result.isPresent() && result.get() == ButtonType.OK) {
 //
 //    }
+    validator = new Validator();
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
   }

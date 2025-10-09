@@ -1099,6 +1099,7 @@ public class CajeroController implements Initializable {
       apertura = false;
       turno = "";
       bufferOperaciones = 0;
+      validator = new Validator();
       try {
         Stage ventanaActual = (Stage) lblBienvenida.getScene().getWindow();
         Stage nuevaVentana = new Stage();
@@ -1125,12 +1126,6 @@ public class CajeroController implements Initializable {
         e.printStackTrace();
       }
     }
-  }
-
-  @FXML
-  public void pruebaCierre() {
-
-
   }
 
 

@@ -1,6 +1,6 @@
 package com.mutu.modulo_caja.Controllers;
 
-import br.com.adilson.util.Extenso;
+
 import br.com.adilson.util.PrinterMatrix;
 import com.mutu.modulo_caja.Services.Servicio;
 import com.mutu.modulo_caja.utils.PrintJob;
@@ -37,22 +37,28 @@ public class CambioController implements Initializable {
   @Autowired public Servicio servicio;
 
   public double totalOperaciones;
+  public static double operacionesAnterior;
   NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     txtRecibido.setTextFormatter(
-        new TextFormatter<>(
-            change -> {
-              change.setText(change.getText().replaceAll("[^0-9]", ""));
-              return change;
-            }));
+            new TextFormatter<>(change -> {
+              String newText = change.getControlNewText();
+              // Permitir solo dígitos y un punto decimal
+              if (newText.matches("\\d*(\\.\\d*)?")) {
+                return change;
+              } else {
+                return null; // Rechaza el cambio
+              }
+            })
+    );
 
     Platform.runLater(
-        () -> {
-          Stage stage = (Stage) btnCerrar.getScene().getWindow();
-          stage.setOnCloseRequest(event -> cerrar());
-        });
+            () -> {
+              Stage stage = (Stage) btnCerrar.getScene().getWindow();
+              stage.setOnCloseRequest(event -> cerrar());
+            });
   }
 
   public void setDatos(double totalOperaciones) {
@@ -115,6 +121,7 @@ public class CambioController implements Initializable {
 //
 //    }
     CajeroController.bufferOperaciones = 0;
+    operacionesAnterior = totalOperaciones;
     Stage ventanaActual = (Stage) btnCerrar.getScene().getWindow();
     ventanaActual.close();
   }
@@ -147,7 +154,7 @@ public class CambioController implements Initializable {
       PrintJob impresion = new PrintJob();
 
       PrinterMatrix printer =
-          impresion.imprimirCambio(nombre, totalop, cambio, recibido, fechaTicket, horaFormateada);
+              impresion.imprimirCambio(nombre, totalop, cambio, recibido, fechaTicket, horaFormateada);
 
       printer.toFile("impresion_Cambio.txt");
 

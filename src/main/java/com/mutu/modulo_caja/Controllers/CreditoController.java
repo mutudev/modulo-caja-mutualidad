@@ -45,7 +45,7 @@ import java.util.*;
 @Component
 public class CreditoController implements Initializable {
 
-  public final Validator validator = new Validator();
+  public Validator validator = new Validator();
 
   @FXML private TextField txtMonto, txtInmediatas, txtSaldoCredito;
   @FXML
@@ -1379,6 +1379,7 @@ public class CreditoController implements Initializable {
     //    if (result.isPresent() && result.get() == ButtonType.OK) {
     //
     //    }
+    validator = new Validator();
     Stage ventanaActual = (Stage) txtMonto.getScene().getWindow();
     ventanaActual.close();
   }
@@ -1387,8 +1388,6 @@ public class CreditoController implements Initializable {
   public void cerrarConTecla(KeyEvent event) {
     if (event.getCode().equals(KeyCode.ESCAPE)) {
       mostrarDialogoCierre();
-    } else if(event.getCode().equals(KeyCode.F12)){
-      System.out.println("Pene: " + devolverDatosCuotas());
     }
   }
 
@@ -1409,6 +1408,7 @@ public class CreditoController implements Initializable {
     //    if (result.isPresent() && result.get() == ButtonType.OK) {
     //
     //    }
+    validator = new Validator();
     Stage ventanaActual = (Stage) txtMonto.getScene().getWindow();
     ventanaActual.close();
   }

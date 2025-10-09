@@ -44,7 +44,7 @@ public class PrevisionController implements Initializable {
 
   @FXML private Label lblError;
 
-  public final Validator validator = new Validator();
+  public Validator validator = new Validator();
   NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
 
   public String nombreSocio, usuario, empresa;
@@ -118,6 +118,7 @@ public class PrevisionController implements Initializable {
 //    if (result.isPresent() && result.get() == ButtonType.OK) {
 //
 //    }
+    validator = new Validator();
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
   }
@@ -136,6 +137,7 @@ public class PrevisionController implements Initializable {
 //      if (result.isPresent() && result.get() == ButtonType.OK) {
 //
 //      }
+      validator = new Validator();
       Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
       ventanaActual.close();
     }
@@ -157,6 +159,7 @@ public class PrevisionController implements Initializable {
 //    if (result.isPresent() && result.get() == ButtonType.OK) {
 //
 //    }
+    validator = new Validator();
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
   }

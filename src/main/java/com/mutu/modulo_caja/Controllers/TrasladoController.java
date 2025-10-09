@@ -46,7 +46,7 @@ public class TrasladoController implements Initializable {
 
   @Autowired public Servicio servicio;
 
-  public final Validator validator = new Validator();
+  public Validator validator = new Validator();
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -105,6 +105,7 @@ public class TrasladoController implements Initializable {
 //    if (result.isPresent() && result.get() == ButtonType.OK) {
 //
 //    }
+    validator = new Validator();
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
   }
@@ -132,6 +133,7 @@ public class TrasladoController implements Initializable {
 //      if (result.isPresent() && result.get() == ButtonType.OK) {
 //
 //      }
+      validator = new Validator();
       Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
       ventanaActual.close();
     }
@@ -153,6 +155,7 @@ public class TrasladoController implements Initializable {
 //    if (result.isPresent() && result.get() == ButtonType.OK) {
 //
 //    }
+    validator = new Validator();
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
   }

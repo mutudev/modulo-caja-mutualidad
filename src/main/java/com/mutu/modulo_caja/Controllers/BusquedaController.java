@@ -36,7 +36,7 @@ public class BusquedaController implements Initializable {
 
   @FXML private TableColumn<Object[], String> colEmpresa;
 
-  public final Validator validator = new Validator();
+  public Validator validator = new Validator();
 
   @Autowired public Servicio busquedaServicio;
 
@@ -94,6 +94,7 @@ public class BusquedaController implements Initializable {
   @FXML
   public void cerrarModal(KeyEvent event) {
     if (event.getCode().equals(KeyCode.ESCAPE)) {
+      validator = new Validator();
       Stage ventanaActual = (Stage) txtNombreSocio.getScene().getWindow();
       ventanaActual.close();
     } else if (event.getCode().equals((KeyCode.ENTER)) && !txtNombreSocio.getText().isEmpty()) {
@@ -127,6 +128,7 @@ public class BusquedaController implements Initializable {
         cajeroController.cargarSocioPorNombre(nombre, numSocio, tipo);
 
         // Cierra la ventana actual
+        validator = new Validator();
         Stage ventanaActual = (Stage) txtNombreSocio.getScene().getWindow();
         ventanaActual.close();
       }

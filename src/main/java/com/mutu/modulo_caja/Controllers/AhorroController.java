@@ -49,7 +49,7 @@ public class AhorroController implements Initializable {
 
   @Autowired private Servicio servicio;
 
-  public final Validator validator = new Validator();
+  public Validator validator = new Validator();
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -107,7 +107,7 @@ public class AhorroController implements Initializable {
 //    if (result.isPresent() && result.get() == ButtonType.OK) {
 //
 //    }
-
+    validator = new Validator();
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
   }
@@ -126,7 +126,7 @@ public class AhorroController implements Initializable {
 //      if (result.isPresent() && result.get() == ButtonType.OK) {
 //
 //      }
-
+      validator = new Validator();
       Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
       ventanaActual.close();
     }
@@ -148,6 +148,7 @@ public class AhorroController implements Initializable {
 //    if (result.isPresent() && result.get() == ButtonType.OK) {
 //
 //    }
+    validator = new Validator();
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
   }
@@ -273,6 +274,8 @@ public class AhorroController implements Initializable {
         alert.setContentText(result.get("resultado").toString().toUpperCase());
         alert.showAndWait();
       }
+    } else {
+      return;
     }
   }
 

@@ -42,7 +42,7 @@ public class CapitalSocialController implements Initializable {
 
   @Autowired public Servicio servicio;
 
-  public final Validator validator = new Validator();
+  public Validator validator = new Validator();
 
   @FXML private TextField txtMontoC, txtNombre, txtEmpresa, txtSocio, txtMontoP;
   @FXML private Label lblError, lblNumSocio, lblCuentaSocio, lblNombreSocio;
@@ -70,13 +70,13 @@ public class CapitalSocialController implements Initializable {
         .withMethod(
             c -> {
               String texto = c.get("input");
-              if (texto == null || texto.equals("") || Integer.parseInt(texto) == 0) {
+              if (texto == null || texto.equals("") || Double.parseDouble(texto) == 0) {
                 c.error("Ingrese un valor mayor a cero");
                 lblError.setText("Ingrese un valor mayor a cero");
-              } else if (Integer.parseInt(texto) > 1000) {
+              } else if (Double.parseDouble(texto) > 1000) {
                 c.error("No puede ingresar valores mayores a $1,000.00");
                 lblError.setText("No puede ingresar valores mayores a $1,000.00");
-              } else if (Integer.parseInt(texto) < 1000) {
+              } else if (Double.parseDouble(texto) < 1000) {
                 c.error("No puede ingresar valores menores a $1,000.00");
                 lblError.setText("No puede ingresar valores menores a $1,000.00");
               } else {
@@ -87,11 +87,16 @@ public class CapitalSocialController implements Initializable {
         .immediate();
 
     txtMontoP.setTextFormatter(
-        new TextFormatter<>(
-            change -> {
-              change.setText(change.getText().replaceAll("[^0-9]", ""));
-              return change;
-            }));
+            new TextFormatter<>(change -> {
+              String newText = change.getControlNewText();
+              // Permitir solo dígitos y un punto decimal
+              if (newText.matches("\\d*(\\.\\d*)?")) {
+                return change;
+              } else {
+                return null; // Rechaza el cambio
+              }
+            })
+    );
 
     Platform.runLater(
         () -> {
@@ -113,6 +118,7 @@ public class CapitalSocialController implements Initializable {
 //    if (result.isPresent() && result.get() == ButtonType.OK) {
 //
 //    }
+    validator = new Validator();
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
   }
@@ -131,6 +137,7 @@ public class CapitalSocialController implements Initializable {
 //      if (result.isPresent() && result.get() == ButtonType.OK) {
 //
 //      }
+      validator = new Validator();
       Stage ventanaActual = (Stage) txtMontoP.getScene().getWindow();
       ventanaActual.close();
     }
@@ -153,6 +160,7 @@ public class CapitalSocialController implements Initializable {
 //    if (result.isPresent() && result.get() == ButtonType.OK) {
 //
 //    }
+    validator = new Validator();
     Stage ventanaActual = (Stage) txtMontoP.getScene().getWindow();
     ventanaActual.close();
   }
