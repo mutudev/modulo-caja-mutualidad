@@ -383,13 +383,16 @@ public class Servicio {
       String hora,
       int num_socio,
       String turno,
+      double total_credito,
+      String datos_credito,
       int transaccion_id,
       String Resultado,
       String saldo_ticket,
       String intereses_devueltos,
       String mora_devueltos,
       String iva_devueltos,
-      String capital_devueltos) {
+      String capital_devueltos,
+      String bonif_devuelto) {
     return repoCredito.pa_PagarCredito(
         opcion,
         monto_capital,
@@ -408,12 +411,15 @@ public class Servicio {
         hora,
         num_socio,
         turno,
+            total_credito,
+            datos_credito,
         transaccion_id,
         Resultado,
         saldo_ticket,
         intereses_devueltos,
         mora_devueltos,
         iva_devueltos,
-        capital_devueltos);
+        capital_devueltos,
+            bonif_devuelto);
   }
 }

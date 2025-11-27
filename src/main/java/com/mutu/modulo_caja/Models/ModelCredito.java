@@ -49,13 +49,16 @@ import java.util.Date;
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "hora", type = String.class ),
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "num_socio", type = Integer.class ),
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "turno", type = String.class ),
+                @StoredProcedureParameter(mode = ParameterMode.IN, name = "total_credito", type = Double.class ),
+                @StoredProcedureParameter(mode = ParameterMode.IN, name = "datos_cuotas", type = String.class ),
                 @StoredProcedureParameter(mode = ParameterMode.OUT, name = "transaccion_id", type = Integer.class ),
                 @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Resultado", type = String.class ),
                 @StoredProcedureParameter(mode = ParameterMode.OUT, name = "saldo_ticket", type = String.class ),
                 @StoredProcedureParameter(mode = ParameterMode.OUT, name = "intereses_devueltos", type = String.class ),
                 @StoredProcedureParameter(mode = ParameterMode.OUT, name = "mora_devueltos", type = String.class ),
                 @StoredProcedureParameter(mode = ParameterMode.OUT, name = "iva_devueltos", type = String.class ),
-                @StoredProcedureParameter(mode = ParameterMode.OUT, name = "capital_devueltos", type = String.class )
+                @StoredProcedureParameter(mode = ParameterMode.OUT, name = "capital_devueltos", type = String.class ),
+                @StoredProcedureParameter(mode = ParameterMode.OUT, name = "bonif_devuelto", type = String.class )
 
         })
 

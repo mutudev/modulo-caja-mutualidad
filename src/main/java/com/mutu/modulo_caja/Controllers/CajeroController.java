@@ -221,7 +221,9 @@ public class CajeroController implements Initializable {
           cargarSocio(true);
         }
         break;
-
+      case KeyCode.ESCAPE:
+        cerrarSesion();
+        break;
       case KeyCode.F2:
         if (!apertura) {
           mostrarError("APERTURA");

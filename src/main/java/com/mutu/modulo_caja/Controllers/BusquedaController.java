@@ -93,7 +93,7 @@ public class BusquedaController implements Initializable {
 
   @FXML
   public void cerrarModal(KeyEvent event) {
-    if (event.getCode().equals(KeyCode.CONTROL)) {
+    if (event.getCode().equals(KeyCode.ESCAPE)) {
       Stage ventanaActual = (Stage) txtNombreSocio.getScene().getWindow();
       ventanaActual.close();
     } else if (event.getCode().equals((KeyCode.ENTER)) && !txtNombreSocio.getText().isEmpty()) {

@@ -63,19 +63,19 @@
         </TableView>
 
         <!-- Datos informativos -->
-        <Label fx:id="lblPlazo" layoutX="30.0" layoutY="382.0" style="-fx-text-fill: #39577C;" text="Plazo: 18 meses">
+        <Label fx:id="lblPlazo" layoutX="32.0" layoutY="411.0" style="-fx-text-fill: #39577C;" text="Plazo: 18 meses">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></Label>
-        <Label fx:id="lblTasa" layoutX="30.0" layoutY="417.0" style="-fx-text-fill: #39577C;" text="Tasa Ordinaria: 2%">
+        <Label fx:id="lblTasa" layoutX="32.0" layoutY="441.0" style="-fx-text-fill: #39577C;" text="Tasa Ordinaria: 2%">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></Label>
-        <Label fx:id="lblMora" layoutX="30.0" layoutY="456.0" style="-fx-text-fill: #39577C;" text="Tasa Moratoria: 2%">
+        <Label fx:id="lblMora" layoutX="32.0" layoutY="471.0" style="-fx-text-fill: #39577C;" text="Tasa Moratoria: 2%">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></Label>
-        <Label fx:id="lblTipo" layoutX="30.0" layoutY="494.0" style="-fx-text-fill: #39577C;" text="Tipo: Tradicional">
+        <Label fx:id="lblTipo" layoutX="32.0" layoutY="501.0" style="-fx-text-fill: #39577C;" text="Tipo: Tradicional">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></Label>
@@ -99,7 +99,7 @@
 
         <!-- Campo adicional -->
 
-      <Label fx:id="lblCodigo" layoutX="30.0" layoutY="533.0" style="-fx-text-fill: #39577C;" text="Código: TRA1">
+      <Label fx:id="lblCodigo" layoutX="32.0" layoutY="531.0" style="-fx-text-fill: #39577C;" text="Código: TRA1">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
@@ -109,6 +109,26 @@
       <Label fx:id="lblError" alignment="TOP_LEFT" focusTraversable="false" layoutX="801.0" layoutY="491.0" prefHeight="27.0" prefWidth="363.0" style="-fx-text-fill: red;">
          <font>
             <Font size="12.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblPlazo1" alignment="CENTER" layoutX="30.0" layoutY="348.0" prefHeight="17.0" prefWidth="175.0" style="-fx-text-fill: #39577C;" text="[F1] CON TODO Y EL INTERÉS">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblPlazo11" alignment="CENTER" layoutX="223.0" layoutY="348.0" prefHeight="17.0" prefWidth="175.0" style="-fx-text-fill: #39577C;" text="[F2] APARTE EL INTERÉS">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblPlazo111" alignment="CENTER" layoutX="23.0" layoutY="369.0" prefHeight="17.0" prefWidth="196.0" style="-fx-text-fill: #39577C;" text="[F9] TOTAL CUOTA INMEDIATA">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblPlazo1111" alignment="CENTER" layoutX="223.0" layoutY="369.0" prefHeight="17.0" prefWidth="196.0" style="-fx-text-fill: #39577C;">
+         <font>
+            <Font name="System Bold" size="12.0" />
          </font>
       </Label>
     </children>

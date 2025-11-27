@@ -13,7 +13,7 @@
             <Font name="System Bold" size="21.0" />
          </font>
       </Label>
-      <TextField fx:id="txtNombreSocio" layoutX="44.0" layoutY="68.0" prefHeight="43.0" prefWidth="748.0" promptText="Ingrese el nombre del socio..." style="-fx-background-color: #39577C; -fx-text-fill: white; -fx-prompt-text-fill: white; -fx-font-weight: bold; -fx-hgap: 20px; -vx-padding: 10px; -fx-background-radius: 50px; -fx-border-radius: 50px; -fx-border-width: 2px; -fx-border-color: white;" />
+      <TextField fx:id="txtNombreSocio" layoutX="44.0" layoutY="68.0" onKeyPressed="#cerrarModal" prefHeight="43.0" prefWidth="748.0" promptText="Ingrese el nombre del socio..." style="-fx-background-color: #39577C; -fx-text-fill: white; -fx-prompt-text-fill: white; -fx-font-weight: bold; -fx-hgap: 20px; -vx-padding: 10px; -fx-background-radius: 50px; -fx-border-radius: 50px; -fx-border-width: 2px; -fx-border-color: white;" />
       <Line disable="true" endX="-100.0" endY="40.0" layoutX="814.0" layoutY="70.0" startX="-100.0" startY="-0.999995231628418" stroke="WHITE" strokeWidth="2.0" />
       <ImageView fitHeight="30.0" fitWidth="26.0" layoutX="732.0" layoutY="76.0" onMouseClicked="#traerCoincidencias" pickOnBounds="true" preserveRatio="true">
          <image>
