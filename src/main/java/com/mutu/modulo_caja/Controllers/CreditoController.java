@@ -16,6 +16,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import net.synedra.validatorfx.Validator;
+import org.hibernate.event.spi.SaveOrUpdateEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.PageRequest;
@@ -477,6 +478,16 @@ public class CreditoController implements Initializable {
             dias = ChronoUnit.DAYS.between(FechaPague, fechaHoy);
             interesAcumulado = Double.parseDouble(cuota[15].toString());
             validador = true;
+          } else if(filaCuota[12] == null && cuotaAnterior.length != 0){
+
+            cuotaReferencia = servicio.traerUltimaCuotaPagada(Integer.parseInt(numCredito), 0);
+            if (cuotaReferencia[0] instanceof Object[]) {
+              Object[] filaCuotapagada = (Object[]) cuotaReferencia[0];
+              capital = parseMoneda(filaCuotapagada[10].toString());
+            }
+
+            interesAcumulado = Double.parseDouble(cuota[15].toString());
+            dias = ChronoUnit.DAYS.between(fechaPagoDate, fechaHoy);
           } else if (cuotaReferencia.length == 0 && filaCuota[12] == null) {
             LocalDate FechaPague = null;
             cuotaReferencia = servicio.traerUltimaCuotaPagada(Integer.parseInt(numCredito), 0);
@@ -514,14 +525,20 @@ public class CreditoController implements Initializable {
         // Checar si existe una con estatus 0
         cuotaAnterior =
             servicio.traerUltimaCuotaConNum(Integer.parseInt(numCredito), 0, (numCuotaActual - 1));
+        LocalDate fechaAnterior = null;
 
         if (cuotaAnterior.length != 0) {
           if (cuotaAnterior[0] instanceof Object[]) {
             Object[] filaCuota = (Object[]) cuotaAnterior[0];
             capital = parseMoneda(filaCuota[10].toString());
             fechaPagoDate = LocalDate.parse(filaCuota[12].toString(), formatter);
+            fechaAnterior = LocalDate.parse(filaCuota[3].toString(), formatter);
+          }
+          if (fechaHoy.isBefore(fechaAnterior)) {
+            return 0;
           }
         }
+
 
         if (fechaPagoDate == null) {
           cuotaAnterior = servicio.traerUltimaCuotaPagada(Integer.parseInt(numCredito), 0);
@@ -542,6 +559,20 @@ public class CreditoController implements Initializable {
         }
 
         interesAcumulado = Double.parseDouble(cuota[15].toString());
+
+        if (fechaHoy.isAfter(fechaAnterior) && cuota[12] == null) {
+
+          if (fechaPagoDate.isEqual(fechaHoy)) {
+            fechaPagoDate = fechaHoy;
+          }
+
+
+
+        } else if (fechaHoy.isAfter(fechaAnterior) && cuota[12].toString() != null){
+          fechaPagoDate = LocalDate.parse(cuota[12].toString(), formatter);
+          capital = parseMoneda(cuota[10].toString());
+        }
+
         dias = ChronoUnit.DAYS.between(fechaPagoDate, fechaHoy);
         double factordiario = (((tasaInteres / 100) * 12) / 360) * capital;
         devolver = BigDecimal.valueOf((interesAcumulado + (dias * factordiario))).setScale(2, RoundingMode.HALF_UP);
@@ -641,6 +672,8 @@ public class CreditoController implements Initializable {
       double interesOrdinario = calcularInteresOrdinario(cuota);
       double bonif = calcularBonificacion(cuota);
       interesOrdinario -= bonif;
+      double mora = calcularMora(cuota);
+      interesOrdinario += mora;
       double ivaCubierto = 0;
       boolean existenActuales = false;
       if (Boolean.parseBoolean(String.valueOf(cuota[14]))) {
