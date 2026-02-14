@@ -22,6 +22,9 @@ public class ModelCaja {
     @Column(name = "SAL_INICIAL")
     private double sal_inicial;
 
+    @Column(name = "SAL_FINAL")
+    private double sal_final;
+
     @Column(name = "FR")
     private LocalDate fr;
 

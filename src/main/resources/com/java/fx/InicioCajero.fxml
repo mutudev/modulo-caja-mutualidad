@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane onKeyPressed="#handlerKeyPressed" onMousePressed="#handlerDeClicks" prefHeight="626.0" prefWidth="1124.0" style="-fx-background-color: #ffffff;" stylesheets="@/assets/css/estilos.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.CajeroController">
+<AnchorPane onKeyPressed="#handlerKeyPressed" onMousePressed="#handlerDeClicks" prefHeight="626.0" prefWidth="1124.0" style="-fx-background-color: #ffffff;" stylesheets="@/assets/css/estilos.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.CajeroController">
    <children>
       <TextField fx:id="txtNumeroSocio" layoutX="402.0" layoutY="29.0" onKeyPressed="#reestablecerCambio" prefHeight="45.0" prefWidth="365.0" promptText="Ingrese el número de socio..." style="-fx-background-color: #39577C; -fx-text-fill: white; -fx-prompt-text-fill: white; -fx-font-weight: bold; -fx-hgap: 20px; -vx-padding: 10px; -fx-background-radius: 50px; -fx-border-radius: 50px; -fx-border-width: 2px; -fx-border-color: white;" styleClass="camposTexto">
          <font>
@@ -26,7 +33,7 @@
                </font>
             </Label>
             <Separator focusTraversable="false" layoutX="20.0" layoutY="53.0" prefHeight="3.0" prefWidth="246.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #FFFFFF;" />
-            <Label fx:id="lblAbonoAhorro" disable="true" layoutX="22.0" layoutY="75.0" onMouseClicked="#handlerDeClicks" styleClass="texto-inicio-cajero" text="[F1] Abono a Ahorro " textFill="WHITE" visible="false">
+            <Label fx:id="lblAbonoAhorro" layoutX="22.0" layoutY="75.0" onMouseClicked="#handlerDeClicks" styleClass="texto-inicio-cajero" text="[F1] Abono a Ahorro " textFill="WHITE">
                <font>
                   <Font name="System Bold" size="20.0" />
                </font>
@@ -70,27 +77,22 @@
             </Label>
 
 
-            <Label fx:id="lblFaltantesSobrantes" disable="true" layoutX="22.0" layoutY="351.0" onMouseClicked="#handlerDeClicks" styleClass="texto-inicio-cajero" text="[F7] Faltantes y Sobrantes" textFill="WHITE" visible="false">
+            <Label fx:id="lblTraslados" disable="true" layoutX="22.0" layoutY="351.0" onMouseClicked="#handlerDeClicks" styleClass="texto-inicio-cajero" text="[F7] Traslados" textFill="WHITE" visible="false">
                <font><Font name="System Bold" size="20.0" /></font>
                <cursor><Cursor fx:constant="HAND" /></cursor>
             </Label>
 
-            <Label fx:id="lblTraslados" disable="true" layoutX="22.0" layoutY="397.0" onMouseClicked="#handlerDeClicks" styleClass="texto-inicio-cajero" text="[F8] Traslados" textFill="WHITE" visible="false">
+            <Label fx:id="lblHistorial" disable="true" layoutX="22.0" layoutY="397.0" onMouseClicked="#handlerDeClicks" styleClass="texto-inicio-cajero" text="[F8] Historial" textFill="WHITE" visible="false">
                <font><Font name="System Bold" size="20.0" /></font>
                <cursor><Cursor fx:constant="HAND" /></cursor>
             </Label>
 
-            <Label fx:id="lblHistorial" disable="true" layoutX="22.0" layoutY="443.0" onMouseClicked="#handlerDeClicks" styleClass="texto-inicio-cajero" text="[F9] Historial" textFill="WHITE" visible="false">
+            <Label fx:id="lblPrevisionSocial" disable="true" layoutX="22.0" layoutY="443.0" onMouseClicked="#handlerDeClicks" styleClass="texto-inicio-cajero" text="[F9] Previsión Social" textFill="WHITE" visible="false">
                <font><Font name="System Bold" size="20.0" /></font>
                <cursor><Cursor fx:constant="HAND" /></cursor>
             </Label>
 
             <Label fx:id="lblCierreCajero" disable="true" layoutX="22.0" layoutY="489.0" onMouseClicked="#handlerDeClicks" styleClass="texto-inicio-cajero" text="[F10] Cierre de Cajero" textFill="WHITE" visible="false">
-               <font><Font name="System Bold" size="20.0" /></font>
-               <cursor><Cursor fx:constant="HAND" /></cursor>
-            </Label>
-
-            <Label fx:id="lblPrevisionSocial" disable="true" layoutX="22.0" layoutY="535.0" onMouseClicked="#handlerDeClicks" styleClass="texto-inicio-cajero" text="[F11] Previsión Social" textFill="WHITE" visible="false">
                <font><Font name="System Bold" size="20.0" /></font>
                <cursor><Cursor fx:constant="HAND" /></cursor>
             </Label>
@@ -143,7 +145,7 @@
       </Label>
       <Label fx:id="lblBienvenida" layoutX="874.0" layoutY="36.0" prefHeight="27.0" prefWidth="221.0" style="-fx-text-fill: #39577C;" text="¡BIENVENIDO, ">
          <font>
-            <Font name="System Bold" size="18.0" />
+            <Font name="System Bold" size="13.0" />
          </font>
       </Label>
       <Label fx:id="lblFecha1" layoutX="332.0" layoutY="36.0" prefHeight="27.0" prefWidth="77.0" style="-fx-text-fill: #39577C;" text="SOCIO:">

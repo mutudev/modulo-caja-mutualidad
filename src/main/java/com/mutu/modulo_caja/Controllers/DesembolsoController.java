@@ -185,16 +185,13 @@ public class DesembolsoController implements Initializable {
           String nombreEmpresa = servicio.traerEmpresa(empresa).getRazonSocial();
           String rfcEmpresa = servicio.traerEmpresa(empresa).getRfc();
           String direcEmpresa =
-              servicio.traerEmpresa(empresa).getCalle()
-                  + " "
-                  + servicio.traerEmpresa(empresa).getCruzamiento()
-                  + " COL. CENTRO";
+                  STR."\{servicio.traerEmpresa(empresa).getCalle()} \{servicio.traerEmpresa(empresa).getCruzamiento()} COL. CENTRO";
           String folio = result.get("transaccion_id").toString();
 
           NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
           String montoenviar = formatoMoneda.format(monto);
           MoneyConverters converter = MoneyConverters.SPANISH_BANKING_MONEY_VALUE;
-          String moneyAsWords = converter.asWords(BigDecimal.valueOf(monto)).toUpperCase() + " MXN";
+          String moneyAsWords = STR."\{converter.asWords(BigDecimal.valueOf(monto)).toUpperCase()} MXN";
           isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
           ModelCredito credito = servicio.traerDatosCredito(Integer.parseInt(colCredito));
           String asesor = credito.getAsesor();
@@ -226,17 +223,7 @@ public class DesembolsoController implements Initializable {
           pars.put("LogoImg", isLogo);
           pars.put(
               "Descripcion",
-              "Recibí de "
-                  + nombreEmpresa
-                  + " la cantidad de "
-                  + montoenviar
-                  + " ("
-                  + moneyAsWords
-                  + ") recibido en efectivo a mi entera satisfacción. Así mismo, manifiesto conocer y apegarme al "
-                  + "cumplimiento del acuerdo 2 de la Asamblea General efectuada el 22 de Julio de 2011,"
-                  + " el cual menciona que todo socio que realice un crédito por sus ahorros o menos y que "
-                  + "en seis meses consecutivos no realice abono alguno a su crédito, será dado de baja con el fin "
-                  + "de evitar el incremento de su deuda y la cartera vencida.");
+                  STR."Recibí de \{nombreEmpresa} la cantidad de \{montoenviar} (\{moneyAsWords}) recibido en efectivo a mi entera satisfacción. Así mismo, manifiesto conocer y apegarme al cumplimiento del acuerdo 2 de la Asamblea General efectuada el 22 de Julio de 2011, el cual menciona que todo socio que realice un crédito por sus ahorros o menos y que en seis meses consecutivos no realice abono alguno a su crédito, será dado de baja con el fin de evitar el incremento de su deuda y la cartera vencida.");
 
           InputStream isRepo = getClass().getResourceAsStream("/Reports/desembolso.jasper");
           JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);

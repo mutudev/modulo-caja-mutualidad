@@ -158,7 +158,7 @@ public class ElegirController implements Initializable {
             alert.setTitle("ERROR AL QUERER PAGAR EL CAPITAL SOCIAL");
             alert.setHeaderText("ERROR EN EL PAGO DE CAPITAL SOCIAL");
             alert.setContentText(
-                "LA CUENTA A LA QUE INTENTA ACCEDER YA TIENE EL MONTO CUBIERTO EN " + empresaCod);
+                    STR."LA CUENTA A LA QUE INTENTA ACCEDER YA TIENE EL MONTO CUBIERTO EN \{empresaCod}");
             alert.showAndWait();
             validador = false;
           } else {
@@ -191,8 +191,7 @@ public class ElegirController implements Initializable {
             alert.setTitle("ERROR AL QUERER PAGAR EL CAPITAL SOCIAL");
             alert.setHeaderText("ERROR EN EL PAGO DE CAPITAL SOCIAL");
             alert.setContentText(
-                "LA CUENTA A LA QUE INTENTA ACCEDER YA TIENE EL MONTO CUBIERTO EN "
-                    + primer_empresa);
+                    STR."LA CUENTA A LA QUE INTENTA ACCEDER YA TIENE EL MONTO CUBIERTO EN \{primer_empresa}");
             alert.showAndWait();
             validador = false;
           } else {
@@ -206,8 +205,7 @@ public class ElegirController implements Initializable {
             alert.setTitle("ERROR AL QUERER PAGAR EL CAPITAL SOCIAL");
             alert.setHeaderText("ERROR EN EL PAGO DE CAPITAL SOCIAL");
             alert.setContentText(
-                "LA CUENTA A LA QUE INTENTA ACCEDER YA TIENE EL MONTO CUBIERTO EN "
-                    + segunda_empresa);
+                    STR."LA CUENTA A LA QUE INTENTA ACCEDER YA TIENE EL MONTO CUBIERTO EN \{segunda_empresa}");
             alert.showAndWait();
             validador = false;
           } else {
@@ -247,73 +245,6 @@ public class ElegirController implements Initializable {
           ventanaActual.close();
         } catch (IOException e) {
           e.printStackTrace();
-        }
-      }
-
-    } else if (opcion.equals("AJSF")) {
-
-      String empresa = "";
-      if (cmbEmpresa
-          .getSelectionModel()
-          .getSelectedItem()
-          .toString()
-          .equals("MUTUALIDAD 12 DE AGOSTO, S.C. DE R.L. DE C.V.")) {
-        empresa = "0001";
-      } else {
-        empresa = "0002";
-      }
-
-      LocalDate fecha = LocalDate.now();
-
-      List<Object[]> cuentaCajero =
-          servicio.traerCuentaCajero(
-              LoginController.usuarioLoggeado, fecha.toString(), 1, turno, empresa);
-
-      if (cuentaCajero.isEmpty()) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("ERROR AL QUERER AJUSTAR LOS SOBRANTES Y FALTANTES");
-        alert.setHeaderText("ERROR AL QUERER REALIZAR SU AJUSTE");
-        alert.setContentText(
-            "EL CAJERO NO CUENTA CON UNA CUENTA ABIERTA PARA LA EMPRESA: "
-                + cmbEmpresa.getSelectionModel().getSelectedItem().toString());
-        alert.showAndWait();
-      } else {
-        String permiso =
-            servicio.pa_VerificarCierre(LoginController.usuarioLoggeado, turno, empresa, 1, "");
-
-        if (permiso.equals("PERMITIR")) {
-          try {
-            Stage ventanaActual = (Stage) lblTitulo.getScene().getWindow();
-            Stage nuevaVentana = new Stage();
-            FXMLLoader fxml =
-                new FXMLLoader(getClass().getResource("/com/java/fx/faltantesYSobrantes.fxml"));
-            fxml.setControllerFactory(Main.context::getBean);
-            Scene nuevaEscena = new Scene(fxml.load());
-            FalSobController controller = fxml.getController();
-            controller.setDatos(cmbEmpresa.getSelectionModel().getSelectedItem().toString(), turno);
-            nuevaEscena
-                .getStylesheets()
-                .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());
-            JMetro jMetro = new JMetro(Style.LIGHT);
-            jMetro.setScene(nuevaEscena);
-            nuevaVentana.setTitle("AJUSTE DE SOBRANTES Y FALTANTES");
-            Image icon = new Image(getClass().getResourceAsStream("/assets/images/logo.png"));
-            nuevaVentana.getIcons().add(icon);
-            nuevaVentana.setScene(nuevaEscena);
-            nuevaVentana.setResizable(false);
-            nuevaVentana.centerOnScreen();
-            nuevaVentana.initModality(Modality.APPLICATION_MODAL);
-            nuevaVentana.show();
-            ventanaActual.close();
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
-        } else {
-          Alert alert = new Alert(Alert.AlertType.ERROR);
-          alert.setTitle("ERROR AL QUERER AJUSTAR LOS SOBRANTES Y FALTANTES");
-          alert.setHeaderText("ERROR AL QUERER REALIZAR SU AJUSTE");
-          alert.setContentText("AÚN NO TIENE PERMITIDO COMENZAR SU PROCESO DE AJUSTE");
-          alert.showAndWait();
         }
       }
 
@@ -461,9 +392,6 @@ public class ElegirController implements Initializable {
     this.usuario = usuario;
   }
 
-  public void setDatosAJSF(String turno) {
-    this.turno = turno;
-  }
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {

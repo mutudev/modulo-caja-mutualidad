@@ -66,6 +66,9 @@ public class ModelAhorro {
   @Column(name = "SALDO")
   private double saldo;
 
+  @Column(name = "SALDO_CONGELADO")
+  private double saldo_congelado;
+
   @Column(name = "STATUS")
   private int status;
 

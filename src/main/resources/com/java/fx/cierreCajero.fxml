@@ -1,45 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane onKeyPressed="#cerrarConTecla" prefHeight="492.0" prefWidth="783.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.CierreController">
+<AnchorPane onKeyPressed="#cerrarConTecla" prefHeight="546.0" prefWidth="722.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.CierreController">
    <children>
-      <Label layoutX="285.0" layoutY="39.0" style="-fx-text-fill: #39577C;" text="CIERRE DE CAJERO">
+       <TextField fx:id="txtSaldoFis" layoutX="165.0" layoutY="160.0" onAction="#procesarMonto" prefHeight="39.0" prefWidth="485.0" />
+       <Label alignment="CENTER" layoutX="-1.0" layoutY="30.0" prefHeight="35.0" prefWidth="722.0" style="-fx-text-fill: #39577C;" text="PROCESO DE CIERRE DE CAJA">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label layoutX="74.0" layoutY="105.0" style="-fx-text-fill: #39577C;" text="MUTUALIDAD 12 DE AGOSTO, S.C. DE R.L. DE C.V.">
+      <Label layoutX="26.0" layoutY="166.0" style="-fx-text-fill: #39577C;" text="SALDO FÍSICO:">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <Label layoutX="74.0" layoutY="230.0" style="-fx-text-fill: #39577C;" text="NUEVA GENERACIÓN DE UMÁN, AC.">
-         <font>
-            <Font name="System Bold" size="18.0" />
-         </font>
-      </Label>
-      <TextField fx:id="txtSaldoMut" editable="false" layoutX="149.0" layoutY="146.0" prefHeight="39.0" prefWidth="549.0" />
-      <TextField fx:id="txtSaldoNgu" editable="false" layoutX="149.0" layoutY="270.0" prefHeight="39.0" prefWidth="549.0" />
-      <Label layoutX="74.0" layoutY="152.0" text="SALDO:">
-         <font>
-            <Font name="System Bold" size="18.0" />
-         </font>
-      </Label>
-      <Label layoutX="74.0" layoutY="276.0" text="SALDO:">
-         <font>
-            <Font name="System Bold" size="18.0" />
-         </font>
-      </Label>
-      <Label fx:id="lblListo" alignment="CENTER" layoutY="334.0" prefHeight="35.0" prefWidth="783.0" style="-fx-text-fill: #39577C;">
-         <font>
-            <Font name="System Bold" size="14.0" />
-         </font>
-      </Label>
-       <Button fx:id="btnCancelar" layoutX="184.0" layoutY="420.0" onAction="#cerrarConBoton" prefHeight="39.0" prefWidth="203.0" style="-fx-background-color: #C0392B; -fx-text-fill: white; -fx-font-weight: bold;" text="CANCELAR" />
 
-       <Button fx:id="btnCerrar" layoutX="424.0" layoutY="420.0" onAction="#cerrar" prefHeight="39.0" prefWidth="203.0" style="-fx-background-color: #39577C; -fx-text-fill: white; -fx-font-weight: bold;" text="CERRAR" />
+       <Button fx:id="btnCancelar" layoutX="29.0" layoutY="475.0" onAction="#cerrarConBoton" prefWidth="130.0" style="-fx-background-color: #C0392B; -fx-text-fill: white; -fx-font-weight: bold;" text="CANCELAR">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Button>
+
+       <Button fx:id="btnCierreMut" layoutX="210.0" layoutY="475.0" onAction="#cerrarMut" prefHeight="39.0" prefWidth="144.0" style="-fx-background-color: #39577C;" text="CERRAR MUT" textFill="WHITE" visible="false">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font></Button>
+      <Label layoutX="65.0" layoutY="107.0" style="-fx-text-fill: #39577C;" text="EMPRESA:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <TextField fx:id="txtEmpresa" editable="false" layoutX="165.0" layoutY="101.0" prefHeight="39.0" prefWidth="485.0" />
+      <Button fx:id="btnLimpiar" layoutX="540.0" layoutY="209.0" mnemonicParsing="false" onAction="#limpiar" prefHeight="0.0" prefWidth="110.0" style="-fx-background-color: #39577C;" text="LIMPIAR" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <TextField fx:id="txtSaldoFis1" layoutX="163.0" layoutY="317.0" onAction="#procesarMonto1" prefHeight="39.0" prefWidth="485.0" />
+      <Label layoutX="24.0" layoutY="323.0" style="-fx-text-fill: #39577C;" text="SALDO FÍSICO:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="63.0" layoutY="264.0" style="-fx-text-fill: #39577C;" text="EMPRESA:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <TextField fx:id="txtEmpresa1" editable="false" layoutX="163.0" layoutY="258.0" prefHeight="39.0" prefWidth="485.0" />
+      <Button fx:id="btnLimpiar1" layoutX="538.0" layoutY="366.0" mnemonicParsing="false" onAction="#limpiar1" prefHeight="0.0" prefWidth="110.0" style="-fx-background-color: #39577C;" text="LIMPIAR" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="btnCierreNgu" layoutX="369.0" layoutY="475.0" onAction="#cerrarNgu" prefHeight="39.0" prefWidth="144.0" style="-fx-background-color: #ff8a05;" text="CERRAR NGU" textFill="WHITE" visible="false">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Button>
+      <Button fx:id="btnImprimir" layoutX="526.0" layoutY="475.0" onAction="#imprimirCierre" prefHeight="39.0" prefWidth="165.0" style="-fx-background-color: #185754;" text="IMPRIMIR CIERRE" textFill="WHITE" visible="false">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Button>
    </children>
 </AnchorPane>

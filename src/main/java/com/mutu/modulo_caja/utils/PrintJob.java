@@ -16,7 +16,7 @@ public class PrintJob {
       String fechaTicket,
       String horaFormateada) {
 
-    String Cajero = "CAJERO: " + nombre;
+    String Cajero = STR."CAJERO: \{nombre}";
     String descripcion1 = "LA NO OBJECION A ESTE COMPROBANTE";
     String descripcion2 = "IMPLICA SU ACEPTACION";
     PrinterMatrix printer = new PrinterMatrix();
@@ -91,7 +91,7 @@ public class PrintJob {
       String[] partes = abonoletras.split("(?i)\\s*CON\\s*");
       if (partes.length >= 2) {
         primeralinea = partes[0];
-        segundalinea = "CON " + partes[1];
+        segundalinea = STR."CON \{partes[1]}";
       }
       printer.printTextWrap(9, 10, 1, 60, efectivo);
       printer.printTextWrap(10, 11, 1, 60, primeralinea);

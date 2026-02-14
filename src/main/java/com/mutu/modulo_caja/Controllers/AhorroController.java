@@ -47,6 +47,9 @@ public class AhorroController implements Initializable {
   public int numero;
   public double ahorrototal;
 
+
+
+
   @Autowired private Servicio servicio;
 
   public Validator validator = new Validator();

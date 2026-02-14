@@ -1412,9 +1412,7 @@ public class ReimpresionController {
                   montoCubEnviar);
           break;
       }
-      System.out.println("SOY INFIEEEEL: " + operaciontipo);
       if (operaciontipo == 1 || operaciontipo == 2 || operaciontipo == 5 || operaciontipo == 10) {
-        System.out.println("ME EJECUTE");
         printer.toFile("Reimpresion.txt");
 
         InputStream inputStream = null;

@@ -55,10 +55,6 @@ public class Servicio {
     return repoUsuario.traerModulos(rolUsuario);
   }
 
-//  public List<Object[]> traerCoincidencias(String nombreCompleto) {
-//    return repoSocio.buscarPorNombreCompleto(nombreCompleto);
-//  }
-
   public ModelAhorro traerCuentaAhorroPorSocio(int socio) {
     return repoAhorro.findBySocio(socio);
   }
@@ -285,6 +281,10 @@ public class Servicio {
     return repoEmpresa.findAll();
   }
 
+  public ModelEmpresa traerEmpresaConRS(String rs) {
+    return repoEmpresa.findByRazonSocial(rs);
+  }
+
   public ModelTraslado traerTrasladoApertura(String cuentaDestino){return repoTraslado.findByCuentaDestino(cuentaDestino);}
 
   public List<Object[]> historialTraslados(
@@ -335,6 +335,10 @@ public class Servicio {
     return repoCaja.findByUsuarioIdAndTurnoAndEmpresaAndEstado(usuario_id, turno, empresa, estado);
   }
 
+  public ModelCaja traerCajaConId(int id) {
+    return repoCaja.findById(id);
+  }
+
   public Object[] traerCierreCajero(int id) {
     return repoCierre.traerCierreCajero(id);
   }
@@ -344,17 +348,10 @@ public class Servicio {
     return repoCredito.findBySocioAndStatusAndMontoAndEmpresa(socio, status, monto, empresa);
   }
 
-//  public List<Object[]> traerCuotasxCredito(int credito_id, int status) {
-//    return repoCredito.cuotasInmediatasXCredito(credito_id, status);
-//  }
-
   public Object[] traerUltimaCuotaPagada(int credito_id, int status) {
     return repoCredito.cuotaAnteriorXCredito(credito_id, status);
   }
 
-  public Object[] traerUltimaCuotaNoPagada(int credito_id, int status) {
-    return repoCredito.cuotaAnteriorNoPagada(credito_id, status);
-  }
 
   public Object[] traerUltimaCuotaConNum(int credito_id, int status, int num_cuota) {
     return repoCredito.cuotaAnteriorConNum(credito_id, status, num_cuota);

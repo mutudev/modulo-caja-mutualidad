@@ -330,7 +330,7 @@ public class TrasladoController implements Initializable {
             pars.put("Turno", turno);
 
             pars.put("Origen", cod_boveda);
-            pars.put("Destino", "CUENTA DE CAJERO " + codcaja);
+            pars.put("Destino", STR."CUENTA DE CAJERO \{LoginController.usuarioLoggeado}");
             pars.put("Monto", montotraslado);
             pars.put("Montoletras", moneyAsWords);
             pars.put("DescProteso", desc);
@@ -395,7 +395,7 @@ public class TrasladoController implements Initializable {
             pars.put("Fecha", fechaTicket);
             pars.put("Turno", turno);
 
-            pars.put("Origen", "CUENTA DE CAJERO " + codcaja);
+            pars.put("Origen", STR."CUENTA DE CAJERO \{LoginController.usuarioLoggeado}");
             pars.put("Destino", cod_boveda);
             pars.put("Monto", montotraslado);
             pars.put("Montoletras", moneyAsWords);

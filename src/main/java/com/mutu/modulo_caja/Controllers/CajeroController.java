@@ -5,7 +5,6 @@ import com.mutu.modulo_caja.Services.Servicio;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingNode;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,30 +17,17 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.engine.design.JasperDesign;
-import net.sf.jasperreports.engine.util.JRLoader;
-import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import net.sf.jasperreports.swing.JRViewer;
-import net.sf.jasperreports.view.JasperViewer;
 import net.synedra.validatorfx.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import win.zqxu.jrviewer.JRViewerFX;
 
-import javax.swing.*;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.sql.Connection;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -64,7 +50,6 @@ public class CajeroController implements Initializable {
   private Label lblDesembolsos,
       lblRetiros,
       lblCapitalSocial,
-      lblFaltantesSobrantes,
       lblTraslados,
       lblHistorial;
 
@@ -98,8 +83,8 @@ public class CajeroController implements Initializable {
     iniciarReloj();
     LocalDateTime fecha = LocalDateTime.now();
     lblFecha.setText(
-        "FECHA: " + fecha.getDayOfMonth() + "/" + fecha.getMonthValue() + "/" + fecha.getYear());
-    lblBienvenida.setText("¡BIENVENIDO, " + usuario + "!");
+            STR."FECHA: \{fecha.getDayOfMonth()}/\{fecha.getMonthValue()}/\{fecha.getYear()}");
+    lblBienvenida.setText(STR."¡BIENVENIDO, \{usuario}!");
 
     validator
         .createCheck()
@@ -312,25 +297,6 @@ public class CajeroController implements Initializable {
         break;
 
       case KeyCode.F7:
-        if (!apertura) {
-          mostrarError("APERTURA");
-          return;
-        }
-
-        if (txtNombreCargado.isVisible() && lblFaltantesSobrantes.isVisible()) {
-          mostrarError("REGISTRAR LOS FALTANTES Y SOBRANTES");
-        } else if (!txtNombreCargado.isVisible() && lblFaltantesSobrantes.isVisible()) {
-          ruta = "/com/java/fx/elegirEmpresa.fxml";
-          titulo = "ELECCIÓN DE EMPRESA";
-          estilo = true;
-          cargar = true;
-          elegir = true;
-          tituloEleccion = "ELECCIÓN DE EMPRESA";
-          opcion = "AJSF";
-        }
-        break;
-
-      case KeyCode.F8:
         if (txtNombreCargado.isVisible() && lblTraslados.isVisible()) {
           mostrarError("PROCESAR TRASLADOS");
         } else if (!txtNombreCargado.isVisible() && lblTraslados.isVisible()) {
@@ -344,7 +310,7 @@ public class CajeroController implements Initializable {
         }
         break;
 
-      case KeyCode.F9:
+      case KeyCode.F8:
         if (!apertura) {
           mostrarError("APERTURA");
           return;
@@ -361,86 +327,45 @@ public class CajeroController implements Initializable {
         break;
 
       case KeyCode.F10:
+        if (!apertura) {
+          mostrarError("APERTURA");
+          return;
+        }
+
         if (txtNombreCargado.isVisible() && lblCierreCajero.isVisible()) {
-          mostrarError("CERRAR");
+          mostrarError("REGISTRAR LOS FALTANTES Y SOBRANTES");
         } else if (!txtNombreCargado.isVisible() && lblCierreCajero.isVisible()) {
 
-          String empresa_cod = "0001";
-          String empresa_cod2 = "0002";
           LocalDate fecha = LocalDate.now();
+          List<Object[]> cuentaMUT = servicio.traerCuentaCajero(LoginController.usuarioLoggeado, fecha.toString(), 1, turno, "0001" );
+          List<Object[]> cuentaNGU = servicio.traerCuentaCajero(LoginController.usuarioLoggeado, fecha.toString(), 1, turno, "0002" );
 
-          List<Object[]> cuentaMUT =
-              servicio.CuentasdeCierre(
-                  LoginController.usuarioLoggeado, fecha.toString(), 0, turno, empresa_cod, 0);
-          List<Object[]> cuentaNGU =
-              servicio.CuentasdeCierre(
-                  LoginController.usuarioLoggeado, fecha.toString(), 0, turno, empresa_cod2, 0);
 
-          if (cuentaMUT.isEmpty() && cuentaNGU.isEmpty()) {
+
+          if(cuentaMUT.size() == 0 || cuentaNGU.size() == 0){
             Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE");
-            alert.setHeaderText("NO TIENE CUENTAS DE CAJA ABIERTAS");
-            alert.setContentText("POR FAVOR, REALICE SU PROCESO DE APERTURA, AJUSTE Y TRASLADO.");
+            alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE.");
+            alert.setHeaderText("ERROR AL QUERER REALIZAR SU CIERRE.");
+            alert.setContentText("NO CUENTA CON CAJAS ABIERTAS EN ALGUNA O EN AMBAS EMPRESAS");
+            alert.showAndWait();
+            return;
+          }else if(Integer.parseInt(cuentaMUT.getFirst()[8].toString()) != 1  ||
+                  Integer.parseInt(cuentaNGU.getFirst()[8].toString()) != 1  ){
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE.");
+            alert.setHeaderText("ERROR AL QUERER REALIZAR SU CIERRE.");
+            alert.setContentText("NO CUENTA CON LOS PERMISOS PARA REALIZAR SU CIERRE");
             alert.showAndWait();
             return;
           }
-
-          if (cuentaMUT.size() == 1 && cuentaNGU.size() == 1) {
-            if (Integer.parseInt(cuentaMUT.getFirst()[9].toString()) == 0) {
-              Alert alert = new Alert(Alert.AlertType.ERROR);
-              alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE");
-              alert.setHeaderText("NO TIENE PERMITIDO CERRAR");
-              alert.setContentText(
-                  "POR FAVOR, REALICE SU PROCESO DE AJUSTE Y TRASLADO PARA LA EMPRESA: "
-                      + empresa_cod);
-              alert.showAndWait();
-              return;
-            }
-
-            if (Integer.parseInt(cuentaNGU.getFirst()[9].toString()) == 0) {
-              Alert alert = new Alert(Alert.AlertType.ERROR);
-              alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE");
-              alert.setHeaderText("NO TIENE PERMITIDO CERRAR");
-              alert.setContentText(
-                  "POR FAVOR, REALICE SU PROCESO DE AJUSTE Y TRASLADO PARA LA EMPRESA: "
-                      + empresa_cod2);
-              alert.showAndWait();
-              return;
-            }
-          } else if (cuentaMUT.size() == 1 && cuentaNGU.size() == 0) {
-            if (Integer.parseInt(cuentaMUT.getFirst()[9].toString()) == 0) {
-              Alert alert = new Alert(Alert.AlertType.ERROR);
-              alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE");
-              alert.setHeaderText("NO TIENE PERMITIDO CERRAR");
-              alert.setContentText(
-                  "POR FAVOR, REALICE SU PROCESO DE AJUSTE Y TRASLADO PARA LA EMPRESA: "
-                      + empresa_cod);
-              alert.showAndWait();
-              return;
-            }
-          } else {
-            if (Integer.parseInt(cuentaNGU.getFirst()[9].toString()) == 0) {
-              Alert alert = new Alert(Alert.AlertType.ERROR);
-              alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE");
-              alert.setHeaderText("NO TIENE PERMITIDO CERRAR");
-              alert.setContentText(
-                  "POR FAVOR, REALICE SU PROCESO DE AJUSTE Y TRASLADO PARA LA EMPRESA: "
-                      + empresa_cod2);
-              alert.showAndWait();
-              return;
-            }
-          }
-
-          CierreMUT = cuentaMUT;
-          CierreNGU = cuentaNGU;
           ruta = "/com/java/fx/cierreCajero.fxml";
-          titulo = "CIERRE DE CAJERO";
-          estilo = true;
+          titulo = "AJUSTE DE SOBRANTES Y FALTANTE";
+          estilo = false;
           cargar = true;
         }
         break;
 
-      case KeyCode.F11:
+      case KeyCode.F9:
         if (!apertura) {
           mostrarError("APERTURA");
           return;
@@ -589,25 +514,6 @@ public class CajeroController implements Initializable {
         cargarSocio(true);
       }
 
-    } else if (source == lblFaltantesSobrantes) {
-
-      if (!apertura) {
-        mostrarError("APERTURA");
-        return;
-      }
-
-      if (txtNombreCargado.isVisible()) {
-        mostrarError("REGISTRAR LOS FALTANTES Y SOBRANTES");
-      } else {
-        ruta = "/com/java/fx/elegirEmpresa.fxml";
-        titulo = "ELECCIÓN DE EMPRESA";
-        estilo = true;
-        cargar = true;
-        elegir = true;
-        tituloEleccion = "ELECCIÓN DE EMPRESA";
-        opcion = "AJSF";
-      }
-
     } else if (source == lblTraslados) {
       if (txtNombreCargado.isVisible()) {
         mostrarError("PROCESAR TRASLADOS");
@@ -639,70 +545,40 @@ public class CajeroController implements Initializable {
 
     } else if (source == lblCierreCajero) {
 
-      if (txtNombreCargado.isVisible()) {
-        mostrarError("CERRAR");
-      } else {
-        String empresa_cod = "0001";
-        String empresa_cod2 = "0002";
-        LocalDate fecha = LocalDate.now();
-        // Aqui el error
-        List<Object[]> cuentaMUT =
-            servicio.CuentasdeCierre(
-                LoginController.usuarioLoggeado, fecha.toString(), 0, turno, empresa_cod, 0);
-        List<Object[]> cuentaNGU =
-            servicio.CuentasdeCierre(
-                LoginController.usuarioLoggeado, fecha.toString(), 0, turno, empresa_cod2, 0);
+      if (!apertura) {
+        mostrarError("APERTURA");
+        return;
+      }
 
-        if (cuentaMUT.isEmpty() && cuentaNGU.isEmpty()) {
+      if (txtNombreCargado.isVisible()) {
+        mostrarError("REGISTRAR LOS FALTANTES Y SOBRANTES");
+      } else {
+
+
+        LocalDate fecha = LocalDate.now();
+
+        List<Object[]> cuentaMUT = servicio.traerCuentaCajero(LoginController.usuarioLoggeado, fecha.toString(), 1, turno, "0001" );
+        List<Object[]> cuentaNGU = servicio.traerCuentaCajero(LoginController.usuarioLoggeado, fecha.toString(), 1, turno, "0002" );
+        if(cuentaMUT.size() == 0 || cuentaNGU.size() == 0){
           Alert alert = new Alert(Alert.AlertType.ERROR);
-          alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE");
-          alert.setHeaderText("NO TIENE CUENTAS DE CAJA ABIERTAS");
-          alert.setContentText("POR FAVOR, REALICE SU PROCESO DE APERTURA, AJUSTE Y TRASLADO.");
+          alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE.");
+          alert.setHeaderText("ERROR AL QUERER REALIZAR SU CIERRE.");
+          alert.setContentText("NO CUENTA CON CAJAS ABIERTAS EN ALGUNA O EN AMBAS EMPRESAS");
+          alert.showAndWait();
+          return;
+        } else if(Integer.parseInt(cuentaMUT.getFirst()[8].toString()) != 1  ||
+                Integer.parseInt(cuentaNGU.getFirst()[8].toString()) != 1  ){
+          Alert alert = new Alert(Alert.AlertType.ERROR);
+          alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE.");
+          alert.setHeaderText("ERROR AL QUERER REALIZAR SU CIERRE.");
+          alert.setContentText("NO CUENTA CON LOS PERMISOS PARA REALIZAR SU CIERRE");
           alert.showAndWait();
           return;
         }
 
-        if (cuentaMUT.size() == 1 && cuentaNGU.size() == 1) {
-          if (Integer.parseInt(cuentaMUT.getFirst()[9].toString()) == 0
-              || Integer.parseInt(cuentaNGU.getFirst()[9].toString()) == 0) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE");
-            alert.setHeaderText("NO TIENE PERMITIDO CERRAR");
-            alert.setContentText(
-                "POR FAVOR, REALICE SU PROCESO DE AJUSTE Y TRASLADO PARA AMBAS EMPRESAS");
-            alert.showAndWait();
-            return;
-          }
-
-        } else if (cuentaMUT.size() == 1 && cuentaNGU.size() == 0) {
-          if (Integer.parseInt(cuentaMUT.getFirst()[9].toString()) == 0) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE");
-            alert.setHeaderText("NO TIENE PERMITIDO CERRAR");
-            alert.setContentText(
-                "POR FAVOR, REALICE SU PROCESO DE AJUSTE Y TRASLADO PARA LA EMPRESA: "
-                    + empresa_cod);
-            alert.showAndWait();
-            return;
-          }
-        } else {
-          if (Integer.parseInt(cuentaNGU.getFirst()[9].toString()) == 0) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE");
-            alert.setHeaderText("NO TIENE PERMITIDO CERRAR");
-            alert.setContentText(
-                "POR FAVOR, REALICE SU PROCESO DE AJUSTE Y TRASLADO PARA LA EMPRESA: "
-                    + empresa_cod2);
-            alert.showAndWait();
-            return;
-          }
-        }
-
-        CierreMUT = cuentaMUT;
-        CierreNGU = cuentaNGU;
         ruta = "/com/java/fx/cierreCajero.fxml";
-        titulo = "CIERRE DE CAJERO";
-        estilo = true;
+        titulo = "CIERRE DE CAJA";
+        estilo = false;
         cargar = true;
       }
 
@@ -817,6 +693,9 @@ public class CajeroController implements Initializable {
       } else if (ruta.contains("desembolso") || ruta.endsWith("desembolso.fxml")) {
         DesembolsoController controller = fxml.getController();
         controller.setDatos(Integer.parseInt(txtNumeroSocio.getText().trim()), usuario);
+      } else if (ruta.contains("cierre") || ruta.endsWith("Cajero.fxml")) {
+        CierreController controller = fxml.getController();
+        controller.settearDatos(turno, lblCierreCajero);
       } else if (ruta.contains("retiro") || ruta.endsWith("retiro.fxml")) {
         RetiroController controller = fxml.getController();
         controller.setDatos(Integer.parseInt(txtNumeroSocio.getText().trim()), usuario, turno);
@@ -844,14 +723,6 @@ public class CajeroController implements Initializable {
             Integer.parseInt(txtNumeroSocio.getText().trim()),
             txtNombreCargado.getText().trim(),
             usuario);
-      } else if (ruta.contains("elegirEmpresa")
-          && ruta.endsWith("elegirEmpresa.fxml")
-          && opcion.equals("AJSF")) {
-        ElegirController controller = fxml.getController();
-        controller.setDatosAJSF(turno);
-      } else if (ruta.contains("cierreCajero") && ruta.endsWith("cierreCajero.fxml")) {
-        CierreController controller = fxml.getController();
-        controller.setDatos(CierreMUT, CierreNGU, lblBienvenida, turno);
       } else if (ruta.contains("otorgarCambio") && ruta.endsWith("otorgarCambio.fxml")) {
         CambioController controller = fxml.getController();
         controller.setDatos(bufferOperaciones);
@@ -1058,20 +929,17 @@ public class CajeroController implements Initializable {
         case "CANCELACIONES":
           labelMap.put(modulos.get(i), lblCancelacion);
           break;
-        case "FALTANTES Y SOBRANTES":
-          labelMap.put(modulos.get(i), lblFaltantesSobrantes);
-          break;
         case "TRASLADOS":
           labelMap.put(modulos.get(i), lblTraslados);
           break;
         case "HISTORIAL":
           labelMap.put(modulos.get(i), lblHistorial);
           break;
-        case "CIERRE DE CAJERO":
-          labelMap.put(modulos.get(i), lblCierreCajero);
-          break;
         case "PREVISION SOCIAL":
           labelMap.put(modulos.get(i), lblPrevisionSocial);
+          break;
+        case "CIERRE DE CAJERO":
+          labelMap.put(modulos.get(i), lblCierreCajero);
           break;
       }
     }

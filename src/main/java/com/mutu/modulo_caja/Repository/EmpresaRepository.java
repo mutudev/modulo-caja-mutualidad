@@ -13,4 +13,6 @@ public interface EmpresaRepository extends JpaRepository<ModelEmpresa, String> {
 
     ModelEmpresa findByCodigo(String codigo);
 
+    ModelEmpresa findByRazonSocial(String razonSocial);
+
 }
