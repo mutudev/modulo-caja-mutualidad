@@ -6,13 +6,23 @@ import com.tenpisoft.n2w.MoneyConverters;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -26,7 +36,10 @@ import org.springframework.stereotype.Component;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.text.NumberFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -52,7 +65,13 @@ public class TrasladoController implements Initializable {
   public void initialize(URL url, ResourceBundle resourceBundle) {
     if (cmbTipoTras != null) {
       ObservableList<String> empresas = FXCollections.observableArrayList();
-      empresas.addAll("BOVEDA - CAJA", "CAJA - BOVEDA");
+
+      if (LoginController.rolusuarioLoggeado == 1) {
+        empresas.addAll("BOVEDA - CAJA");
+      } else {
+        empresas.addAll("BOVEDA - CAJA", "CAJA - BOVEDA");
+      }
+
       cmbTipoTras.setItems(empresas);
       cmbTipoTras.getSelectionModel().selectFirst();
     }
@@ -166,6 +185,32 @@ public class TrasladoController implements Initializable {
 
 
     if (validator.validate()) {
+
+      Stage loadingStage = new Stage();
+      loadingStage.initModality(Modality.APPLICATION_MODAL);
+      loadingStage.initStyle(StageStyle.UNDECORATED);
+      loadingStage.setAlwaysOnTop(true);
+
+
+      VBox loadingPane = new VBox(20);
+      loadingPane.setAlignment(Pos.CENTER);
+      loadingPane.setPadding(new Insets(30));
+      loadingPane.setStyle("-fx-background-color: white; -fx-border-color: #185754; -fx-border-width: 2;");
+
+      ProgressIndicator progressIndicator = new ProgressIndicator();
+      progressIndicator.setPrefSize(60, 60);
+
+      Label loadingLabel = new Label("Generando Traslado...");
+      loadingLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+      loadingLabel.setTextFill(Color.web("#39577c"));
+
+      loadingPane.getChildren().addAll(progressIndicator, loadingLabel);
+
+      Scene loadingScene = new Scene(loadingPane, 300, 150);
+      loadingStage.setScene(loadingScene);
+
+      loadingStage.centerOnScreen();
+
       String nom_empresa = txtEmpresa.getText().trim();
       String cod_empresa = "";
       String cod_boveda = "";
@@ -254,7 +299,9 @@ public class TrasladoController implements Initializable {
       String nombreEmpresa = servicio.traerEmpresa(cod_empresa).getRazonSocial();
       String rfcEmpresa = servicio.traerEmpresa(cod_empresa).getRfc();
       String direcEmpresa =
-              STR."\{servicio.traerEmpresa(cod_empresa).getCalle()} \{servicio.traerEmpresa(cod_empresa).getCruzamiento()} COL. CENTRO";
+              servicio.traerEmpresa(cod_empresa).getCalle() + " "
+                      + servicio.traerEmpresa(cod_empresa).getCruzamiento()
+                      + " COL. CENTRO";
 
       String folio = res.get("transaccion_id").toString();
       if (folio.equals("0")) {
@@ -287,7 +334,10 @@ public class TrasladoController implements Initializable {
           nombreEmpresa = servicio.traerEmpresa(cod_empresa).getRazonSocial();
           rfcEmpresa = servicio.traerEmpresa(cod_empresa).getRfc();
           direcEmpresa =
-                  STR."\{servicio.traerEmpresa(cod_empresa).getCalle()} \{servicio.traerEmpresa(cod_empresa).getCruzamiento()} COL. CENTRO";
+                  servicio.traerEmpresa(cod_empresa).getCalle() + " "
+                          + servicio.traerEmpresa(cod_empresa).getCruzamiento()
+                          + " COL. CENTRO";
+
           folio = res.get("transaccion_id").toString();
         } else {
           return;
@@ -298,7 +348,9 @@ public class TrasladoController implements Initializable {
       String montotraslado = formatoMoneda.format(monto_trasladar);
       MoneyConverters converter = MoneyConverters.SPANISH_BANKING_MONEY_VALUE;
       String moneyAsWords =
-              STR."\{converter.asWords(BigDecimal.valueOf(monto_trasladar)).toUpperCase()} MXN";
+              converter.asWords(BigDecimal.valueOf(monto_trasladar))
+                      .toUpperCase() + " MXN";
+
       int codcaja = 0;
       String desc = "";
       if (cod_empresa.equals("0001")) {
@@ -310,129 +362,99 @@ public class TrasladoController implements Initializable {
       }
       switch (res.get("Resultado").toString()) {
         case "APERTURA":
-          codcaja = servicio.traerDatosCaja(userid, turno, cod_empresa, 1).getId();
+
           alert.setTitle("APERTURA EXITOSA");
           alert.setHeaderText("APERTURA REALIZADA CORRECTAMENTE");
           alert.setContentText(
-                  STR."EL CAJERO: \{LoginController.usuarioLoggeado} AHORA ESTÁ LISTO PARA REALIZAR SUS OPERACIONES EN: \{nom_empresa}");
+                  "EL CAJERO: " + LoginController.usuarioLoggeado
+                          + " AHORA ESTÁ LISTO PARA REALIZAR SUS OPERACIONES EN: "
+                          + nom_empresa);
+
           alert.showAndWait();
-          try {
 
-            Map pars = new HashMap<>();
-            pars.put("Empresa", nombreEmpresa);
-            pars.put("Logoempresa", isLogo);
-            pars.put("Rfc", rfcEmpresa);
-            pars.put("Direccion", direcEmpresa);
-            pars.put("Titulo", "REPORTE DE TRASLADO DE APERTURA");
+          protesonom = cod_empresa.equals("0001")
+                  ? "CONT.PRIV. MARIA CARMINIA MONTERO QUINTAL"
+                  : "CASIMIRO UITZ VILLANUEVA";
 
-            pars.put("Id", folio);
-            pars.put("Fecha", fechaTicket);
-            pars.put("Turno", turno);
+          Map<String, Object> parsApertura =
+                  construirParametrosReporte(
+                          nombreEmpresa,
+                          isLogo,
+                          rfcEmpresa,
+                          direcEmpresa,
+                          "REPORTE DE TRASLADO DE APERTURA",
+                          folio,
+                          fechaTicket,
+                          turno,
+                          cod_boveda,
+                          "CUENTA DE CAJERO " + LoginController.usuarioLoggeado,
+                          montotraslado,
+                          moneyAsWords,
+                          desc,
+                          LoginController.usuarioLoggeado,
+                          nomcajero,
+                          horaFormateada,
+                          protesonom,
+                          "TRASLADO DE APERTURA realizado por " + montotraslado
+                                  + " (" + moneyAsWords + ") efectuado en la sucursal de UMAN por "
+                                  + nomcajero + " y autorizado por " + protesonom
+                  );
 
-            pars.put("Origen", cod_boveda);
-            pars.put("Destino", STR."CUENTA DE CAJERO \{LoginController.usuarioLoggeado}");
-            pars.put("Monto", montotraslado);
-            pars.put("Montoletras", moneyAsWords);
-            pars.put("DescProteso", desc);
-
-            pars.put("Cajerouser", LoginController.usuarioLoggeado);
-            pars.put("Cajeronom", nomcajero);
-            pars.put("Hora", horaFormateada);
-            if (cod_empresa.equals("0001")) {
-              protesonom = "CONT.PRIV. MARIA CARMINIA MONTERO QUINTAL";
-            } else {
-              protesonom = "CASIMIRO UITZ VILLANUEVA";
-            }
-            pars.put("Protesonom", protesonom);
-
-            pars.put(
-                "Descripcion",
-                    STR."TRASLADO DE APERTURA realizado por \{montotraslado} (\{moneyAsWords}) efectuado en la sucursal de UMAN por \{nomcajero} y autorizado por \{protesonom}");
-
-            InputStream isRepo =
-                getClass().getResourceAsStream("/Reports/traslado_apertura.jasper");
-            JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
-            JasperPrint jpRepo =
-                JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
-
-            JasperViewer viewer = new JasperViewer(jpRepo, false);
-
-            // viewer.setAlwaysOnTop(true);
-            viewer.setSize(800, 600);
-            viewer.setLocationRelativeTo(null);
-            viewer.setTitle("REPORTE DE TRASLADO");
-            viewer.setVisible(true);
-
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
+          generarReporteAsync(
+                  "/Reports/traslado_apertura.jasper",
+                  parsApertura,
+                  loadingStage
+          );
 
           permitir = true;
           break;
+
         case "CIERRE":
+
           alert.setTitle("TRASLADO DE CIERRE EXITOSO");
           alert.setHeaderText("TRASLADO DE CIERRE REALIZADO CORRECTAMENTE");
           alert.setContentText(
-                  STR."EL CAJERO: \{LoginController.usuarioLoggeado} AHORA ESTÁ LISTO PARA CERRAR EN: \{nom_empresa}");
+                  "EL CAJERO: " + LoginController.usuarioLoggeado
+                          + " AHORA ESTÁ LISTO PARA CERRAR EN: "
+                          + nom_empresa);
           alert.showAndWait();
 
-          if (servicio.traerDatosCaja(userid, turno, cod_empresa, 0) != null) {
-            codcaja = servicio.traerDatosCaja(userid, turno, cod_empresa, 0).getId();
-          } else {
-            codcaja = servicio.traerDatosCaja(userid, turno, cod_empresa, 1).getId();
-          }
+          String protesonomCierre = cod_empresa.equals("0001")
+                  ? "CONT.PRIV. MARIA CARMINIA MONTERO QUINTAL"
+                  : "CASIMIRO UITZ VILLANUEVA";
 
-          try {
+          Map<String, Object> parsCierre =
+                  construirParametrosReporte(
+                          nombreEmpresa,
+                          isLogo,
+                          rfcEmpresa,
+                          direcEmpresa,
+                          "REPORTE DE TRASLADO DE CIERRE",
+                          folio,
+                          fechaTicket,
+                          turno,
+                          "CUENTA DE CAJERO " + LoginController.usuarioLoggeado,
+                          cod_boveda,
+                          montotraslado,
+                          moneyAsWords,
+                          desc,
+                          LoginController.usuarioLoggeado,
+                          nomcajero,
+                          horaFormateada,
+                          protesonomCierre,
+                          "TRASLADO DE CIERRE realizado por " + montotraslado
+                                  + " (" + moneyAsWords + ") efectuado en la sucursal de UMAN por "
+                                  + nomcajero + " y autorizado por " + protesonomCierre
+                  );
 
-            Map pars = new HashMap<>();
-            pars.put("Empresa", nombreEmpresa);
-            pars.put("Logo", isLogo);
-            pars.put("Rfc", rfcEmpresa);
-            pars.put("Direccion", direcEmpresa);
-            pars.put("Titulo", "REPORTE DE TRASLADO DE CIERRE");
-
-            pars.put("Id", folio);
-            pars.put("Fecha", fechaTicket);
-            pars.put("Turno", turno);
-
-            pars.put("Origen", STR."CUENTA DE CAJERO \{LoginController.usuarioLoggeado}");
-            pars.put("Destino", cod_boveda);
-            pars.put("Monto", montotraslado);
-            pars.put("Montoletras", moneyAsWords);
-            pars.put("DescProteso", desc);
-
-            pars.put("Cajerouser", LoginController.usuarioLoggeado);
-            pars.put("Cajeronom", nomcajero);
-            pars.put("Hora", horaFormateada);
-            if (cod_empresa.equals("0001")) {
-              protesonom = "CONT.PRIV. MARIA CARMINIA MONTERO QUINTAL";
-            } else {
-              protesonom = "CASIMIRO UITZ VILLANUEVA";
-            }
-            pars.put("Protesonom", protesonom);
-
-            pars.put(
-                "Descripcion",
-                    STR."TRASLADO DE CIERRE realizado por \{montotraslado} (\{moneyAsWords}) efectuado en la sucursal de UMAN por \{nomcajero} y autorizado por \{protesonom}");
-
-            InputStream isRepo = getClass().getResourceAsStream("/Reports/traslado_cierre.jasper");
-            JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
-            JasperPrint jpRepo =
-                JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
-
-            JasperViewer viewer = new JasperViewer(jpRepo, false);
-
-            viewer.setAlwaysOnTop(true);
-            viewer.setSize(800, 600);
-            viewer.setLocationRelativeTo(null);
-            viewer.setTitle("REPORTE DE TRASLADO");
-            viewer.setVisible(true);
-
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
+          generarReporteAsync(
+                  "/Reports/traslado_cierre.jasper",
+                  parsCierre,
+                  loadingStage
+          );
 
           break;
+
         default:
           Alert alert2 = new Alert(Alert.AlertType.ERROR);
           alert2.setTitle("ERROR AL PROCESAR EL TRASLADO DEL CAJERO");
@@ -456,4 +478,102 @@ public class TrasladoController implements Initializable {
       alert2.showAndWait();
     }
   }
+
+
+  private Map<String, Object> construirParametrosReporte(
+          String nombreEmpresa,
+          InputStream logo,
+          String rfcEmpresa,
+          String direccionEmpresa,
+          String titulo,
+          String folio,
+          String fechaTicket,
+          String turno,
+          String origen,
+          String destino,
+          String monto,
+          String montoLetras,
+          String descProteso,
+          String usuario,
+          String nombreCajero,
+          String hora,
+          String protesonom,
+          String descripcion) {
+
+    Map<String, Object> pars = new HashMap<>();
+
+    pars.put("Empresa", nombreEmpresa);
+    pars.put("Logoempresa", logo);
+    pars.put("Rfc", rfcEmpresa);
+    pars.put("Direccion", direccionEmpresa);
+    pars.put("Titulo", titulo);
+    pars.put("Id", folio);
+    pars.put("Fecha", fechaTicket);
+    pars.put("Turno", turno);
+    pars.put("Origen", origen);
+    pars.put("Destino", destino);
+    pars.put("Monto", monto);
+    pars.put("Montoletras", montoLetras);
+    pars.put("DescProteso", descProteso);
+    pars.put("Cajerouser", usuario);
+    pars.put("Cajeronom", nombreCajero);
+    pars.put("Hora", hora);
+    pars.put("Protesonom", protesonom);
+    pars.put("Descripcion", descripcion);
+
+    return pars;
+  }
+
+
+
+  private void generarReporteAsync(String rutaReporte,
+                                   Map<String, Object> pars,
+                                   Stage loadingStage) {
+
+    Task<Void> task = new Task<>() {
+      @Override
+      protected Void call() {
+        try {
+
+          InputStream isRepo =
+                  getClass().getResourceAsStream(rutaReporte);
+          System.out.println(rutaReporte);
+          JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
+          JasperPrint jpRepo =
+                  JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
+
+          Platform.runLater(() -> {
+            JasperViewer viewer = new JasperViewer(jpRepo, false);
+            viewer.setSize(800, 600);
+            viewer.setAlwaysOnTop(true);
+            viewer.setLocationRelativeTo(null);
+            viewer.setTitle("REPORTE DE TRASLADO");
+            viewer.setVisible(true);
+          });
+
+        } catch (Exception e) {
+          e.printStackTrace();
+          Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("ERROR");
+            alert.setHeaderText("ERROR AL GENERAR EL REPORTE");
+            alert.setContentText("OCURRIÓ UN ERROR: " + e.getMessage());
+            alert.showAndWait();
+          });
+        }
+        return null;
+      }
+    };
+
+    task.setOnSucceeded(e -> loadingStage.close());
+    task.setOnFailed(e -> loadingStage.close());
+
+    loadingStage.show();
+    new Thread(task).start();
+  }
+
+
+
+
+
 }

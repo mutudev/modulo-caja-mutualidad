@@ -5,11 +5,22 @@ import com.mutu.modulo_caja.Models.*;
 import com.mutu.modulo_caja.Services.Servicio;
 import com.mutu.modulo_caja.utils.PrintJob;
 import com.tenpisoft.n2w.MoneyConverters;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -952,11 +963,35 @@ public class ReimpresionController {
 
   @FXML
   public void filtrarOpcion() {
+
+
+
     if (opcion != 0) {
       cancelarOperacion();
     } else {
 
-      if (operaciontipo == 6 || operaciontipo == 7) {}
+      Stage loadingStage = new Stage();
+      loadingStage.initModality(Modality.APPLICATION_MODAL);
+      loadingStage.initStyle(StageStyle.UNDECORATED);
+      loadingStage.setAlwaysOnTop(true);
+
+      VBox loadingPane = new VBox(20);
+      loadingPane.setAlignment(Pos.CENTER);
+      loadingPane.setPadding(new Insets(30));
+      loadingPane.setStyle("-fx-background-color: white; -fx-border-color: #185754; -fx-border-width: 2;");
+
+      ProgressIndicator progressIndicator = new ProgressIndicator();
+      progressIndicator.setPrefSize(60, 60);
+
+      Label loadingLabel = new Label("Generando Reimpresión...");
+      loadingLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+      loadingLabel.setTextFill(Color.web("#39577c"));
+
+      loadingPane.getChildren().addAll(progressIndicator, loadingLabel);
+
+      Scene loadingScene = new Scene(loadingPane, 300, 150);
+      loadingStage.setScene(loadingScene);
+      loadingStage.centerOnScreen();
 
       NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
       try {
@@ -970,10 +1005,10 @@ public class ReimpresionController {
       String nombreEmpresa = servicio.traerEmpresa(empresacod).getRazonSocial();
       String rfcEmpresa = servicio.traerEmpresa(empresacod).getRfc();
       String direcEmpresa =
-          servicio.traerEmpresa(empresacod).getCalle()
-              + " "
-              + servicio.traerEmpresa(empresacod).getCruzamiento()
-              + " COL. CENTRO";
+              servicio.traerEmpresa(empresacod).getCalle() + " "
+                      + servicio.traerEmpresa(empresacod).getCruzamiento()
+                      + " COL. CENTRO";
+
 
       PrintJob impresora = new PrintJob();
       double abono = 0;
@@ -1103,31 +1138,62 @@ public class ReimpresionController {
             pars.put("Hora", hora);
             pars.put("LogoImg", isLogo);
             pars.put(
-                "Descripcion",
-                "Recibí de "
-                    + nombreEmpresa
-                    + " la cantidad de "
-                    + montoenviar
-                    + " ("
-                    + letras
-                    + ") recibido en efectivo a mi entera satisfacción. Así mismo, manifiesto conocer y apegarme al "
-                    + "cumplimiento del acuerdo 2 de la Asamblea General efectuada el 22 de Julio de 2011,"
-                    + " el cual menciona que todo socio que realice un crédito por sus ahorros o menos y que "
-                    + "en seis meses consecutivos no realice abono alguno a su crédito, será dado de baja con el fin "
-                    + "de evitar el incremento de su deuda y la cartera vencida.");
+                    "Descripcion",
+                    "Recibí de " + nombreEmpresa
+                            + " la cantidad de " + montoenviar
+                            + " (" + letras + ") recibido en efectivo a mi entera satisfacción. "
+                            + "Así mismo, manifiesto conocer y apegarme al cumplimiento del acuerdo 2 de la Asamblea General efectuada el 22 de Julio de 2011, "
+                            + "el cual menciona que todo socio que realice un crédito por sus ahorros o menos y que en seis meses consecutivos "
+                            + "no realice abono alguno a su crédito, será dado de baja con el fin de evitar el incremento de su deuda y la cartera vencida."
+            );
 
-            InputStream isRepo = getClass().getResourceAsStream("/Reports/desembolso.jasper");
-            JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
-            JasperPrint jpRepo =
-                JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
 
-            JasperViewer viewer = new JasperViewer(jpRepo, false);
+            Task<Void> task = new Task<>() {
+              @Override
+              protected Void call() {
+                try {
 
-            viewer.setAlwaysOnTop(true);
-            viewer.setSize(800, 600);
-            viewer.setLocationRelativeTo(null);
-            viewer.setTitle("REPORTE DE DESEMBOLSO");
-            viewer.setVisible(true);
+                  InputStream isRepo = getClass().getResourceAsStream("/Reports/desembolso.jasper");
+                  JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
+                  JasperPrint jpRepo =
+                          JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
+
+
+                  Platform.runLater(() -> {
+                    JasperViewer viewer = new JasperViewer(jpRepo, false);
+                    viewer.setAlwaysOnTop(true);
+                    viewer.setSize(800, 600);
+                    viewer.setLocationRelativeTo(null);
+                    viewer.setTitle("REPORTE DE DESEMBOLSO");
+                    viewer.setVisible(true);
+                  });
+
+                } catch (Exception e) {
+                  e.printStackTrace();
+                  Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("ERROR");
+                    alert.setHeaderText("ERROR AL GENERAR EL REPORTE");
+                    alert.setContentText("OCURRIÓ UN ERROR: " + e.getMessage());
+                    alert.showAndWait();
+                  });
+                }
+                return null;
+              }
+            };
+
+            task.setOnSucceeded(e -> loadingStage.close());
+            task.setOnFailed(e -> loadingStage.close());
+
+            loadingStage.show();
+            new Thread(task).start();
+
+
+
+
+
+
+
 
           } catch (Exception e) {
             e.printStackTrace();
@@ -1171,38 +1237,65 @@ public class ReimpresionController {
             pars.put("Hora", hora);
             if (empresa.equals("0001")) {
               pars.put(
-                  "Descripcion",
-                  "Recibí de la "
-                      + nombreEmpresa
-                      + " la cantidad de "
-                      + montoretirado
-                      + " ("
-                      + letras
-                      + ") por concepto de RETIRO DE CUENTA DE AHORRO.");
+                      "Descripcion",
+                      "Recibí de la " + nombreEmpresa
+                              + " la cantidad de " + montoretirado
+                              + " (" + letras + ") por concepto de RETIRO DE CUENTA DE AHORRO."
+              );
             } else {
               pars.put(
-                  "Descripcion",
-                  "Recibí de "
-                      + nombreEmpresa
-                      + " la cantidad de "
-                      + montoretirado
-                      + " ("
-                      + letras
-                      + ") por concepto de RETIRO DE CUENTA DE AHORRO.");
+                      "Descripcion",
+                      "Recibí de " + nombreEmpresa
+                              + " la cantidad de " + montoretirado
+                              + " (" + letras + ") por concepto de RETIRO DE CUENTA DE AHORRO."
+              );
             }
 
-            InputStream isRepo = getClass().getResourceAsStream("/Reports/retiro.jasper");
-            JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
-            JasperPrint jpRepo =
-                JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
 
-            JasperViewer viewer = new JasperViewer(jpRepo, false);
+            Task<Void> task = new Task<>() {
+              @Override
+              protected Void call() {
+                try {
+                  InputStream isRepo = getClass().getResourceAsStream("/Reports/retiro.jasper");
+                  JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
+                  JasperPrint jpRepo =
+                          JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
 
-            viewer.setAlwaysOnTop(true);
-            viewer.setSize(800, 600);
-            viewer.setLocationRelativeTo(null);
-            viewer.setTitle("REPORTE DE RETIRO");
-            viewer.setVisible(true);
+
+
+
+                  Platform.runLater(() -> {
+                    JasperViewer viewer = new JasperViewer(jpRepo, false);
+                    viewer.setAlwaysOnTop(true);
+                    viewer.setSize(800, 600);
+                    viewer.setLocationRelativeTo(null);
+                    viewer.setTitle("REPORTE DE RETIRO");
+                    viewer.setVisible(true);
+                  });
+
+                } catch (Exception e) {
+                  e.printStackTrace();
+                  Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("ERROR");
+                    alert.setHeaderText("ERROR AL GENERAR EL REPORTE");
+                    alert.setContentText("OCURRIÓ UN ERROR: " + e.getMessage());
+                    alert.showAndWait();
+                  });
+                }
+                return null;
+              }
+            };
+
+            task.setOnSucceeded(e -> loadingStage.close());
+            task.setOnFailed(e -> loadingStage.close());
+
+            loadingStage.show();
+            new Thread(task).start();
+
+
+
+
 
           } catch (Exception e) {
             e.printStackTrace();
@@ -1287,30 +1380,60 @@ public class ReimpresionController {
             pars.put("DescProteso", desc);
 
             pars.put(
-                "Descripcion",
-                "TRASLADO DE APERTURA realizado por "
-                    + txtMonto.getText()
-                    + " ("
-                    + letras
-                    + ") efectuado en la sucursal de "
-                    + "UMAN por "
-                    + nomcajero
-                    + " y autorizado por "
-                    + protesonom);
+                    "Descripcion",
+                    "TRASLADO DE APERTURA realizado por " + txtMonto.getText()
+                            + " (" + letras + ") efectuado en la sucursal de UMAN por "
+                            + nomcajero + " y autorizado por " + protesonom
+            );
 
-            InputStream isRepo =
-                getClass().getResourceAsStream("/Reports/traslado_apertura.jasper");
-            JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
-            JasperPrint jpRepo =
-                JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
 
-            JasperViewer viewer = new JasperViewer(jpRepo, false);
+            Task<Void> task = new Task<>() {
+              @Override
+              protected Void call() {
+                try {
 
-            viewer.setAlwaysOnTop(true);
-            viewer.setSize(800, 600);
-            viewer.setLocationRelativeTo(null);
-            viewer.setTitle("REPORTE DE TRASLADO");
-            viewer.setVisible(true);
+                  InputStream isRepo =
+                          getClass().getResourceAsStream("/Reports/traslado_apertura.jasper");
+                  JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
+                  JasperPrint jpRepo =
+                          JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
+
+
+
+
+                  Platform.runLater(() -> {
+                    JasperViewer viewer = new JasperViewer(jpRepo, false);
+                    viewer.setAlwaysOnTop(true);
+                    viewer.setSize(800, 600);
+                    viewer.setLocationRelativeTo(null);
+                    viewer.setTitle("REPORTE DE TRASLADO");
+                    viewer.setVisible(true);
+                  });
+
+                } catch (Exception e) {
+                  e.printStackTrace();
+                  Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("ERROR");
+                    alert.setHeaderText("ERROR AL GENERAR EL REPORTE");
+                    alert.setContentText("OCURRIÓ UN ERROR: " + e.getMessage());
+                    alert.showAndWait();
+                  });
+                }
+                return null;
+              }
+            };
+
+            task.setOnSucceeded(e -> loadingStage.close());
+            task.setOnFailed(e -> loadingStage.close());
+
+            loadingStage.show();
+            new Thread(task).start();
+
+
+
+
+
 
           } catch (Exception e) {
             e.printStackTrace();
@@ -1358,29 +1481,54 @@ public class ReimpresionController {
             pars.put("Protesonom", protesonom);
 
             pars.put(
-                "Descripcion",
-                "TRASLADO DE CIERRE realizado por "
-                    + txtMonto.getText()
-                    + " ("
-                    + letras
-                    + ") efectuado en la sucursal de "
-                    + "UMAN por "
-                    + nomcajero
-                    + " y autorizado por "
-                    + protesonom);
+                    "Descripcion",
+                    "TRASLADO DE CIERRE realizado por " + txtMonto.getText()
+                            + " (" + letras + ") efectuado en la sucursal de UMAN por "
+                            + nomcajero + " y autorizado por " + protesonom
+            );
 
-            InputStream isRepo = getClass().getResourceAsStream("/Reports/traslado_cierre.jasper");
-            JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
-            JasperPrint jpRepo =
-                JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
+            Task<Void> task = new Task<>() {
+              @Override
+              protected Void call() {
+                try {
 
-            JasperViewer viewer = new JasperViewer(jpRepo, false);
 
-            viewer.setAlwaysOnTop(true);
-            viewer.setSize(800, 600);
-            viewer.setLocationRelativeTo(null);
-            viewer.setTitle("REPORTE DE TRASLADO");
-            viewer.setVisible(true);
+                  InputStream isRepo = getClass().getResourceAsStream("/Reports/traslado_cierre.jasper");
+                  JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
+                  JasperPrint jpRepo =
+                          JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
+
+                  Platform.runLater(() -> {
+                    JasperViewer viewer = new JasperViewer(jpRepo, false);
+                    viewer.setAlwaysOnTop(true);
+                    viewer.setSize(800, 600);
+                    viewer.setLocationRelativeTo(null);
+                    viewer.setTitle("REPORTE DE TRASLADO");
+                    viewer.setVisible(true);
+                  });
+
+                } catch (Exception e) {
+                  e.printStackTrace();
+                  Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("ERROR");
+                    alert.setHeaderText("ERROR AL GENERAR EL REPORTE");
+                    alert.setContentText("OCURRIÓ UN ERROR: " + e.getMessage());
+                    alert.showAndWait();
+                  });
+                }
+                return null;
+              }
+            };
+
+            task.setOnSucceeded(e -> loadingStage.close());
+            task.setOnFailed(e -> loadingStage.close());
+
+            loadingStage.show();
+            new Thread(task).start();
+
+
+
 
           } catch (Exception e) {
             e.printStackTrace();

@@ -34,6 +34,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+
 @Component
 public class CajeroController implements Initializable {
 
@@ -83,8 +84,12 @@ public class CajeroController implements Initializable {
     iniciarReloj();
     LocalDateTime fecha = LocalDateTime.now();
     lblFecha.setText(
-            STR."FECHA: \{fecha.getDayOfMonth()}/\{fecha.getMonthValue()}/\{fecha.getYear()}");
-    lblBienvenida.setText(STR."¡BIENVENIDO, \{usuario}!");
+            "FECHA: " + fecha.getDayOfMonth() + "/"
+                    + fecha.getMonthValue() + "/"
+                    + fecha.getYear());
+
+    lblBienvenida.setText("¡BIENVENIDO, " + usuario + "!");
+
 
     validator
         .createCheck()
@@ -695,7 +700,7 @@ public class CajeroController implements Initializable {
         controller.setDatos(Integer.parseInt(txtNumeroSocio.getText().trim()), usuario);
       } else if (ruta.contains("cierre") || ruta.endsWith("Cajero.fxml")) {
         CierreController controller = fxml.getController();
-        controller.settearDatos(turno, lblCierreCajero);
+        controller.settearDatos(lblCierreCajero, turno);
       } else if (ruta.contains("retiro") || ruta.endsWith("retiro.fxml")) {
         RetiroController controller = fxml.getController();
         controller.setDatos(Integer.parseInt(txtNumeroSocio.getText().trim()), usuario, turno);

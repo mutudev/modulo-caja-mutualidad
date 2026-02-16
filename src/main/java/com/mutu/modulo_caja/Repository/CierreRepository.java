@@ -22,8 +22,8 @@ public interface CierreRepository extends JpaRepository<ModelCierre, Integer> {
       String Resultado);
 
   @Procedure(name = "Cierre_Cajero.pa_CierreDeCajero")
-  Map<String, Object> procesarCierre(int cuenta_cajeroMut, int cuenta_cajeroNgu, String fecha, double saldo_fisico, String Resultado,
-                                     int Cierre_id);
+  Map<String, Object> procesarCierre(int cuenta_cajeroMut, int cuenta_cajeroNgu, String fecha, double saldo_fisico, String usuario, String Resultado,
+                                     int Cierre_id_mut, int Cierre_id_ngu);
 
   @Query (value = "SELECT * FROM CIERRE_CAJERO WHERE ID = :id", nativeQuery = true)
   Object[] traerCierreCajero(@Param("id") int id);

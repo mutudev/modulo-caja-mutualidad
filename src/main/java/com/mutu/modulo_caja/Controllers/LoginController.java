@@ -47,6 +47,7 @@ public class LoginController implements Initializable {
   private final Validator validator = new Validator();
 
   public static String usuarioLoggeado = "";
+  public static int rolusuarioLoggeado = 0;
 
   @Autowired private Servicio usuarioService;
 
@@ -138,6 +139,7 @@ public class LoginController implements Initializable {
     if (validator.validate() && result.get("Resultado").toString().equals("CORRECTO")) {
       try {
         rol = Integer.parseInt(result.get("Rol").toString());
+        rolusuarioLoggeado = Integer.parseInt(result.get("Rol").toString());
         usuarioLoggeado = txtUsuario.getText().trim();
         Stage ventanaActual = (Stage) btnIngresar.getScene().getWindow();
         Stage nuevaVentana = new Stage();

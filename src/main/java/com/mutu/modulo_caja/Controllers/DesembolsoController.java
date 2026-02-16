@@ -9,13 +9,23 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -146,59 +156,96 @@ public class DesembolsoController implements Initializable {
 
   @FXML
   public void procesarDesembolso() {
+
     if (!tableDesembolsos.getItems().isEmpty() && tableDesembolsos.getItems().size() == 1) {
+
       Object[] primeraFila = (Object[]) tableDesembolsos.getItems().get(0);
 
       String montoString = String.valueOf(primeraFila[1]);
-
       montoString = montoString.replaceAll("[\\$,]", "");
       double monto = Double.parseDouble(montoString);
 
       String colCredito = String.valueOf(primeraFila[4]);
-
       String socio = String.valueOf(primeraFila[0]);
       String nomsocio = String.valueOf(primeraFila[3]);
+
       LocalDateTime fecha = LocalDateTime.now();
       LocalDateTime fechaVenc = fecha.plusYears(1);
       LocalTime hora = fecha.toLocalTime();
+
       DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm:ss");
       DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
       String fechaTicket = fecha.format(formatter);
       String fechaVencticket = fechaVenc.format(formatter);
       String horaticket = hora.format(formatterHora);
 
       Map<String, Object> result =
-          servicio.ProcesarDesembolso(
-              Integer.parseInt(colCredito), usuario, monto, horaticket, "", 0);
+              servicio.ProcesarDesembolso(
+                      Integer.parseInt(colCredito), usuario, monto, horaticket, "", 0);
 
       if (result.get("Resultado").toString().equals("CORRECTO")) {
+
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("DESEMBOLSO PROCESADO CON ÉXITO");
         alert.setHeaderText("DESEMBOLSO PROCESADO CON ÉXITO");
         alert.setContentText(
-            "DESEMBOLSO DEL SOCIO: " + socio + " POR: " + montoString + " HECHO CON EXITO");
+                "DESEMBOLSO DEL SOCIO: " + socio + " POR: " + montoString + " HECHO CON EXITO");
         alert.showAndWait();
+
         String empresa = servicio.traerEmpresa("0002").getCodigo();
 
+        Stage loadingStage = new Stage();
+        loadingStage.initModality(Modality.APPLICATION_MODAL);
+        loadingStage.initStyle(StageStyle.UNDECORATED);
+        loadingStage.setAlwaysOnTop(true);
+
+        VBox loadingPane = new VBox(20);
+        loadingPane.setAlignment(Pos.CENTER);
+        loadingPane.setPadding(new Insets(30));
+        loadingPane.setStyle("-fx-background-color: white; -fx-border-color: #185754; -fx-border-width: 2;");
+
+        ProgressIndicator progressIndicator = new ProgressIndicator();
+        progressIndicator.setPrefSize(60, 60);
+
+        Label loadingLabel = new Label("Generando Desembolso...");
+        loadingLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+        loadingLabel.setTextFill(Color.web("#39577c"));
+
+        loadingPane.getChildren().addAll(progressIndicator, loadingLabel);
+
+        Scene loadingScene = new Scene(loadingPane, 300, 150);
+        loadingStage.setScene(loadingScene);
+        loadingStage.centerOnScreen();
+
         try {
+
           InputStream isLogo = null;
           String nombreEmpresa = servicio.traerEmpresa(empresa).getRazonSocial();
           String rfcEmpresa = servicio.traerEmpresa(empresa).getRfc();
           String direcEmpresa =
-                  STR."\{servicio.traerEmpresa(empresa).getCalle()} \{servicio.traerEmpresa(empresa).getCruzamiento()} COL. CENTRO";
+                  servicio.traerEmpresa(empresa).getCalle() + " "
+                          + servicio.traerEmpresa(empresa).getCruzamiento()
+                          + " COL. CENTRO";
+
+
           String folio = result.get("transaccion_id").toString();
 
           NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
           String montoenviar = formatoMoneda.format(monto);
+
           MoneyConverters converter = MoneyConverters.SPANISH_BANKING_MONEY_VALUE;
-          String moneyAsWords = STR."\{converter.asWords(BigDecimal.valueOf(monto)).toUpperCase()} MXN";
+          String moneyAsWords =
+                  converter.asWords(BigDecimal.valueOf(monto)).toUpperCase() + " MXN";
+
+
           isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
+
           ModelCredito credito = servicio.traerDatosCredito(Integer.parseInt(colCredito));
           String asesor = credito.getAsesor();
           String ord = String.valueOf(credito.getTasa()) + " %";
           String mor = String.valueOf(credito.getMora()) + " %";
-          String fechvenc = String.valueOf(credito.getFv());
-          isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
+
           Map pars = new HashMap<>();
           pars.put("Empresa", nombreEmpresa);
           pars.put("Logo", isLogo);
@@ -211,31 +258,65 @@ public class DesembolsoController implements Initializable {
           pars.put("NumSocio", String.valueOf(socio));
           pars.put("NombreSocio", nomsocio);
           pars.put("ASESOR", asesor);
-
           pars.put("IntOrd", ord);
           pars.put("IntMora", mor);
           pars.put("Vencimiento", fechaVencticket);
-
           pars.put("Monto", montoenviar);
           pars.put("MontoLetras", moneyAsWords);
           pars.put("Cajero", LoginController.usuarioLoggeado);
           pars.put("Hora", horaticket);
           pars.put("LogoImg", isLogo);
+
           pars.put(
-              "Descripcion",
-                  STR."Recibí de \{nombreEmpresa} la cantidad de \{montoenviar} (\{moneyAsWords}) recibido en efectivo a mi entera satisfacción. Así mismo, manifiesto conocer y apegarme al cumplimiento del acuerdo 2 de la Asamblea General efectuada el 22 de Julio de 2011, el cual menciona que todo socio que realice un crédito por sus ahorros o menos y que en seis meses consecutivos no realice abono alguno a su crédito, será dado de baja con el fin de evitar el incremento de su deuda y la cartera vencida.");
+                  "Descripcion",
+                  "Recibí de " + nombreEmpresa
+                          + " la cantidad de " + montoenviar
+                          + " (" + moneyAsWords + ") recibido en efectivo a mi entera satisfacción. "
+                          + "Así mismo, manifiesto conocer y apegarme al cumplimiento del acuerdo 2 de la Asamblea General efectuada el 22 de Julio de 2011, "
+                          + "el cual menciona que todo socio que realice un crédito por sus ahorros o menos y que en seis meses consecutivos "
+                          + "no realice abono alguno a su crédito, será dado de baja con el fin de evitar el incremento de su deuda y la cartera vencida."
+          );
 
-          InputStream isRepo = getClass().getResourceAsStream("/Reports/desembolso.jasper");
-          JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
-          JasperPrint jpRepo = JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
+          Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+              try {
 
-          JasperViewer viewer = new JasperViewer(jpRepo, false);
+                InputStream isRepo =
+                        getClass().getResourceAsStream("/Reports/desembolso.jasper");
 
-          viewer.setAlwaysOnTop(true);
-          viewer.setSize(800, 600);
-          viewer.setLocationRelativeTo(null);
-          viewer.setTitle("REPORTE DE DESEMBOLSO");
-          viewer.setVisible(true);
+                JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
+                JasperPrint jpRepo =
+                        JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
+
+                Platform.runLater(() -> {
+                  JasperViewer viewer = new JasperViewer(jpRepo, false);
+                  viewer.setAlwaysOnTop(true);
+                  viewer.setSize(800, 600);
+                  viewer.setLocationRelativeTo(null);
+                  viewer.setTitle("REPORTE DE DESEMBOLSO");
+                  viewer.setVisible(true);
+                });
+
+              } catch (Exception e) {
+                e.printStackTrace();
+                Platform.runLater(() -> {
+                  Alert alert = new Alert(Alert.AlertType.ERROR);
+                  alert.setTitle("ERROR");
+                  alert.setHeaderText("ERROR AL GENERAR EL REPORTE");
+                  alert.setContentText("OCURRIÓ UN ERROR: "+ e.getMessage());
+                  alert.showAndWait();
+                });
+              }
+              return null;
+            }
+          };
+
+          task.setOnSucceeded(e -> loadingStage.close());
+          task.setOnFailed(e -> loadingStage.close());
+
+          loadingStage.show();
+          new Thread(task).start();
 
         } catch (Exception e) {
           e.printStackTrace();
@@ -243,14 +324,18 @@ public class DesembolsoController implements Initializable {
 
         Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
         ventanaActual.close();
+
       } else {
+
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("ERROR AL QUERER PROCESAR EL DESEMBOLSO");
         alert.setHeaderText("ERROR EN EL DESEMBOLSO");
         alert.setContentText(result.get("Resultado").toString().toUpperCase());
         alert.showAndWait();
       }
+
     } else {
+
       Alert alert = new Alert(Alert.AlertType.ERROR);
       alert.setTitle("NO HAY DESEMBOLSO PENDIENTE");
       alert.setHeaderText("NO HAY DESEMBOLSO PENDIENTE");
@@ -258,4 +343,5 @@ public class DesembolsoController implements Initializable {
       alert.showAndWait();
     }
   }
+
 }

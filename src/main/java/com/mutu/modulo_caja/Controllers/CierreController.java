@@ -4,18 +4,28 @@ import com.mutu.modulo_caja.Main;
 import com.mutu.modulo_caja.Models.ModelCaja;
 import com.mutu.modulo_caja.Models.ModelEmpresa;
 import com.mutu.modulo_caja.Models.ModelTraslado;
+import com.mutu.modulo_caja.Models.ModelUsuario;
 import com.mutu.modulo_caja.Services.Servicio;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -26,6 +36,7 @@ import net.synedra.validatorfx.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -35,20 +46,28 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.UnaryOperator;
 
 @Component
 public class CierreController implements Initializable {
 
-  @FXML private TextField  txtSaldoFis, txtEmpresa, txtEmpresa1, txtSaldoFis1;
-  @FXML private Button btnCancelar, btnLimpiar, btnLimpiar1, btnCierreMut, btnCierreNgu, btnImprimir;
+  @FXML private TextField  txtSaldoFis, txt1000, txt500, txt200, txt100, txt50, txt20, txt10, txt5, txt2,
+          txt1, txt50c, txt20c, txt10c;
 
-  private Label lblFalt;
+  @FXML private Button btnCancelar, btnLimpiar, btnCalcular, btnImprimir;
+
+
+  @FXML private Label lblEmpresa1, lblEmpresa2;
+
+  private Label cierreCajero;
 
   public String empresa, turno, codigoEmpresa, empresa1 ;
 
-  public BigDecimal saldoInicial, saldoFinal, saldoFisico, saldoFisico1, saldoInicialNgu, saldoFinalNgu;
+  public BigDecimal saldoInicial, saldoFinal, saldoFisico, saldoInicialNgu, saldoFinalNgu;
 
   public int usuario_id = 0, codcaja =0, foliotrasladoCierreMut = 0, foliotrasladoCierreNgu = 0;
+
+  public double totalMandar = 0;
 
   public Validator validator = new Validator();
 
@@ -64,29 +83,26 @@ public class CierreController implements Initializable {
   public void initialize(URL url, ResourceBundle resourceBundle) {
     // Validador
 
-    txtSaldoFis.setTextFormatter(
-            new TextFormatter<>(
-                    change -> {
-                      String newText = change.getControlNewText();
-                      // Permitir solo dígitos y un punto decimal
-                      if (newText.matches("\\d*(\\.\\d*)?")) {
-                        return change;
-                      } else {
-                        return null; // Rechaza el cambio
-                      }
-                    }));
 
-    txtSaldoFis1.setTextFormatter(
-            new TextFormatter<>(
-                    change -> {
-                      String newText = change.getControlNewText();
-                      // Permitir solo dígitos y un punto decimal
-                      if (newText.matches("\\d*(\\.\\d*)?")) {
-                        return change;
-                      } else {
-                        return null; // Rechaza el cambio
-                      }
-                    }));
+    UnaryOperator<TextFormatter.Change> filter = change -> {
+      String newText = change.getControlNewText();
+      if (newText.matches("\\d*(\\.\\d*)?")) {
+        return change;
+      }
+      return null;
+    };
+
+    TextField[] fields = {
+            txt1000, txt500, txt200, txt100, txt50,
+            txt20, txt10, txt5, txt2, txt1,
+            txt50c, txt20c, txt10c
+    };
+
+    for (TextField field : fields) {
+      field.setTextFormatter(new TextFormatter<>(filter));
+    }
+
+
 
     Platform.runLater(
             () -> {
@@ -94,522 +110,426 @@ public class CierreController implements Initializable {
               stage.setOnCloseRequest(event -> cierreDeVentana(event));
             });
     btnLimpiar.setVisible(false);
-    btnLimpiar1.setVisible(false);
+
+
+    lblEmpresa1.setText("MUTUALIDAD DOCE DE AGOSTO S.C. DE R.L. DE C.V.");
+    lblEmpresa2.setText( "NUEVA GENERACION DE UMAN, AC.");
+
   }
 
   @FXML
-  public void procesarMonto() {
+  public void calcularMonto() {
 
-    double saldofis = Double.parseDouble(txtSaldoFis.getText());
-    if(saldofis <= 0){
-      Alert alert = new Alert(Alert.AlertType.ERROR);
-      alert.setTitle("ERRROR AL INGREDSAR DATOS");
-      alert.setHeaderText("ERROR AL INGRESAR DATOS");
-      alert.setContentText("POR FAVOR, ESCRIBA UN MONTO VALIDO.");
-      alert.showAndWait();
-      limpiar();
-      return;
-    }
-    txtSaldoFis.setTextFormatter(null);
-    txtSaldoFis.setText(formatoMoneda.format(saldofis));
+    double n1000 = getValue(txt1000, 1000);
+    double n500  = getValue(txt500, 500);
+    double n200  = getValue(txt200, 200);
+    double n100  = getValue(txt100, 100);
+    double n50   = getValue(txt50, 50);
+    double n20   = getValue(txt20, 20);
+    double n10   = getValue(txt10, 10);
+    double n5    = getValue(txt5, 5);
+    double n2    = getValue(txt2, 2);
+    double n1    = getValue(txt1, 1);
+    double n50c  = getValue(txt50c, 0.5);
+    double n20c  = getValue(txt20c, 0.2);
+    double n10c  = getValue(txt10c, 0.1);
+
+    txt1000.setDisable(true);
+    txt500.setDisable(true);
+    txt200.setDisable(true);
+    txt100.setDisable(true);
+    txt50.setDisable(true);
+    txt20.setDisable(true);
+    txt10.setDisable(true);
+    txt5.setDisable(true);
+    txt2.setDisable(true);
+    txt1.setDisable(true);
+    txt50c.setDisable(true);
+    txt20c.setDisable(true);
+    txt10c.setDisable(true);
+
+
+
+     totalMandar = n1000 + n500 + n200 + n100 + n50 +
+            n20 + n10 + n5 + n2 + n1 +
+            n50c + n20c + n10c;
+    String totalFormateado = formatoMoneda.format(totalMandar);
+    txtSaldoFis.setText(totalFormateado);
     btnLimpiar.setVisible(true);
-    saldoFisico = BigDecimal.valueOf(saldofis);
-    btnCierreMut.setVisible(true);
-    txtSaldoFis.setEditable(false);
-  }
-
-  @FXML
-  public void procesarMonto1() {
-
-    double saldofis = Double.parseDouble(txtSaldoFis1.getText());
-    if(saldofis <= 0){
-      Alert alert = new Alert(Alert.AlertType.ERROR);
-      alert.setTitle("ERRROR AL INGREDSAR DATOS");
-      alert.setHeaderText("ERROR AL INGRESAR DATOS");
-      alert.setContentText("POR FAVOR, ESCRIBA UN MONTO VALIDO.");
-      alert.showAndWait();
-      limpiar1();
-      return;
-    }
-    txtSaldoFis1.setTextFormatter(null);
-    txtSaldoFis1.setText(formatoMoneda.format(saldofis));
-    btnLimpiar1.setVisible(true);
-    saldoFisico1 = BigDecimal.valueOf(saldofis);
-    btnCierreNgu.setVisible(true);
-
-    txtSaldoFis1.setEditable(false);
 
   }
+
 
   @FXML
   public void limpiar(){
     txtSaldoFis.setText("");
-    txtSaldoFis.setTextFormatter(
-            new TextFormatter<>(
-                    change -> {
-                      String newText = change.getControlNewText();
-                      // Permitir solo dígitos y un punto decimal
-                      if (newText.matches("\\d*(\\.\\d*)?")) {
-                        return change;
-                      } else {
-                        return null; // Rechaza el cambio
-                      }
-                    }));
-
+    txt1000.setDisable(false);
+    txt500.setDisable(false);
+    txt200.setDisable(false);
+    txt100.setDisable(false);
+    txt50.setDisable(false);
+    txt20.setDisable(false);
+    txt10.setDisable(false);
+    txt5.setDisable(false);
+    txt2.setDisable(false);
+    txt1.setDisable(false);
+    txt50c.setDisable(false);
+    txt20c.setDisable(false);
+    txt10c.setDisable(false);
+    txt1000.setText("");
+    txt500.setText("");
+    txt200.setText("");
+    txt100.setText("");
+    txt50.setText("");
+    txt20.setText("");
+    txt10.setText("");
+    txt5.setText("");
+    txt2.setText("");
+    txt1.setText("");
+    txt50c.setText("");
+    txt20c.setText("");
+    txt10c.setText("");
+    txtSaldoFis.setText("");
     btnLimpiar.setVisible(false);
-    saldoFisico = BigDecimal.ZERO;
-
-    btnCierreMut.setVisible(false);
-    txtSaldoFis.setEditable(true);
-
-
   }
 
-  @FXML
-  public void limpiar1(){
-    txtSaldoFis1.setText("");
-    txtSaldoFis1.setTextFormatter(
-            new TextFormatter<>(
-                    change -> {
-                      String newText = change.getControlNewText();
-                      // Permitir solo dígitos y un punto decimal
-                      if (newText.matches("\\d*(\\.\\d*)?")) {
-                        return change;
-                      } else {
-                        return null; // Rechaza el cambio
-                      }
-                    }));
-    btnLimpiar1.setVisible(false);
-    saldoFisico1 = BigDecimal.ZERO;
-    btnCierreNgu.setVisible(false);
 
-    txtSaldoFis1.setEditable(true);
-  }
-
-  private boolean isValido(String resMutu, String resNgu) {
-    boolean valido = false;
-    if (resMutu.equals("CORRECTO") && resNgu.equals("CORRECTO")) {
-      valido = true;
-    } else {
-      String error = "";
-      if (resMutu.equals("CORRECTO") && !resNgu.equals("CORRECTO")) {
-        error = resNgu.toUpperCase();
-      } else if (!resMutu.equals("CORRECTO") && resNgu.equals("CORRECTO")) {
-        error = resMutu.toUpperCase();
-      } else {
-        error = resMutu.toUpperCase();
-      }
-      Alert alert = new Alert(Alert.AlertType.ERROR);
-      alert.setTitle("ERROR AL REALIZAR EL CIERRE DE CAJERO");
-      alert.setHeaderText("ERROR EN EL CIERRE");
-      alert.setContentText("ERROR: " + error);
-      alert.showAndWait();
+  private double getValue(TextField field, double multiplier) {
+    if (field.getText().isEmpty()) {
+      field.setText("0");
+      return 0;
     }
-    return valido;
+    return Double.parseDouble(field.getText()) * multiplier;
   }
 
 
-  public void settearDatos(String turno, Label lblFalt) {
-    this.empresa = "MUTUALIDAD DOCE DE AGOSTO S.C. DE R.L. DE C.V.";
+  public void settearDatos(Label lblCierreCajero, String turno) {
+    this.cierreCajero = lblCierreCajero;
     this.turno = turno;
-    this.lblFalt = lblFalt;
-    this.empresa1 = "NUEVA GENERACION DE UMAN, AC.";
-    txtEmpresa.setText(empresa);
-    txtEmpresa1.setText(empresa1);
+    ModelUsuario usuario = servicio.traerDatosUsuario(LoginController.usuarioLoggeado);
+    ModelCaja cajaMut = servicio.traerDatosCaja(usuario.getId(), turno, "0001", 1);
+    ModelCaja cajaNgu = servicio.traerDatosCaja(usuario.getId(), turno, "0002", 1);
 
-    ModelEmpresa mut = servicio.traerEmpresaConRS(empresa);
-    ModelEmpresa ngu = servicio.traerEmpresaConRS(empresa1);
-
-    //Obtener id del usuario
-    usuario_id = servicio.traerDatosUsuario(LoginController.usuarioLoggeado).getId();
-    ModelCaja cajaMut = servicio.traerDatosCaja(usuario_id, turno, mut.getCodigo(), 1);
-    ModelCaja cajaNgu = servicio.traerDatosCaja(usuario_id, turno, ngu.getCodigo(), 1);
-
-    this.cajaNgu = cajaNgu;
     this.cajaMut = cajaMut;
-
-    saldoInicial = BigDecimal.valueOf(cajaMut.getSal_inicial());
-    saldoFinal = BigDecimal.valueOf(cajaMut.getSal_final());
-    saldoInicialNgu = BigDecimal.valueOf(cajaNgu.getSal_inicial());
-    saldoFinalNgu = BigDecimal.valueOf(cajaNgu.getSal_final());
-  }
-
-  @FXML
-  public void cerrarNgu() {
-
-    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    alert.setTitle("CIERRE DE CAJA");
-    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR TU CAJA DE ESTA EMPRESA?");
-    alert.setContentText(
-            "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR.");
-
-    Optional<ButtonType> result = alert.showAndWait();
-    if (result.isPresent() && result.get() != ButtonType.OK) {
-      return;
-    }
-
-
-    DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm:ss");
-    LocalDateTime fecha = LocalDateTime.now();
-    LocalTime hora = fecha.toLocalTime();
-    String horaticket = hora.format(formatterHora);
-    BigDecimal ajusteNgu = BigDecimal.valueOf(0);
-
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    String fechaTicket = fecha.format(formatter);
-
-    //Hacer ajuste para ambas empresas
-    if (saldoFinal == BigDecimal.valueOf(0)) {
-      ajusteNgu = BigDecimal.valueOf(saldoInicialNgu.doubleValue() - saldoFisico1.doubleValue());
-    } else {
-      ajusteNgu = BigDecimal.valueOf(saldoFinalNgu.doubleValue() - saldoFisico1.doubleValue());
-    }
-
-    //TRASLADO DE CIERRE
-    Map<String, Object> resNgu =
-            servicio.procesarTraslado(
-                    LoginController.usuarioLoggeado,
-                    saldoFisico1.doubleValue(),
-                    7,
-                    cajaNgu.getEmpresa(),
-                    horaticket,
-                    turno,
-                    1,
-                    "",
-                    0);
-
-
-    String resAjusteNgu ="";
-    if(ajusteNgu.doubleValue()>0){
-      resAjusteNgu = servicio.procesarAjuste(LoginController.usuarioLoggeado,ajusteNgu.doubleValue(),0,
-              turno,cajaNgu.getEmpresa(), saldoFisico.doubleValue(),"");
-    }else if(ajusteNgu.doubleValue()<0){
-
-      resAjusteNgu = servicio.procesarAjuste(LoginController.usuarioLoggeado,0, -1 * ajusteNgu.doubleValue(),
-              turno,cajaNgu.getEmpresa(), saldoFisico.doubleValue(),"");
-    }else{
-      resAjusteNgu = servicio.procesarAjuste(LoginController.usuarioLoggeado,0,0,
-              turno,cajaNgu.getEmpresa(), saldoFisico.doubleValue(),"");
-
-    }
-
-    if(!resAjusteNgu.equals("CORRECTO")){
-
-      Alert alert2 = new Alert(Alert.AlertType.ERROR);
-      alert2.setTitle("ERROR");
-      alert2.setHeaderText("ERROR AL CERRAR LA EMPRESA");
-      alert2.setContentText(resAjusteNgu.toString().toUpperCase());
-      alert2.showAndWait();
-      return;
-    }
-
-
-
-    String folioNgu = resNgu.get("transaccion_id").toString();
-    if (folioNgu.equals("0")) {
-      Alert alert2 = new Alert(Alert.AlertType.ERROR);
-      alert2.setTitle("ERROR");
-      alert2.setHeaderText("ERROR AL CERRAR LA EMPRESA");
-      alert2.setContentText(resNgu.get("Resultado").toString().toUpperCase());
-      alert2.showAndWait();
-      return;
-    } else {
-      foliotrasladoCierreNgu = Integer.valueOf(folioNgu);
-      Alert alert2 = new Alert(Alert.AlertType.INFORMATION);
-      alert2.setTitle("¡CORRECTO!");
-      alert2.setHeaderText("CIERRE DE EMPRESA EXITOSO");
-      alert2.setContentText("PUEDE PROCEDER CON SU SIGUIENTE CIERRE O A LA IMPRESIÓN.");
-      alert2.showAndWait();
-    }
-
-    btnCierreNgu.setDisable(true);
-
-    if (btnCierreMut.isDisabled()) {
-      btnImprimir.setVisible(true);
-    }
-
-
-
+    this.cajaNgu = cajaNgu;
 
   }
 
   @FXML
   public void imprimirCierre() {
-    //Verificar que ambas empresas esten cerradas
 
+    //Verificar que ambas empresas esten cerradas y obtener los ID's de cajas
     cajaMut = servicio.traerCajaConId(cajaMut.getId());
     cajaNgu = servicio.traerCajaConId(cajaNgu.getId());
 
+    if (cajaMut == null || cajaNgu == null) {
+      Alert alert = new Alert(Alert.AlertType.ERROR);
+      alert.setTitle("ERROR");
+      alert.setHeaderText("ERROR AL GENERAR EL CIERRE");
+      alert.setContentText("NO SE ENCONTRÓ REGISTROS DE ALGUNA DE LAS CAJAS DEL USUARIO.");
+      alert.showAndWait();
+      return;
+    }
+
+    if (cajaNgu.getAjuste() != 1 || cajaMut.getAjuste() != 1) {
+      Alert alert = new Alert(Alert.AlertType.ERROR);
+      alert.setTitle("ERROR");
+      alert.setHeaderText("ERROR AL GENERAR EL CIERRE");
+      alert.setContentText("ALGUNA DE LAS CAJAS DEL USUARIO NO SE ENCUENTRA CON ACCESO.");
+      alert.showAndWait();
+      return;
+    }
 
     LocalDate fecha = LocalDate.now();
 
+    //Declarar la pantalla de carga
+    Stage loadingStage = new Stage();
+    loadingStage.initModality(Modality.APPLICATION_MODAL);
+    loadingStage.initStyle(StageStyle.UNDECORATED);
+    loadingStage.setAlwaysOnTop(true);
 
-    Map<String, Object> resMutu =
-            servicio.pa_procesarCierre(cajaMut.getId(), 0, fecha.toString(), saldoFisico.doubleValue(), "", 0);
+    VBox loadingPane = new VBox(20);
+    loadingPane.setAlignment(Pos.CENTER);
+    loadingPane.setPadding(new Insets(30));
+    loadingPane.setStyle("-fx-background-color: white; -fx-border-color: #185754; -fx-border-width: 2;");
 
-    Map<String, Object> resNgu =
-            servicio.pa_procesarCierre(0, cajaNgu.getId(), fecha.toString(), saldoFisico1.doubleValue(), "", 0);
+    ProgressIndicator progressIndicator = new ProgressIndicator();
+    progressIndicator.setPrefSize(60, 60);
 
-    boolean valido =
-            isValido(resMutu.get("Resultado").toString(), resNgu.get("Resultado").toString());
+    Label loadingLabel = new Label("Generando Cierre...");
+    loadingLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+    loadingLabel.setTextFill(Color.web("#39577c"));
 
-    if (valido) {
-      try {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("CIERRE HECHO CORRECTAMENTE");
-        alert.setHeaderText("CIERRE EXITOSO");
-        alert.setContentText(STR."CIERRE EXITOSO DEL CAJERO: \{LoginController.usuarioLoggeado}");
-        alert.showAndWait();
+    loadingPane.getChildren().addAll(progressIndicator, loadingLabel);
 
-        String mutNombre = "MUTUALIDAD DOCE DE AGOSTO S.C. DE R.L. DE C.V.";
-        String nguNombre = "NUEVA GENERACIÓN DE UMÁN. AC.";
+    Scene loadingScene = new Scene(loadingPane, 300, 150);
+    loadingStage.setScene(loadingScene);
+    loadingStage.centerOnScreen();
 
-        Object[] datos =
-                servicio.traerCierreCajero(Integer.parseInt(resMutu.get("Cierre_id").toString()));
-        Object[] datosNGU =
-                servicio.traerCierreCajero(Integer.parseInt(resNgu.get("Cierre_id").toString()));
-        String folio = "";
-        String fechad = "";
-        String hora = "";
-        String empresa = "";
-        String rfcEmpresa = "";
-        String direcEmpresa = "";
-        InputStream isLogo = null;
-        InputStream isLogo2 = null;
+    Map<String, Object> res = servicio.pa_procesarCierre(cajaMut.getId(), cajaNgu.getId(), fecha.toString(), totalMandar, LoginController.usuarioLoggeado, "", 0, 0);
+    //Verificar que haya sido válido el cierre
+    if (res.get("Resultado").toString().equalsIgnoreCase("CORRECTO")){
+      //Seguimos con el cierre
+      Alert alert = new Alert(Alert.AlertType.INFORMATION);
+      alert.setTitle("CIERRE HECHO CORRECTAMENTE");
+      alert.setHeaderText("CIERRE EXITOSO");
+      alert.setContentText("CIERRE EXITOSO DEL CAJERO: "+ LoginController.usuarioLoggeado);
+      alert.showAndWait();
 
-        ModelTraslado trasladoCMut =
-                servicio.traerTrasladoCajero(String.valueOf(cajaMut.getId()));
-        ModelTraslado trasladoCNgu =
-                servicio.traerTrasladoCajero(String.valueOf(cajaNgu.getId()));
+      //Obtener los id de cierre de mut y NGU que se retornan
+      int cierreMut = Integer.valueOf(res.get("Cierre_id_mut").toString());
+      int cierreNgu = Integer.valueOf(res.get("Cierre_id_ngu").toString());
 
-        ModelTraslado trasladoAMut =
-                servicio.traerTrasladoApertura(String.valueOf(cajaMut.getId()));
-        ModelTraslado trasladoANgu =
-                servicio.traerTrasladoApertura(String.valueOf(cajaNgu.getId()));
+      // Obtenemos los datos para el reporte
+      Task<Void> task =
+          new Task<>() {
+            @Override
+            protected Void call() {
+              try {
 
-        String nomcajero = "";
-        String ahorros = "";
-        double ahorrosCant = 0;
-        String creditos = "";
-        double creditosCant = 0;
-        String retiros = "";
-        double retirosCant = 0;
-        String desembolsos = "";
-        double desembolsosCant = 0;
-        String capital = "";
-        double csCant = 0;
-        String presoc = "";
-        double presocCant = 0;
-        String apertura = "";
-        double aperturaCant = 0;
-        String cierre = "";
-        double cierreCant = 0;
-        String sobrante = "";
-        double sobranteCant = 0;
-        String faltante = "";
-        double faltanteCant = 0;
-        String total = "";
-        double totalcant = 0;
-        String saldoFisicoMut = "";
-        double cantSaldoFisicoMut = 0;
+                String mutNombre = lblEmpresa1.getText().trim();
+                String nguNombre = lblEmpresa2.getText().trim();
 
-        // NGU var
-        String ahorrosNGU = "";
-        double ahorrosCantNGU = 0;
-        String creditosNGU = "";
-        double creditosCantNGU = 0;
-        String retirosNGU = "";
-        double retirosCantNGU = 0;
-        String desembolsosNGU = "";
-        double desembolsosCantNGU = 0;
-        String capitalNGU = "";
-        double csCantNGU = 0;
-        String presocNGU = "";
-        double presocCantNGU = 0;
-        String aperturaNGU = "";
-        double aperturaCantNGU = 0;
-        String cierreNGU = "";
-        double cierreCantNGU = 0;
-        String sobranteNGU = "";
-        double sobranteCantNGU = 0;
-        String faltanteNGU = "";
-        double faltanteCantNGU = 0;
-        String totalNGU = "";
-        double totalcantNGU = 0;
-        String saldoFisicoNgu = "";
-        double cantSaldoFisicoNgu = 0;
+                Object[] datos = servicio.traerCierreCajero(cierreMut);
+                Object[] datosNGU = servicio.traerCierreCajero(cierreNgu);
 
-        // Totales
-        String ahorrosTOT = "";
-        double ahorrosCantTOT = 0;
-        String creditosTOT = "";
-        double creditosCantTOT = 0;
-        String retirosTOT = "";
-        double retirosCantTOT = 0;
-        String desembolsosTOT = "";
-        double desembolsosCantTOT = 0;
-        String capitalTOT = "";
-        double csCantTOT = 0;
-        String presocTOT = "";
-        double presocCantTOT = 0;
-        String aperturaTOT = "";
-        double aperturaCantTOT = 0;
-        String cierreTOT = "";
-        double cierreCantTOT = 0;
-        String sobranteTOT = "";
-        double sobranteCantTOT = 0;
-        String faltanteTOT = "";
-        double faltanteCantTOT = 0;
-        String totalTOT = "";
-        double totalcantTOT = 0;
-        String totSaldoFisicoAmbas = "";
-        double cantTotSaldoFisicoAmbas = 0;
+                String folio = "";
+                String fechad = "";
+                String hora = "";
+                String empresa = "";
+                String rfcEmpresa = "";
+                String direcEmpresa = "";
+                InputStream isLogo = null;
+                InputStream isLogo2 = null;
 
-        NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
+                ModelTraslado trasladoCMut =
+                    servicio.traerTrasladoCajero(String.valueOf(cajaMut.getId()));
+                ModelTraslado trasladoCNgu =
+                    servicio.traerTrasladoCajero(String.valueOf(cajaNgu.getId()));
 
-        folio =
-                STR."MUT\{resMutu.get("Cierre_id").toString()}-NGU\{resNgu.get("Cierre_id").toString()}";
+                ModelTraslado trasladoAMut =
+                    servicio.traerTrasladoApertura(String.valueOf(cajaMut.getId()));
+                ModelTraslado trasladoANgu =
+                    servicio.traerTrasladoApertura(String.valueOf(cajaNgu.getId()));
 
-        for (Object filaObj : datos) {
-          if (filaObj instanceof Object[]) {
-            Object[] fila = (Object[]) filaObj;
+                String nomcajero = "";
+                String ahorros = "";
+                double ahorrosCant = 0;
+                String creditos = "";
+                double creditosCant = 0;
+                String retiros = "";
+                double retirosCant = 0;
+                String desembolsos = "";
+                double desembolsosCant = 0;
+                String capital = "";
+                double csCant = 0;
+                String presoc = "";
+                double presocCant = 0;
+                String apertura = "";
+                double aperturaCant = 0;
+                String cierre = "";
+                double cierreCant = 0;
+                String total = "";
+                double totalcant = 0;
+                String saldoFisicoMut = "";
+                double cantSaldoFisicoMut = 0;
+                String sobranteMUT = "";
+                double sobranteCantMUT = 0;
+                String faltanteMUT = "";
+                double faltanteCantMUT = 0;
 
-            hora = fila[15].toString();
+                // NGU var
+                String ahorrosNGU = "";
+                double ahorrosCantNGU = 0;
+                String creditosNGU = "";
+                double creditosCantNGU = 0;
+                String retirosNGU = "";
+                double retirosCantNGU = 0;
+                String desembolsosNGU = "";
+                double desembolsosCantNGU = 0;
+                String capitalNGU = "";
+                double csCantNGU = 0;
+                String presocNGU = "";
+                double presocCantNGU = 0;
+                String aperturaNGU = "";
+                double aperturaCantNGU = 0;
+                String cierreNGU = "";
+                double cierreCantNGU = 0;
+                String totalNGU = "";
+                double totalcantNGU = 0;
+                String saldoFisicoNgu = "";
+                double cantSaldoFisicoNgu = 0;
+                String sobranteNGU = "";
+                double sobranteCantNGU = 0;
+                String faltanteNGU = "";
+                double faltanteCantNGU = 0;
 
-            nomcajero = servicio.traerCajeroPorUsuario(LoginController.usuarioLoggeado);
-            ahorrosCant = Double.parseDouble(String.valueOf(fila[2]));
-            ahorros = formatoMoneda.format(ahorrosCant);
+                // Totales
+                String ahorrosTOT = "";
+                double ahorrosCantTOT = 0;
+                String creditosTOT = "";
+                double creditosCantTOT = 0;
+                String retirosTOT = "";
+                double retirosCantTOT = 0;
+                String desembolsosTOT = "";
+                double desembolsosCantTOT = 0;
+                String capitalTOT = "";
+                double csCantTOT = 0;
+                String presocTOT = "";
+                double presocCantTOT = 0;
+                String aperturaTOT = "";
+                double aperturaCantTOT = 0;
+                String cierreTOT = "";
+                double cierreCantTOT = 0;
+                String sobranteTOT = "";
+                double sobranteCantTOT = 0;
+                String faltanteTOT = "";
+                double faltanteCantTOT = 0;
+                String totalTOT = "";
+                double totalcantTOT = 0;
+                String totSaldoFisicoAmbas = "";
+                double cantTotSaldoFisicoAmbas = 0;
 
-            creditosCant = Double.parseDouble(String.valueOf(fila[3]));
-            creditos = formatoMoneda.format(creditosCant);
+                NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
 
-            retirosCant = Double.parseDouble(String.valueOf(fila[4]));
-            retiros = formatoMoneda.format(retirosCant);
+                folio = "MUT" + String.valueOf(cierreMut) + "-NGU" + String.valueOf(cierreNgu);
 
-            desembolsosCant = Double.parseDouble(String.valueOf(fila[5]));
-            desembolsos = formatoMoneda.format(desembolsosCant);
+                for (Object filaObj : datos) {
+                  if (filaObj instanceof Object[]) {
+                    Object[] fila = (Object[]) filaObj;
 
-            csCant = Double.parseDouble(String.valueOf(fila[6]));
-            capital = formatoMoneda.format(csCant);
+                    hora = fila[15].toString();
 
-            presocCant = Double.parseDouble(String.valueOf(fila[7]));
-            presoc = formatoMoneda.format(presocCant);
+                    nomcajero = servicio.traerCajeroPorUsuario(LoginController.usuarioLoggeado);
+                    ahorrosCant = Double.parseDouble(String.valueOf(fila[2]));
+                    ahorros = formatoMoneda.format(ahorrosCant);
 
-            aperturaCant = Double.parseDouble(String.valueOf(fila[8]));
-            apertura = formatoMoneda.format(aperturaCant);
+                    creditosCant = Double.parseDouble(String.valueOf(fila[3]));
+                    creditos = formatoMoneda.format(creditosCant);
 
-            cierreCant = Double.parseDouble(String.valueOf(fila[9]));
-            cierre = formatoMoneda.format(cierreCant);
+                    retirosCant = Double.parseDouble(String.valueOf(fila[4]));
+                    retiros = formatoMoneda.format(retirosCant);
 
-            sobranteCant = Double.parseDouble(String.valueOf(fila[10]));
-            sobrante = formatoMoneda.format(sobranteCant);
+                    desembolsosCant = Double.parseDouble(String.valueOf(fila[5]));
+                    desembolsos = formatoMoneda.format(desembolsosCant);
 
-            faltanteCant = Double.parseDouble(String.valueOf(fila[11]));
-            faltante = formatoMoneda.format(faltanteCant);
+                    csCant = Double.parseDouble(String.valueOf(fila[6]));
+                    capital = formatoMoneda.format(csCant);
 
-            cantSaldoFisicoMut = Double.parseDouble(String.valueOf(fila[12]));
-            saldoFisicoMut = formatoMoneda.format(cantSaldoFisicoMut);
+                    presocCant = Double.parseDouble(String.valueOf(fila[7]));
+                    presoc = formatoMoneda.format(presocCant);
 
-            totalcant =
-                    creditosCant
+                    aperturaCant = Double.parseDouble(String.valueOf(fila[8]));
+                    apertura = formatoMoneda.format(aperturaCant);
+
+                    cierreCant = Double.parseDouble(String.valueOf(fila[9]));
+                    cierre = formatoMoneda.format(cierreCant);
+
+                    sobranteCantMUT = Double.parseDouble(String.valueOf(fila[10]));
+                    sobranteMUT = formatoMoneda.format(sobranteCantMUT);
+
+                    faltanteCantMUT = Double.parseDouble(String.valueOf(fila[11]));
+                    faltanteMUT = formatoMoneda.format(faltanteCantMUT);
+
+                    cantSaldoFisicoMut = Double.parseDouble(String.valueOf(fila[12]));
+                    saldoFisicoMut = formatoMoneda.format(cantSaldoFisicoMut);
+
+                    totalcant =
+                        creditosCant
                             + ahorrosCant
                             - retirosCant
                             - desembolsosCant
                             + csCant
                             + presocCant
-                            + aperturaCant
-                            + sobranteCant
-                            - faltanteCant;
-            total = formatoMoneda.format(totalcant);
-          }
-        }
+                            + aperturaCant;
+                    total = formatoMoneda.format(totalcant);
+                  }
+                }
 
-        for (Object filaObj : datosNGU) {
-          if (filaObj instanceof Object[]) {
-            Object[] fila = (Object[]) filaObj;
+                for (Object filaObj : datosNGU) {
+                  if (filaObj instanceof Object[]) {
+                    Object[] fila = (Object[]) filaObj;
 
-            ahorrosCantNGU = Double.parseDouble(String.valueOf(fila[2]));
-            ahorrosNGU = formatoMoneda.format(ahorrosCantNGU);
+                    ahorrosCantNGU = Double.parseDouble(String.valueOf(fila[2]));
+                    ahorrosNGU = formatoMoneda.format(ahorrosCantNGU);
 
-            creditosCantNGU = Double.parseDouble(String.valueOf(fila[3]));
-            creditosNGU = formatoMoneda.format(creditosCantNGU);
+                    creditosCantNGU = Double.parseDouble(String.valueOf(fila[3]));
+                    creditosNGU = formatoMoneda.format(creditosCantNGU);
 
-            retirosCantNGU = Double.parseDouble(String.valueOf(fila[4]));
-            retirosNGU = formatoMoneda.format(retirosCantNGU);
+                    retirosCantNGU = Double.parseDouble(String.valueOf(fila[4]));
+                    retirosNGU = formatoMoneda.format(retirosCantNGU);
 
-            desembolsosCantNGU = Double.parseDouble(String.valueOf(fila[5]));
-            desembolsosNGU = formatoMoneda.format(desembolsosCantNGU);
+                    desembolsosCantNGU = Double.parseDouble(String.valueOf(fila[5]));
+                    desembolsosNGU = formatoMoneda.format(desembolsosCantNGU);
 
-            csCantNGU = Double.parseDouble(String.valueOf(fila[6]));
-            capitalNGU = formatoMoneda.format(csCantNGU);
+                    csCantNGU = Double.parseDouble(String.valueOf(fila[6]));
+                    capitalNGU = formatoMoneda.format(csCantNGU);
 
-            presocCantNGU = Double.parseDouble(String.valueOf(fila[7]));
-            presocNGU = formatoMoneda.format(presocCantNGU);
+                    presocCantNGU = Double.parseDouble(String.valueOf(fila[7]));
+                    presocNGU = formatoMoneda.format(presocCantNGU);
 
-            aperturaCantNGU = Double.parseDouble(String.valueOf(fila[8]));
-            aperturaNGU = formatoMoneda.format(aperturaCantNGU);
+                    aperturaCantNGU = Double.parseDouble(String.valueOf(fila[8]));
+                    aperturaNGU = formatoMoneda.format(aperturaCantNGU);
 
-            cierreCantNGU = Double.parseDouble(String.valueOf(fila[9]));
-            cierreNGU = formatoMoneda.format(cierreCantNGU);
+                    cierreCantNGU = Double.parseDouble(String.valueOf(fila[9]));
+                    cierreNGU = formatoMoneda.format(cierreCantNGU);
 
-            sobranteCantNGU = Double.parseDouble(String.valueOf(fila[10]));
-            sobranteNGU = formatoMoneda.format(sobranteCantNGU);
+                    sobranteCantNGU = Double.parseDouble(String.valueOf(fila[10]));
+                    sobranteNGU = formatoMoneda.format(sobranteCantNGU);
 
-            faltanteCantNGU = Double.parseDouble(String.valueOf(fila[11]));
-            faltanteNGU = formatoMoneda.format(faltanteCantNGU);
+                    faltanteCantNGU = Double.parseDouble(String.valueOf(fila[11]));
+                    faltanteNGU = formatoMoneda.format(faltanteCantNGU);
 
-            cantSaldoFisicoNgu = Double.parseDouble(String.valueOf(fila[12]));
-            saldoFisicoNgu = formatoMoneda.format(cantSaldoFisicoNgu);
+                    cantSaldoFisicoNgu = Double.parseDouble(String.valueOf(fila[12]));
+                    saldoFisicoNgu = formatoMoneda.format(cantSaldoFisicoNgu);
 
-            totalcantNGU =
-                    creditosCantNGU
+                    totalcantNGU =
+                        creditosCantNGU
                             + ahorrosCantNGU
                             - retirosCantNGU
                             - desembolsosCantNGU
                             + csCantNGU
                             + presocCantNGU
-                            + aperturaCantNGU
-                            + sobranteCantNGU
-                            - faltanteCantNGU;
-            totalNGU = formatoMoneda.format(totalcantNGU);
-          }
-        }
+                            + aperturaCantNGU;
+                    totalNGU = formatoMoneda.format(totalcantNGU);
+                  }
+                }
 
-        ahorrosCantTOT = ahorrosCant + ahorrosCantNGU;
-        ahorrosTOT = formatoMoneda.format(ahorrosCantTOT);
+                ahorrosCantTOT = ahorrosCant + ahorrosCantNGU;
+                ahorrosTOT = formatoMoneda.format(ahorrosCantTOT);
 
-        creditosCantTOT = creditosCant + creditosCantNGU;
-        creditosTOT = formatoMoneda.format(creditosCantTOT);
+                creditosCantTOT = creditosCant + creditosCantNGU;
+                creditosTOT = formatoMoneda.format(creditosCantTOT);
 
-        retirosCantTOT = retirosCant + retirosCantNGU;
-        retirosTOT = formatoMoneda.format(retirosCantTOT);
+                retirosCantTOT = retirosCant + retirosCantNGU;
+                retirosTOT = formatoMoneda.format(retirosCantTOT);
 
-        desembolsosCantTOT = desembolsosCant + desembolsosCantNGU;
-        desembolsosTOT = formatoMoneda.format(desembolsosCantTOT);
+                desembolsosCantTOT = desembolsosCant + desembolsosCantNGU;
+                desembolsosTOT = formatoMoneda.format(desembolsosCantTOT);
 
-        csCantTOT = csCant + csCantNGU;
-        capitalTOT = formatoMoneda.format(csCantTOT);
+                csCantTOT = csCant + csCantNGU;
+                capitalTOT = formatoMoneda.format(csCantTOT);
 
-        presocCantTOT = presocCant + presocCantNGU;
-        presocTOT = formatoMoneda.format(presocCantTOT);
+                presocCantTOT = presocCant + presocCantNGU;
+                presocTOT = formatoMoneda.format(presocCantTOT);
 
-        aperturaCantTOT = aperturaCant + aperturaCantNGU;
-        aperturaTOT = formatoMoneda.format(aperturaCantTOT);
+                aperturaCantTOT = aperturaCant + aperturaCantNGU;
+                aperturaTOT = formatoMoneda.format(aperturaCantTOT);
 
-        cierreCantTOT = cierreCant + cierreCantNGU;
-        cierreTOT = formatoMoneda.format(cierreCantTOT);
+                cierreCantTOT = totalcant + totalcantNGU;
+                cierreTOT = formatoMoneda.format(cierreCantTOT);
 
-        sobranteCantTOT = sobranteCant + sobranteCantNGU;
-        sobranteTOT = formatoMoneda.format(sobranteCantTOT);
+                sobranteCantTOT = sobranteCantMUT;
+                sobranteTOT = formatoMoneda.format(sobranteCantTOT);
 
-        faltanteCantTOT = faltanteCant + faltanteCantNGU;
-        faltanteTOT = formatoMoneda.format(faltanteCantTOT);
+                faltanteCantTOT = faltanteCantMUT;
+                faltanteTOT = formatoMoneda.format(faltanteCantTOT);
 
-        cantTotSaldoFisicoAmbas = cantSaldoFisicoMut + cantSaldoFisicoNgu;
-        totSaldoFisicoAmbas = formatoMoneda.format(cantTotSaldoFisicoAmbas);
+                cantTotSaldoFisicoAmbas = cantSaldoFisicoMut + cantSaldoFisicoNgu;
+                totSaldoFisicoAmbas = formatoMoneda.format(cantTotSaldoFisicoAmbas);
 
-        totalcantTOT =
-                creditosCantTOT
+                totalcantTOT =
+                    creditosCantTOT
                         + ahorrosCantTOT
                         - retirosCantTOT
                         - desembolsosCantTOT
@@ -618,205 +538,137 @@ public class CierreController implements Initializable {
                         + aperturaCantTOT
                         + sobranteCantTOT
                         - faltanteCantTOT;
-        totalTOT = formatoMoneda.format(totalcantTOT);
+                totalTOT = formatoMoneda.format(totalcantTOT);
 
-        isLogo = getClass().getResourceAsStream("/assets/images/logo-mut.png");
-        isLogo2 = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                isLogo = getClass().getResourceAsStream("/assets/images/logo-mut.png");
+                isLogo2 = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        try {
-          Map pars = new HashMap<>();
+                Map pars = new HashMap<>();
 
-          pars.put("LOGOMUT", isLogo);
-          pars.put("LOGO_NGU", isLogo2);
+                pars.put("LOGOMUT", isLogo);
+                pars.put("LOGO_NGU", isLogo2);
 
-          pars.put("EMPRESA_1", mutNombre);
-          pars.put("EMPRESA_2", nguNombre);
-          pars.put("Titulo", "REPORTE DE CIERRE DE CAJERO");
-          pars.put("USUARIO", LoginController.usuarioLoggeado);
-          pars.put("NOMBRE_USER", nomcajero);
-          pars.put("TURNO", turno);
-          pars.put("Folio", folio);
-          pars.put("Fecha", fecha.format(formatter));
-          pars.put("Hora", hora);
+                pars.put("EMPRESA_1", mutNombre);
+                pars.put("EMPRESA_2", nguNombre);
+                pars.put("Titulo", "REPORTE DE CIERRE DE CAJERO");
+                pars.put("USUARIO", LoginController.usuarioLoggeado);
+                pars.put("NOMBRE_USER", nomcajero);
+                pars.put("TURNO", turno);
+                pars.put("Folio", folio);
+                pars.put("Fecha", fecha.format(formatter));
+                pars.put("Hora", hora);
 
-          pars.put("DEP_AHORRO_MUT", ahorros);
-          pars.put("DEP_CREDITO_MUTU", creditos);
-          pars.put("DEP_CS_MUT", capital);
-          pars.put("DEP_RETIROS_MUT", retiros);
-          pars.put("DEP_DESEMBOLSO_MUT", desembolsos);
-          pars.put("DEP_PRESOC_MUT", presoc);
-          pars.put("DEP_TRASLADO_A_MUT", apertura);
-          pars.put("DEP_TRASLADO_C_MUT", total);
-          pars.put("SOBRANTE_MUT", sobrante);
-          pars.put("FALTANTE_MUT", faltante);
-          pars.put("TOTAL_MUT", cierre);
+                pars.put("DEP_AHORRO_MUT", ahorros);
+                pars.put("DEP_CREDITO_MUTU", creditos);
+                pars.put("DEP_CS_MUT", capital);
+                pars.put("DEP_RETIROS_MUT", retiros);
+                pars.put("DEP_DESEMBOLSO_MUT", desembolsos);
+                pars.put("DEP_PRESOC_MUT", presoc);
+                pars.put("DEP_TRASLADO_A_MUT", apertura);
+                pars.put("DEP_TRASLADO_C_MUT", cierre);
+                pars.put("TOTAL_MUT", total);
 
-          pars.put("DEP_AHORRO_NGU", ahorrosNGU);
-          pars.put("DEP_CREDITO_NGU", creditosNGU);
-          pars.put("DEP_CS_NGU", capitalNGU);
-          pars.put("DEP_RETIROS_NGU", retirosNGU);
-          pars.put("DEP_DESEMBOLSO_NGU", desembolsosNGU);
-          pars.put("DEP_PRESOC_NGU", presocNGU);
-          pars.put("DEP_TRASLADO_A_NGU", aperturaNGU);
-          pars.put("DEP_TRASLADO_C_NGU", totalNGU);
-          pars.put("SOBRANTE_NGU", sobranteNGU);
-          pars.put("FALTANTE_NGU", faltanteNGU);
-          pars.put("TOTAL_NGU", cierreNGU);
+                pars.put("DEP_AHORRO_NGU", ahorrosNGU);
+                pars.put("DEP_CREDITO_NGU", creditosNGU);
+                pars.put("DEP_CS_NGU", capitalNGU);
+                pars.put("DEP_RETIROS_NGU", retirosNGU);
+                pars.put("DEP_DESEMBOLSO_NGU", desembolsosNGU);
+                pars.put("DEP_PRESOC_NGU", presocNGU);
+                pars.put("DEP_TRASLADO_A_NGU", aperturaNGU);
+                pars.put("DEP_TRASLADO_C_NGU", cierreNGU);
+                pars.put("TOTAL_NGU", totalNGU);
 
-          pars.put("DEP_AHORRO", ahorrosTOT);
-          pars.put("DEP_CREDITO_TOT", creditosTOT);
-          pars.put("DEP_CS_TOT", capitalTOT);
-          pars.put("DEP_RETIROS_TOT", retirosTOT);
-          pars.put("DEP_DESEMBOLSO_TOT", desembolsosTOT);
-          pars.put("DEP_PRESOC_TOT", presocTOT);
-          pars.put("DEP_TRASLADO_A_TOT", aperturaTOT);
-          pars.put("DEP_TRASLADO_C_TOT", totalTOT);
-          pars.put("SOBRANTE_TOT", sobranteTOT);
-          pars.put("FALTANTE_TOT", faltanteTOT);
-          pars.put("TOTAL_F", cierreTOT);
+                pars.put("DEP_AHORRO", ahorrosTOT);
+                pars.put("DEP_CREDITO_TOT", creditosTOT);
+                pars.put("DEP_CS_TOT", capitalTOT);
+                pars.put("DEP_RETIROS_TOT", retirosTOT);
+                pars.put("DEP_DESEMBOLSO_TOT", desembolsosTOT);
+                pars.put("DEP_PRESOC_TOT", presocTOT);
+                pars.put("DEP_TRASLADO_A_TOT", aperturaTOT);
+                pars.put("DEP_TRASLADO_C_TOT", totalTOT);
+                pars.put("SOBRANTE_TOT", sobranteTOT);
+                pars.put("FALTANTE_TOT", faltanteTOT);
+                pars.put("TOTAL_F", cierreTOT);
 
-          // pars.put("TOTAL_E" , cierreTOT);
-          pars.put("TOTAL_FISI", saldoFisicoMut);
-          pars.put("TOTAL_FISI_NGU", saldoFisicoNgu);
-          pars.put("TOTAL_FISI_TOT", totSaldoFisicoAmbas);
+                pars.put("TOTAL_FISI_TOT", totSaldoFisicoAmbas);
 
-          InputStream isRepo = getClass().getResourceAsStream("/Reports/cierrefinal.jasper");
-          JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
-          JasperPrint jpRepo =
-                  JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
+                InputStream isRepo = getClass().getResourceAsStream("/Reports/cierrefinal.jasper");
+                JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
+                JasperPrint jpRepo =
+                    JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
 
-          JasperViewer viewer = new JasperViewer(jpRepo, false);
+                Platform.runLater(
+                    () -> {
+                      JasperViewer viewer = new JasperViewer(jpRepo, false);
+                      viewer.setAlwaysOnTop(true);
+                      viewer.setSize(800, 600);
+                      viewer.setLocationRelativeTo(null);
+                      viewer.setTitle("REPORTE DE CIERRE DE CAJERO");
+                      viewer.setVisible(true);
 
-          viewer.setSize(800, 600);
-          viewer.setLocationRelativeTo(null);
-          viewer.setTitle("REPORTE DE CIERRE DE CAJERO");
-          viewer.setVisible(true);
+                      try {
+                        Stage ventanaActual = (Stage) btnImprimir.getScene().getWindow();
+                        Stage ventanaPrincipal = (Stage) cierreCajero.getScene().getWindow();
+                        Stage nuevaVentana = new Stage();
+                        FXMLLoader fxml =
+                            new FXMLLoader(getClass().getResource("/com/java/fx/login.fxml"));
+                        fxml.setControllerFactory(Main.context::getBean);
+                        Scene nuevaEscena = new Scene(fxml.load());
+                        nuevaEscena
+                            .getStylesheets()
+                            .add(
+                                getClass().getResource("/assets/css/estilos.css").toExternalForm());
+                        nuevaVentana.setTitle("AUTENTICACIÓN DE USUARIO");
+                        Image icon =
+                            new Image(getClass().getResourceAsStream("/assets/images/logo.png"));
+                        nuevaVentana.getIcons().add(icon);
+                        nuevaVentana.setScene(nuevaEscena);
+                        nuevaVentana.setResizable(false);
+                        nuevaVentana.centerOnScreen();
+                        nuevaVentana.show();
+                        ventanaActual.close();
+                        ventanaPrincipal.close();
+                      } catch (IOException e) {
 
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
+                      }
+                    });
 
-        Stage ventanaActual = (Stage) btnImprimir.getScene().getWindow();
-        Stage ventanaPrincipal = (Stage) lblFalt.getScene().getWindow();
-        Stage nuevaVentana = new Stage();
-        FXMLLoader fxml = new FXMLLoader(getClass().getResource("/com/java/fx/login.fxml"));
-        fxml.setControllerFactory(Main.context::getBean);
-        Scene nuevaEscena = new Scene(fxml.load());
-        nuevaEscena
-                .getStylesheets()
-                .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());
-        nuevaVentana.setTitle("AUTENTICACIÓN DE USUARIO");
-        Image icon = new Image(getClass().getResourceAsStream("/assets/images/logo.png"));
-        nuevaVentana.getIcons().add(icon);
-        nuevaVentana.setScene(nuevaEscena);
-        nuevaVentana.setResizable(false);
-        nuevaVentana.centerOnScreen();
-        nuevaVentana.show();
-        ventanaActual.close();
-        ventanaPrincipal.close();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
+              } catch (Exception e) {
+                e.printStackTrace();
+                Platform.runLater(
+                    () -> {
+                      Alert alert = new Alert(Alert.AlertType.ERROR);
+                      alert.setTitle("ERROR");
+                      alert.setHeaderText("ERROR AL GENERAR EL REPORTE");
+                      alert.setContentText("OCURRIÓ UN ERROR: " + e.getMessage());
+                      alert.showAndWait();
+                    });
+              }
+              return null;
+            }
+          };
 
-    }
-  }
+      task.setOnSucceeded(e -> loadingStage.close());
+      task.setOnFailed(e -> loadingStage.close());
 
-  @FXML
-  public void cerrarMut() {
-
-    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    alert.setTitle("CIERRE DE CAJA");
-    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR TU CAJA DE ESTA EMPRESA?");
-    alert.setContentText(
-            "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR.");
-
-    Optional<ButtonType> result = alert.showAndWait();
-    if (result.isPresent() && result.get() != ButtonType.OK) {
-      return;
-    }
+      loadingStage.show();
+      new Thread(task).start();
 
 
-    DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm:ss");
-    LocalDateTime fecha = LocalDateTime.now();
-    LocalTime hora = fecha.toLocalTime();
-    String horaticket = hora.format(formatterHora);
-    BigDecimal ajusteMut = BigDecimal.valueOf(0);
-
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    String fechaTicket = fecha.format(formatter);
-
-    //Hacer ajuste para ambas empresas
-    if (saldoFinal == BigDecimal.valueOf(0)) {
-      ajusteMut = BigDecimal.valueOf(saldoInicial.doubleValue() - saldoFisico.doubleValue());
     } else {
-      ajusteMut = BigDecimal.valueOf(saldoFinal.doubleValue() - saldoFisico.doubleValue());
-    }
-
-    //TRASLADO DE CIERRE
-    Map<String, Object> resMut =
-            servicio.procesarTraslado(
-                    LoginController.usuarioLoggeado,
-                    saldoFisico.doubleValue(),
-                    7,
-                    cajaMut.getEmpresa(),
-                    horaticket,
-                    turno,
-                    1,
-                    "",
-                    0);
-
-
-    //multiplicar ajsute por negativo
-    String resAjusteMUT ="";
-    if(ajusteMut.doubleValue()>0){
-      resAjusteMUT = servicio.procesarAjuste(LoginController.usuarioLoggeado,ajusteMut.doubleValue(),0,
-              turno,cajaMut.getEmpresa(), saldoFisico.doubleValue(),"");
-    }else if(ajusteMut.doubleValue()<0){
-
-      resAjusteMUT = servicio.procesarAjuste(LoginController.usuarioLoggeado,0,-1 * ajusteMut.doubleValue(),
-              turno,cajaMut.getEmpresa(), saldoFisico.doubleValue(),"");
-    }else{
-      resAjusteMUT = servicio.procesarAjuste(LoginController.usuarioLoggeado,0,0,
-              turno,cajaMut.getEmpresa(), saldoFisico.doubleValue(),"");
-
-    }
-
-    if(!resAjusteMUT.equals("CORRECTO")){
-
-      Alert alert2 = new Alert(Alert.AlertType.ERROR);
-      alert2.setTitle("ERROR");
-      alert2.setHeaderText("ERROR AL CERRAR LA EMPRESA");
-      alert2.setContentText(resAjusteMUT.toString().toUpperCase());
-      alert2.showAndWait();
-      return;
+      //Mostramos el error
+      Alert alert = new Alert(Alert.AlertType.ERROR);
+      alert.setTitle("ERROR AL REALIZAR EL CIERRE DE CAJERO");
+      alert.setHeaderText("ERROR EN EL CIERRE");
+      alert.setContentText("ERROR: " + res.get("Resultado").toString().toUpperCase());
+      alert.showAndWait();
     }
 
 
 
 
-    String folioMut = resMut.get("transaccion_id").toString();
-    if (folioMut.equals("0")) {
-      Alert alert2 = new Alert(Alert.AlertType.ERROR);
-      alert2.setTitle("ERROR");
-      alert2.setHeaderText("ERROR AL CERRAR LA EMPRESA");
-      alert2.setContentText(resMut.get("Resultado").toString().toUpperCase());
-      alert2.showAndWait();
-      return;
-    } else {
-      foliotrasladoCierreMut = Integer.valueOf(folioMut);
-      Alert alert2 = new Alert(Alert.AlertType.INFORMATION);
-      alert2.setTitle("¡CORRECTO!");
-      alert2.setHeaderText("CIERRE DE EMPRESA EXITOSO");
-      alert2.setContentText("PUEDE PROCEDER CON SU SIGUIENTE CIERRE O A LA IMPRESIÓN.");
-      alert2.showAndWait();
-    }
 
-    btnCierreMut.setDisable(true);
-
-    if (btnCierreNgu.isDisabled()) {
-      btnImprimir.setVisible(true);
-    }
 
 
 
@@ -825,17 +677,6 @@ public class CierreController implements Initializable {
 
   public void cierreDeVentana(Event event) {
     event.consume();
-    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    //    alert.setTitle("CIERRE DE VENTANA");
-    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-    //    alert.setContentText(
-    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-    //
-    //    Optional<ButtonType> result = alert.showAndWait();
-    //    if (result.isPresent() && result.get() == ButtonType.OK) {
-    //
-    //    }
     validator = new Validator();
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();
@@ -844,17 +685,6 @@ public class CierreController implements Initializable {
   @FXML
   public void cerrarConTecla(KeyEvent event) {
     if (event.getCode().equals(KeyCode.ESCAPE)) {
-      //      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-      //      alert.setTitle("CIERRE DE VENTANA");
-      //      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-      //      alert.setContentText(
-      //          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-      //              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-      //
-      //      Optional<ButtonType> result = alert.showAndWait();
-      //      if (result.isPresent() && result.get() == ButtonType.OK) {
-      //
-      //      }
       validator = new Validator();
       Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
       ventanaActual.close();
@@ -863,17 +693,6 @@ public class CierreController implements Initializable {
 
   @FXML
   public void cerrarConBoton() {
-    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    //    alert.setTitle("CIERRE DE VENTANA");
-    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-    //    alert.setContentText(
-    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-    //
-    //    Optional<ButtonType> result = alert.showAndWait();
-    //    if (result.isPresent() && result.get() == ButtonType.OK) {
-    //
-    //    }
     validator = new Validator();
     Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
     ventanaActual.close();

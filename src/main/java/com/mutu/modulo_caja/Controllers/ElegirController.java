@@ -158,7 +158,7 @@ public class ElegirController implements Initializable {
             alert.setTitle("ERROR AL QUERER PAGAR EL CAPITAL SOCIAL");
             alert.setHeaderText("ERROR EN EL PAGO DE CAPITAL SOCIAL");
             alert.setContentText(
-                    STR."LA CUENTA A LA QUE INTENTA ACCEDER YA TIENE EL MONTO CUBIERTO EN \{empresaCod}");
+                    "LA CUENTA A LA QUE INTENTA ACCEDER YA TIENE EL MONTO CUBIERTO EN " + empresaCod);
             alert.showAndWait();
             validador = false;
           } else {
@@ -191,7 +191,7 @@ public class ElegirController implements Initializable {
             alert.setTitle("ERROR AL QUERER PAGAR EL CAPITAL SOCIAL");
             alert.setHeaderText("ERROR EN EL PAGO DE CAPITAL SOCIAL");
             alert.setContentText(
-                    STR."LA CUENTA A LA QUE INTENTA ACCEDER YA TIENE EL MONTO CUBIERTO EN \{primer_empresa}");
+                    "LA CUENTA A LA QUE INTENTA ACCEDER YA TIENE EL MONTO CUBIERTO EN " + primer_empresa);
             alert.showAndWait();
             validador = false;
           } else {
@@ -205,7 +205,7 @@ public class ElegirController implements Initializable {
             alert.setTitle("ERROR AL QUERER PAGAR EL CAPITAL SOCIAL");
             alert.setHeaderText("ERROR EN EL PAGO DE CAPITAL SOCIAL");
             alert.setContentText(
-                    STR."LA CUENTA A LA QUE INTENTA ACCEDER YA TIENE EL MONTO CUBIERTO EN \{segunda_empresa}");
+                    "LA CUENTA A LA QUE INTENTA ACCEDER YA TIENE EL MONTO CUBIERTO EN " + segunda_empresa);
             alert.showAndWait();
             validador = false;
           } else {

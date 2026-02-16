@@ -39,8 +39,10 @@ import java.time.LocalDate;
           type = Integer.class),
       @StoredProcedureParameter(mode = ParameterMode.IN, name = "fecha", type = String.class),
             @StoredProcedureParameter(mode = ParameterMode.IN, name = "saldo_fisico", type = Double.class),
+            @StoredProcedureParameter(mode = ParameterMode.IN, name = "usuario", type = String.class),
       @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Resultado", type = String.class),
-            @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Cierre_id", type = Integer.class),
+            @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Cierre_id_mut", type = Integer.class),
+            @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Cierre_id_ngu", type = Integer.class)
     })
 public class ModelCierre {
 

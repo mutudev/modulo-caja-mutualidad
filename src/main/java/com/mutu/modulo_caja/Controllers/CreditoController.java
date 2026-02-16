@@ -1148,7 +1148,10 @@ public class CreditoController implements Initializable {
       String nombreEmpresa = servicio.traerEmpresa(empresaCod).getRazonSocial();
       String rfcEmpresa = servicio.traerEmpresa(empresaCod).getRfc();
       String direcEmpresa =
-              STR."\{servicio.traerEmpresa(empresaCod).getCalle()} \{servicio.traerEmpresa(empresaCod).getCruzamiento()} COL. CENTRO";
+              servicio.traerEmpresa(empresaCod).getCalle() + " "
+                      + servicio.traerEmpresa(empresaCod).getCruzamiento()
+                      + " COL. CENTRO";
+
 
       if (servicio.traerCuentasCS(Integer.parseInt(numSocio)).size() == 1) {
         psmut = servicio.traerCuentasCS(Integer.parseInt(numSocio)).getFirst().getMonto_cubierto();
@@ -1209,16 +1212,22 @@ public class CreditoController implements Initializable {
       if (opcion == 1) {
         capenviar = formatoMoneda.format(montoPagado);
         moneyAsWords =
-                STR."\{converter
-                        .asWords(BigDecimal.valueOf(abonoTotal).setScale(2, RoundingMode.HALF_UP))
-                        .toUpperCase()} MXN"; // REDONDEAR A DOS DECIMALES
+                converter
+                        .asWords(
+                                BigDecimal.valueOf(abonoTotal)
+                                        .setScale(2, RoundingMode.HALF_UP)
+                        )
+                        .toUpperCase() + " MXN"; // REDONDEAR A DOS DECIMALES
 
       } else if (opcion == 2) {
 
         moneyAsWords =
-                STR."\{converter
-                        .asWords(BigDecimal.valueOf(abonoTotal).setScale(2, RoundingMode.HALF_UP))
-                        .toUpperCase()} MXN";
+                converter
+                        .asWords(
+                                BigDecimal.valueOf(abonoTotal)
+                                        .setScale(2, RoundingMode.HALF_UP)
+                        )
+                        .toUpperCase() + " MXN";
       }
 
       PrintJob impresion = new PrintJob();

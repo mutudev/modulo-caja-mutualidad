@@ -7,13 +7,23 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -154,62 +164,93 @@ public class RetiroController implements Initializable {
   public void procesarRetiro() {
 
     if (!tableRetiros.getItems().isEmpty() && tableRetiros.getItems().size() == 1) {
+
       Object[] primeraFila = (Object[]) tableRetiros.getItems().get(0);
 
       String montoString = String.valueOf(primeraFila[3]);
-
       montoString = montoString.replaceAll("[\\$,]", "");
+
       LocalDateTime fecha = LocalDateTime.now();
       LocalTime hora = fecha.toLocalTime();
+
       DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm:ss");
       DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-      String fechaTicket = fecha.format(formatter);
 
+      String fechaTicket = fecha.format(formatter);
       double monto = Double.parseDouble(montoString);
 
       int id = Integer.parseInt(txtIdentificador.getText().trim());
+
       Map<String, Object> result =
-          servicio.ProcesarRetiro(
-              id,
-              socio,
-              LoginController.usuarioLoggeado,
-              monto,
-              empresa,
-              fechaTicket,
-              turno,
-              0,
-              "");
+              servicio.ProcesarRetiro(
+                      id,
+                      socio,
+                      LoginController.usuarioLoggeado,
+                      monto,
+                      empresa,
+                      fechaTicket,
+                      turno,
+                      0,
+                      "");
 
       if (result.get("Resultado").toString().equals("CORRECTO")) {
+
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("RETIRO PROCESADO CON ÉXITO");
         alert.setHeaderText("RETIRO PROCESADO CON ÉXITO");
         alert.setContentText(
-            "RETIRO DEL SOCIO: " + socio + " POR: " + montoString + " HECHO CON EXITO");
+                "RETIRO DEL SOCIO: " + socio + " POR: " + montoString + " HECHO CON EXITO");
         alert.showAndWait();
 
+        Stage loadingStage = new Stage();
+        loadingStage.initModality(Modality.APPLICATION_MODAL);
+        loadingStage.initStyle(StageStyle.UNDECORATED);
+        loadingStage.setAlwaysOnTop(true);
+
+        VBox loadingPane = new VBox(20);
+        loadingPane.setAlignment(Pos.CENTER);
+        loadingPane.setPadding(new Insets(30));
+        loadingPane.setStyle("-fx-background-color: white; -fx-border-color: #185754; -fx-border-width: 2;");
+
+        ProgressIndicator progressIndicator = new ProgressIndicator();
+        progressIndicator.setPrefSize(60, 60);
+
+        Label loadingLabel = new Label("Generando Retiro...");
+        loadingLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+        loadingLabel.setTextFill(Color.web("#39577c"));
+
+        loadingPane.getChildren().addAll(progressIndicator, loadingLabel);
+
+        Scene loadingScene = new Scene(loadingPane, 300, 150);
+        loadingStage.setScene(loadingScene);
+        loadingStage.centerOnScreen();
+
         try {
-          InputStream isLogo = null;
+
+          InputStream isLogo;
+
           ModelAhorro ahororoactual = servicio.traerCuentaAhorroPorSocio(socio);
+
           String horaFormateada = hora.format(formatterHora);
           String nombreEmpresa = servicio.traerEmpresa(empresa).getRazonSocial();
           String rfcEmpresa = servicio.traerEmpresa(empresa).getRfc();
           String direcEmpresa =
-              servicio.traerEmpresa(empresa).getCalle()
-                  + " "
-                  + servicio.traerEmpresa(empresa).getCruzamiento()
-                  + " COL. CENTRO";
+                  servicio.traerEmpresa(empresa).getCalle()
+                          + " "
+                          + servicio.traerEmpresa(empresa).getCruzamiento()
+                          + " COL. CENTRO";
+
           String numcuenta = ahororoactual.getNum_cuenta();
           String nomsocio = String.valueOf(primeraFila[6]);
-          double montores = ahororoactual.getSaldo();
           String montoanterior = String.valueOf(primeraFila[1]);
-          String folio = result.get("transaccion_id").toString();
-
-          NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
           String montoactual = String.valueOf(primeraFila[2]);
           String montoretirado = String.valueOf(primeraFila[3]);
+          String folio = result.get("transaccion_id").toString();
+
           MoneyConverters converter = MoneyConverters.SPANISH_BANKING_MONEY_VALUE;
-          String moneyAsWords = converter.asWords(BigDecimal.valueOf(monto)).toUpperCase() + " MXN";
+          String moneyAsWords =
+                  converter.asWords(BigDecimal.valueOf(monto)).toUpperCase() + " MXN";
+
           if (empresa.equals("0001")) {
             isLogo = getClass().getResourceAsStream("/assets/images/logo-mut.png");
           } else {
@@ -233,39 +274,64 @@ public class RetiroController implements Initializable {
           pars.put("Montoletras", moneyAsWords);
           pars.put("Cajero", LoginController.usuarioLoggeado);
           pars.put("Hora", horaFormateada);
+
           if (empresa.equals("0001")) {
             pars.put(
-                "Descripcion",
-                "Recibí de la "
-                    + nombreEmpresa
-                    + " la cantidad de "
-                    + montoretirado
-                    + " ("
-                    + moneyAsWords
-                    + ") por concepto de RETIRO DE CUENTA DE AHORRO.");
+                    "Descripcion",
+                    "Recibí de la " + nombreEmpresa
+                            + " la cantidad de " + montoretirado
+                            + " (" + moneyAsWords + ") por concepto de RETIRO DE CUENTA DE AHORRO."
+            );
           } else {
             pars.put(
-                "Descripcion",
-                "Recibí de "
-                    + nombreEmpresa
-                    + " la cantidad de "
-                    + montoretirado
-                    + " ("
-                    + moneyAsWords
-                    + ") por concepto de RETIRO DE CUENTA DE AHORRO.");
+                    "Descripcion",
+                    "Recibí de " + nombreEmpresa
+                            + " la cantidad de " + montoretirado
+                            + " (" + moneyAsWords + ") por concepto de RETIRO DE CUENTA DE AHORRO."
+            );
           }
 
-          InputStream isRepo = getClass().getResourceAsStream("/Reports/retiro.jasper");
-          JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
-          JasperPrint jpRepo = JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
 
-          JasperViewer viewer = new JasperViewer(jpRepo, false);
+          Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+              try {
 
-          viewer.setAlwaysOnTop(true);
-          viewer.setSize(800, 600);
-          viewer.setLocationRelativeTo(null);
-          viewer.setTitle("REPORTE DE RETIRO");
-          viewer.setVisible(true);
+                InputStream isRepo =
+                        getClass().getResourceAsStream("/Reports/retiro.jasper");
+
+                JasperReport jrRepo = (JasperReport) JRLoader.loadObject(isRepo);
+                JasperPrint jpRepo =
+                        JasperFillManager.fillReport(jrRepo, pars, new JREmptyDataSource());
+
+                Platform.runLater(() -> {
+                  JasperViewer viewer = new JasperViewer(jpRepo, false);
+                  viewer.setAlwaysOnTop(true);
+                  viewer.setSize(800, 600);
+                  viewer.setLocationRelativeTo(null);
+                  viewer.setTitle("REPORTE DE RETIRO");
+                  viewer.setVisible(true);
+                });
+
+              } catch (Exception e) {
+                e.printStackTrace();
+                Platform.runLater(() -> {
+                  Alert alert = new Alert(Alert.AlertType.ERROR);
+                  alert.setTitle("ERROR");
+                  alert.setHeaderText("ERROR AL GENERAR EL REPORTE");
+                  alert.setContentText("OCURRIÓ UN ERROR: " + e.getMessage());
+                  alert.showAndWait();
+                });
+              }
+              return null;
+            }
+          };
+
+          task.setOnSucceeded(e -> loadingStage.close());
+          task.setOnFailed(e -> loadingStage.close());
+
+          loadingStage.show();
+          new Thread(task).start();
 
         } catch (Exception e) {
           e.printStackTrace();
@@ -273,14 +339,18 @@ public class RetiroController implements Initializable {
 
         Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
         ventanaActual.close();
+
       } else {
+
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("ERROR AL QUERER PROCESAR EL RETIRAR");
         alert.setHeaderText("ERROR EN EL RETIRO");
         alert.setContentText(result.get("Resultado").toString().toUpperCase());
         alert.showAndWait();
       }
+
     } else {
+
       Alert alert = new Alert(Alert.AlertType.ERROR);
       alert.setTitle("NO TIENE RETIROS PENDIENTES");
       alert.setHeaderText("NO TIENE RETIROS PENDIENTES");
@@ -288,4 +358,5 @@ public class RetiroController implements Initializable {
       alert.showAndWait();
     }
   }
+
 }

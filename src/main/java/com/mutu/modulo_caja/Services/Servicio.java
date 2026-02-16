@@ -265,8 +265,8 @@ public class Servicio {
 
   @Transactional
   public Map<String, Object> pa_procesarCierre(
-      int cuenta_cajeroMut, int cuenta_cajeroNgu, String fecha, double saldo_fisico, String Resultado, int Cierre_id) {
-    return repoCierre.procesarCierre(cuenta_cajeroMut, cuenta_cajeroNgu, fecha, saldo_fisico, Resultado, Cierre_id);
+      int cuenta_cajeroMut, int cuenta_cajeroNgu, String fecha, double saldo_fisico, String usuario, String Resultado, int Cierre_id_mut, int Cierre_id_ngu) {
+    return repoCierre.procesarCierre(cuenta_cajeroMut, cuenta_cajeroNgu, fecha, saldo_fisico, usuario, Resultado, Cierre_id_mut, Cierre_id_ngu);
   }
 
   public List<ModelUsuario> traerCajero(int rol) {
