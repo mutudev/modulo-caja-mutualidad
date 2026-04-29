@@ -664,14 +664,6 @@ public class CierreController implements Initializable {
       alert.setContentText("ERROR: " + res.get("Resultado").toString().toUpperCase());
       alert.showAndWait();
     }
-
-
-
-
-
-
-
-
   }
 
 

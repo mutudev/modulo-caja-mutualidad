@@ -15,7 +15,6 @@ public class Report {
                 // Ruta al archivo .jrxml
                 String jrxmlFile = "Reports/desembolso.jrxml";
 
-
                 // Compilar el archivo JRXML a un archivo .jasper
                 InputStream jrxmlStream = Class.class.getResourceAsStream(jrxmlFile);
                 JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);

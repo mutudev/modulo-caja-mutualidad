@@ -61,7 +61,7 @@ public class PrintJob {
     String totalAhorro = "AHORRO: " + ahorro;
     Extenso e = new Extenso();
     e.setNumber(21.59);
-    printer.setOutSize(30, 60);
+    printer.setOutSize(22, 60);
     printer.printTextWrap(1, 2, 1, 60, empresa); // Columna 1
     printer.printTextWrap(2, 3, 1, 60, "RFC: " + rfc); // Columna 2
     printer.printTextWrap(3, 4, 1, 60, direc); // Columna 3
@@ -132,7 +132,7 @@ public class PrintJob {
     String cajero = "USUARIO: " + LoginController.usuarioLoggeado;
     Extenso e = new Extenso();
     e.setNumber(21.59);
-    printer.setOutSize(30, 60);
+    printer.setOutSize(22, 60);
     printer.printTextWrap(1, 2, 1, 60, empresa); // Columna 1
     printer.printTextWrap(2, 3, 1, 60, "RFC: " + rfc); // Columna 2
     printer.printTextWrap(3, 4, 1, 60, direc); // Columna 3
@@ -181,7 +181,7 @@ public class PrintJob {
     //    String totalAhorro = "AHORRO: " + ahorro;
     Extenso e = new Extenso();
     e.setNumber(21.59);
-    printer.setOutSize(30, 60);
+    printer.setOutSize(22, 60);
     printer.printTextWrap(1, 2, 1, 60, empresa); // Columna 1
     printer.printTextWrap(2, 3, 1, 60, "RFC: " + rfc); // Columna 2
     printer.printTextWrap(3, 4, 1, 60, direc); // Columna 3
@@ -207,6 +207,7 @@ public class PrintJob {
 
     return printer;
   }
+
   public PrinterMatrix imprimirCancelacionAbonoACredito(
           String empresa,
           String rfc,

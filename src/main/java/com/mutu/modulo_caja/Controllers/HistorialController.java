@@ -21,373 +21,197 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 @Component
 public class HistorialController implements Initializable {
 
-  @FXML private ComboBox cmbEmpresa, cmbOperacion;
-  @FXML private Button btnCancelar, btnVer;
+  // ─── Constantes ───────────────────────────────────────────────────────────
 
-  @FXML private TableView tableHistorial;
-  @FXML private TableView tableTraslados;
+  private static final DateTimeFormatter FORMATTER_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-  public int operacionreimpresion;
+  /** Mapeo operación (label) → tipo_operacion (id). */
+  private static final Map<String, Integer> OPERACION_ID = Map.of(
+          "ABONO A CUENTA DE AHORRO",           1,
+          "ABONO A CUENTA DE CRÉDITO",          2,
+          "PROCESAMIENTO DE DESEMBOLSO",         3,
+          "PROCESAMIENTO DE RETIRO",             4,
+          "ABONO A CUENTA DE CAPITAL SOCIAL",   5,
+          "TRASLADO DE BÓVEDA A CAJAS",          6,
+          "TRASLADO DE CAJAS A BÓVEDA",          7,
+          "ABONO A CUENTA DE PREVISIÓN SOCIAL", 10
+  );
+
+  // ─── FXML ─────────────────────────────────────────────────────────────────
+
+  @FXML private ComboBox<String> cmbEmpresa, cmbOperacion;
+  @FXML private Button          btnCancelar, btnVer;
+
+  @FXML private TableView<Object[]> tableHistorial, tableTraslados;
 
   @FXML private TableColumn<Object[], String> colSocio, colNombre, colFecha, colHora, colMonto;
-  @FXML
-  private TableColumn<Object[], String> colID,
-      colUsuario,
-      colOrigen,
-      colDestino,
-      colMontoT,
-      colFechaT;
+  @FXML private TableColumn<Object[], String> colID, colUsuario, colOrigen, colDestino, colMontoT, colFechaT;
+
+  // ─── Estado ───────────────────────────────────────────────────────────────
+
+  public int    operacionreimpresion;
   public String usuario, turno;
 
   List<Object[]> CopiaOperaciones;
 
   @Autowired public Servicio servicio;
 
+  // ─── Initializable ────────────────────────────────────────────────────────
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     if (cmbEmpresa != null && cmbOperacion != null) {
-
-      List<ModelEmpresa> empresas = servicio.traerEmpresas();
-      ObservableList<String> empresasProcesadas = FXCollections.observableArrayList();
-
-      for (ModelEmpresa empresa : empresas) {
-        empresasProcesadas.add(empresa.getRazonSocial());
-      }
-
-      cmbEmpresa.setItems(empresasProcesadas);
+      List<String> empresaNames = servicio.traerEmpresas().stream()
+              .map(ModelEmpresa::getRazonSocial)
+              .toList();
+      cmbEmpresa.setItems(FXCollections.observableArrayList(empresaNames));
       cmbEmpresa.getSelectionModel().selectFirst();
 
-      List<ModelOperaciones> operaciones = servicio.traerOperacions();
-
-      ObservableList<String> operacionesProcesadas = FXCollections.observableArrayList();
-
-      for (ModelOperaciones operacion : operaciones) {
-        operacionesProcesadas.add(operacion.getOperacion().toUpperCase());
-      }
-
-      cmbOperacion.setItems(operacionesProcesadas);
-      cmbOperacion.getSelectionModel().selectFirst();
-
-      cmbEmpresa.setItems(empresasProcesadas);
-      cmbOperacion.setItems(operacionesProcesadas);
-      cmbEmpresa.getSelectionModel().selectFirst();
+      List<String> operacionNames = servicio.traerOperacions().stream()
+              .map(o -> o.getOperacion().toUpperCase())
+              .toList();
+      cmbOperacion.setItems(FXCollections.observableArrayList(operacionNames));
       cmbOperacion.getSelectionModel().selectFirst();
     }
 
-    colSocio.setCellValueFactory(
-        cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[0])));
-    colNombre.setCellValueFactory(
-        cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[1])));
-    colFecha.setCellValueFactory(
-        cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[2])));
-    colHora.setCellValueFactory(
-        cellData -> new SimpleStringProperty((String) cellData.getValue()[6]));
-    colMonto.setCellValueFactory(
-        cellData -> new SimpleStringProperty((String) cellData.getValue()[3]));
+    // Tabla historial
+    colSocio .setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue()[0])));
+    colNombre.setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue()[1])));
+    colFecha .setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue()[2])));
+    colHora  .setCellValueFactory(c -> new SimpleStringProperty((String) c.getValue()[6]));
+    colMonto .setCellValueFactory(c -> new SimpleStringProperty((String) c.getValue()[3]));
 
-    // Parte de los traslados
-    colID.setCellValueFactory(
-        cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[0])));
-    colUsuario.setCellValueFactory(
-        cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[1])));
-    colOrigen.setCellValueFactory(
-        cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[5])));
-    colDestino.setCellValueFactory(
-        cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[6])));
-    colMontoT.setCellValueFactory(
-        cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[3])));
-    colFechaT.setCellValueFactory(
-        cellData -> new SimpleStringProperty((String) cellData.getValue()[7]));
+    // Tabla traslados
+    colID     .setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue()[0])));
+    colUsuario.setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue()[1])));
+    colOrigen .setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue()[5])));
+    colDestino.setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue()[6])));
+    colMontoT .setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue()[3])));
+    colFechaT .setCellValueFactory(c -> new SimpleStringProperty((String) c.getValue()[7]));
 
-    Platform.runLater(
-        () -> {
-          Stage stage = (Stage) btnCancelar.getScene().getWindow();
-          stage.setOnCloseRequest(event -> cierreDeVentana(event));
-        });
+    Platform.runLater(() -> {
+      Stage stage = (Stage) btnCancelar.getScene().getWindow();
+      stage.setOnCloseRequest(this::cierreDeVentana);
+    });
   }
 
-  public void cierreDeVentana(Event event) {
-    event.consume();
-    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    //    alert.setTitle("CIERRE DE VENTANA");
-    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-    //    alert.setContentText(
-    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-    //
-    //    Optional<ButtonType> result = alert.showAndWait();
-    //    if (result.isPresent() && result.get() == ButtonType.OK) {
-    //
-    //    }
-    Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
-    ventanaActual.close();
-  }
+  // ─── Datos ────────────────────────────────────────────────────────────────
 
-  @FXML
-  public void cerrarConTecla(KeyEvent event) {
-    if (event.getCode().equals(KeyCode.ESCAPE)) {
-      //      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-      //      alert.setTitle("CIERRE DE VENTANA");
-      //      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-      //      alert.setContentText(
-      //          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-      //              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-      //
-      //      Optional<ButtonType> result = alert.showAndWait();
-      //      if (result.isPresent() && result.get() == ButtonType.OK) {
-      //
-      //      }
-      Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
-      ventanaActual.close();
-    }
-
-    if (event.getCode().equals(KeyCode.ENTER)) {
-      verOperacion();
-    }
-  }
-
-  @FXML
-  public void cerrarConBoton() {
-    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    //    alert.setTitle("CIERRE DE VENTANA");
-    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-    //    alert.setContentText(
-    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-    //
-    //    Optional<ButtonType> result = alert.showAndWait();
-    //    if (result.isPresent() && result.get() == ButtonType.OK) {
-    //
-    //    }
-    Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
-    ventanaActual.close();
+  public void setDatos(String usuario, String turno) {
+    this.usuario = usuario;
+    this.turno   = turno;
+    traerOperaciones();
   }
 
   @FXML
   public void traerOperaciones() {
-    LocalDateTime fecha = LocalDateTime.now();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    String fechaEnviar = fecha.format(formatter);
+    String fechaEnviar    = LocalDate.now().format(FORMATTER_FECHA);
+    String empresa        = resolverCodigoEmpresa();
+    int    usuario_id     = servicio.traerDatosUsuario(LoginController.usuarioLoggeado).getId();
+    int    tipo_operacion = resolverTipoOperacion();
 
-    String empresa =
-        cmbEmpresa
-                .getSelectionModel()
-                .getSelectedItem()
-                .toString()
-                .equals("MUTUALIDAD DOCE DE AGOSTO S.C. DE R.L. DE C.V.")
-            ? "0001"
-            : "0002";
-    int usuario_id = servicio.traerDatosUsuario(LoginController.usuarioLoggeado).getId();
-    int tipo_operacion = 0;
+    boolean esTraslado = (tipo_operacion == 6 || tipo_operacion == 7);
 
-    // Determina el tipo de operación basado en la selección
-    switch (cmbOperacion.getSelectionModel().getSelectedItem().toString()) {
-      case "ABONO A CUENTA DE AHORRO":
-        tipo_operacion = 1;
-        break;
-      case "ABONO A CUENTA DE CRÉDITO":
-        tipo_operacion = 2;
-        break;
-      case "PROCESAMIENTO DE DESEMBOLSO":
-        tipo_operacion = 3;
-        break;
-      case "PROCESAMIENTO DE RETIRO":
-        tipo_operacion = 4;
-        break;
-      case "ABONO A CUENTA DE CAPITAL SOCIAL":
-        tipo_operacion = 5;
-        break;
-      case "TRASLADO DE BÓVEDA A CAJAS":
-        tipo_operacion = 6;
-        break;
-      case "TRASLADO DE CAJAS A BÓVEDA":
-        tipo_operacion = 7;
-        break;
-      case "ABONO A CUENTA DE PREVISIÓN SOCIAL":
-        tipo_operacion = 10;
-        break;
-    }
+    List<Object[]> operaciones = esTraslado
+            ? servicio.historialTraslados(usuario_id, tipo_operacion, 1, fechaEnviar, turno, empresa)
+            : servicio.traerHistorial(fechaEnviar, 1, empresa, turno, usuario_id, tipo_operacion, 1);
 
-    List<Object[]> operaciones;
-    if (tipo_operacion != 6 && tipo_operacion != 7) {
-      operaciones =
-          servicio.traerHistorial(fechaEnviar, 1, empresa, turno, usuario_id, tipo_operacion, 1);
-      tableHistorial.setVisible(true);
-      tableTraslados.setVisible(false);
-    } else {
-      operaciones =
-          servicio.historialTraslados(usuario_id, tipo_operacion, 1, fechaEnviar, turno, empresa);
-      tableHistorial.setVisible(false);
-      tableTraslados.setVisible(true);
-    }
+    tableHistorial.setVisible(!esTraslado);
+    tableTraslados.setVisible(esTraslado);
 
-    ObservableList<Object[]> datosOperaciones = FXCollections.observableArrayList();
-    for (Object[] resultado : operaciones) {
-      int operacion = (int) resultado[4];
-      if (operacion == tipo_operacion) {
-        datosOperaciones.add(resultado);
-      }
-    }
+    final int tipoFinal = tipo_operacion;
+    ObservableList<Object[]> datos = FXCollections.observableArrayList(
+            operaciones.stream()
+                    .filter(r -> (int) r[4] == tipoFinal)
+                    .toList()
+    );
 
-    if (tableHistorial.isVisible()) {
-      tableHistorial.setItems(datosOperaciones);
-    } else {
-      tableTraslados.setItems(datosOperaciones);
-    }
+    if (esTraslado) tableTraslados.setItems(datos);
+    else            tableHistorial.setItems(datos);
   }
+
+  // ─── Ver / reimprimir operación ───────────────────────────────────────────
 
   @FXML
   public void verOperacion() {
+    boolean historialVisible  = tableHistorial.isVisible();
+    Object[] fila             = historialVisible
+            ? tableHistorial.getSelectionModel().getSelectedItem()
+            : tableTraslados.getSelectionModel().getSelectedItem();
 
-    Object[] selectedRow = (Object[]) tableHistorial.getSelectionModel().getSelectedItem();
-    Object[] selectedRowTraslado = (Object[]) tableTraslados.getSelectionModel().getSelectedItem();
-
-    String nombre = "", numSocio = "", fecha = "", monto = "";
-    String IdOperacion = "";
-    String hora = "";
-    String cuenta_origen = "";
-    String cuenta_destino = "";
-    String capital_pagado = "";
-    String interes_pagado = "";
-    String mora_pagada = "";
-    String iva_pagado = "";
-    String bonif_aplicada = "";
-    String saldo_credito = "";
-    String tipo_credito = "";
-
-    if (tableHistorial.isVisible() && selectedRow != null) {
-
-      nombre = (String) selectedRow[1];
-      numSocio = String.valueOf(selectedRow[0]);
-      fecha = (String) selectedRow[2];
-      monto = (String) selectedRow[3];
-      hora = (String) selectedRow[6];
-      IdOperacion = String.valueOf(selectedRow[11]);
-      capital_pagado = (String) selectedRow[13];
-      interes_pagado = (String) selectedRow[14];
-      mora_pagada = (String) selectedRow[15];
-      iva_pagado = (String) selectedRow[16];
-      bonif_aplicada = (String) selectedRow[17];
-      saldo_credito = (String) selectedRow[18];
-      tipo_credito = (String) selectedRow[19];
-
-    } else if (tableTraslados.isVisible() && selectedRowTraslado != null) {
-
-      IdOperacion = String.valueOf(selectedRowTraslado[0]);
-      nombre = (String) selectedRowTraslado[1];
-      numSocio = String.valueOf(selectedRowTraslado[0]);
-      monto = (String) selectedRowTraslado[3];
-      hora = (String) selectedRowTraslado[8];
-      fecha = (String) selectedRowTraslado[7];
-
-      if (selectedRowTraslado[4].equals("6")) {
-        cuenta_origen = (String) selectedRowTraslado[6];
-        cuenta_destino = (String) selectedRowTraslado[5];
-
-      } else {
-
-        cuenta_origen = (String) selectedRowTraslado[5];
-        cuenta_destino = (String) selectedRowTraslado[6];
-      }
-
-    } else {
-      Alert alert = new Alert(Alert.AlertType.ERROR);
-      alert.setTitle("NO HA SELECCIONADO NINGUNA OPERACIÓN");
-      alert.setHeaderText("SIN OPERACIÓN SELECCIONADA");
-      alert.setContentText("POR FAVOR, SELECCIONE UNA OPERACIÓN.");
-      alert.showAndWait();
+    if (fila == null) {
+      mostrarError("NO HA SELECCIONADO NINGUNA OPERACIÓN",
+              "SIN OPERACIÓN SELECCIONADA",
+              "POR FAVOR, SELECCIONE UNA OPERACIÓN.");
       return;
     }
 
-    String operacion = cmbOperacion.getSelectionModel().getSelectedItem().toString();
-    String empresa = cmbEmpresa.getSelectionModel().getSelectedItem().toString();
+    String operacion = cmbOperacion.getSelectionModel().getSelectedItem();
+    String empresa   = cmbEmpresa.getSelectionModel().getSelectedItem();
+    operacionreimpresion = resolverTipoOperacion();
 
-    switch (operacion) {
-      case "ABONO A CUENTA DE AHORRO":
-        operacionreimpresion = 1;
-        break;
-      case "ABONO A CUENTA DE CRÉDITO":
-        operacionreimpresion = 2;
-        break;
-      case "PROCESAMIENTO DE DESEMBOLSO":
-        operacionreimpresion = 3;
-        break;
-      case "PROCESAMIENTO DE RETIRO":
-        operacionreimpresion = 4;
-        break;
-      case "ABONO A CUENTA DE CAPITAL SOCIAL":
-        operacionreimpresion = 5;
-        break;
-      case "TRASLADO DE BÓVEDA A CAJAS":
-        operacionreimpresion = 6;
-        break;
-      case "TRASLADO DE CAJAS A BÓVEDA":
-        operacionreimpresion = 7;
-        break;
-      case "ABONO A CUENTA DE PREVISIÓN SOCIAL":
-        operacionreimpresion = 10;
-        break;
-    }
     try {
-      Stage nuevaVentana = new Stage();
       FXMLLoader fxml = new FXMLLoader(getClass().getResource("/com/java/fx/verOperacion.fxml"));
       fxml.setControllerFactory(Main.context::getBean);
-      Scene nuevaEscena = new Scene(fxml.load());
+      Scene escena = new Scene(fxml.load());
       ReimpresionController controller = fxml.getController();
-      if (operacionreimpresion != 6 && operacionreimpresion != 7) {
+
+      if (historialVisible) {
         controller.setDatos(
-            numSocio,
-            IdOperacion,
-            operacion,
-            empresa,
-            fecha,
-            monto,
-            nombre,
-            operacionreimpresion,
-            hora,
-            capital_pagado,
-            interes_pagado,
-            mora_pagada,
-            iva_pagado,
-            bonif_aplicada,
-            saldo_credito,
-            tipo_credito);
+                String.valueOf(fila[0]),   // numSocio
+                String.valueOf(fila[11]),  // IdOperacion
+                operacion, empresa,
+                (String) fila[2],          // fecha
+                (String) fila[3],          // monto
+                (String) fila[1],          // nombre
+                operacionreimpresion,
+                (String) fila[6],          // hora
+                (String) fila[13],         // capital_pagado
+                (String) fila[14],         // interes_pagado
+                (String) fila[15],         // mora_pagada
+                (String) fila[16],         // iva_pagado
+                (String) fila[17],         // bonif_aplicada
+                (String) fila[18],         // saldo_credito
+                (String) fila[19]          // tipo_credito
+        );
       } else {
+        boolean boveda = fila[4].equals("6");
         controller.setDatosTrasladosHistorial(
-            IdOperacion,
-            nombre,
-            monto,
-            cmbOperacion.getSelectionModel().getSelectedItem().toString(),
-            cuenta_origen,
-            cuenta_destino,
-            fecha,
-            operacionreimpresion,
-            this,
-            turno,
-            empresa,
-            hora);
+                String.valueOf(fila[0]),                          // IdOperacion
+                (String) fila[1],                                 // nombre
+                (String) fila[3],                                 // monto
+                operacion,
+                boveda ? (String) fila[6] : (String) fila[5],    // cuenta_origen
+                boveda ? (String) fila[5] : (String) fila[6],    // cuenta_destino
+                (String) fila[7],                                 // fecha
+                operacionreimpresion,
+                this, turno, empresa,
+                (String) fila[8]                                  // hora
+        );
       }
 
-      nuevaEscena
-          .getStylesheets()
-          .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());
-      nuevaVentana.setTitle("REIMPRESIÓN DE OPERACIÓN");
-      nuevaVentana.setScene(nuevaEscena);
-      nuevaVentana.setResizable(false);
-      nuevaVentana.centerOnScreen();
-      nuevaVentana.initModality(Modality.APPLICATION_MODAL);
-      nuevaVentana.show();
+      escena.getStylesheets().add(getClass().getResource("/assets/css/estilos.css").toExternalForm());
+
+      Stage nueva = new Stage();
+      nueva.setTitle("REIMPRESIÓN DE OPERACIÓN");
+      nueva.setScene(escena);
+      nueva.setResizable(false);
+      nueva.centerOnScreen();
+      nueva.initModality(Modality.APPLICATION_MODAL);
+      nueva.show();
+
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -395,14 +219,50 @@ public class HistorialController implements Initializable {
 
   @FXML
   public void detectarClicks(MouseEvent event) {
-    if (event.getClickCount() == 2) {
-      verOperacion();
-    }
+    if (event.getClickCount() == 2) verOperacion();
   }
 
-  public void setDatos(String usuario, String turno) {
-    this.usuario = usuario;
-    this.turno = turno;
-    traerOperaciones();
+  // ─── Cierre de ventana ────────────────────────────────────────────────────
+
+  public void cierreDeVentana(Event event) {
+    event.consume();
+    cerrarVentanaActual();
+  }
+
+  @FXML
+  public void cerrarConTecla(KeyEvent event) {
+    if (event.getCode() == KeyCode.ESCAPE) cerrarVentanaActual();
+    if (event.getCode() == KeyCode.ENTER)  verOperacion();
+  }
+
+  @FXML
+  public void cerrarConBoton() {
+    cerrarVentanaActual();
+  }
+
+  // ─── Helpers privados ─────────────────────────────────────────────────────
+
+  private void cerrarVentanaActual() {
+    ((Stage) btnCancelar.getScene().getWindow()).close();
+  }
+
+  /** Devuelve "0001" o "0002" según la empresa seleccionada. */
+  private String resolverCodigoEmpresa() {
+    return cmbEmpresa.getSelectionModel().getSelectedItem()
+            .equals("MUTUALIDAD DOCE DE AGOSTO S.C. DE R.L. DE C.V.") ? "0001" : "0002";
+  }
+
+  /** Devuelve el tipo_operacion numérico según el ComboBox, o 0 si no se reconoce. */
+  private int resolverTipoOperacion() {
+    String label = cmbOperacion.getSelectionModel().getSelectedItem();
+    return OPERACION_ID.getOrDefault(label, 0);
+  }
+
+  private void mostrarError(String titulo, String header, String contenido) {
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setTitle(titulo);
+    alert.setHeaderText(header);
+    alert.setContentText(contenido);
+    alert.showAndWait();
   }
 }

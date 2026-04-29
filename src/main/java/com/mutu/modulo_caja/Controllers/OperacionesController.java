@@ -28,59 +28,57 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 @Component
 public class OperacionesController implements Initializable {
 
   @FXML private ComboBox cmbEmpresa, cmbOperacion, cmbCajero;
-
   @Autowired public Servicio servicio;
-
   @FXML private TableView tablaOperaciones;
   @FXML private TableView tableTraslados;
 
-  @FXML
-  private TableColumn<Object[], String> colTrasID,
-      colTrasUser,
-      colTrasOrigen,
-      colTrasDestino,
-      colTrasMonto,
-      colTrasFecha;
-  @FXML
-  private TableColumn<Object[], String> colSocio,
-      colNombre,
-      colFecha,
-      colHora,
-      colOperacion,
-      colMonto;
+  @FXML private TableColumn<Object[], String> colTrasID, colTrasUser, colTrasOrigen,
+          colTrasDestino, colTrasMonto, colTrasFecha;
+  @FXML private TableColumn<Object[], String> colSocio, colNombre, colFecha,
+          colHora, colOperacion, colMonto;
+
+  // Mapa centralizado para resolución de tipo de operación
+  private static final Map<String, Integer> OPERACIONES_MAP = Map.of(
+          "ABONO A CUENTA DE AHORRO", 1,
+          "ABONO A CUENTA DE CRÉDITO", 2,
+          "PROCESAMIENTO DE DESEMBOLSO", 3,
+          "PROCESAMIENTO DE RETIRO", 4,
+          "ABONO A CUENTA DE CAPITAL SOCIAL", 5,
+          "TRASLADO DE BÓVEDA A CAJAS", 6,
+          "TRASLADO DE CAJAS A BÓVEDA", 7,
+          "ABONO A CUENTA DE PREVISIÓN SOCIAL", 10
+  );
 
   String turno = "";
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-
+    // Empresas
     List<ModelEmpresa> empresas = servicio.traerEmpresas();
     ObservableList<String> empresasProcesadas = FXCollections.observableArrayList();
-
     for (ModelEmpresa empresa : empresas) {
       empresasProcesadas.add(empresa.getRazonSocial());
     }
-
     cmbEmpresa.setItems(empresasProcesadas);
     cmbEmpresa.getSelectionModel().selectFirst();
 
+    // Operaciones
     List<ModelOperaciones> operaciones = servicio.traerOperacions();
-
     ObservableList<String> operacionesProcesadas = FXCollections.observableArrayList();
-
     for (ModelOperaciones operacion : operaciones) {
       operacionesProcesadas.add(operacion.getOperacion().toUpperCase());
     }
-
     cmbOperacion.setItems(operacionesProcesadas);
     cmbOperacion.getSelectionModel().selectFirst();
 
+    // Cajeros
     List<ModelUsuario> usuarios = servicio.traerCajero(1);
     ObservableList<String> cajeros = FXCollections.observableArrayList();
     for (ModelUsuario usuario : usuarios) {
@@ -89,143 +87,80 @@ public class OperacionesController implements Initializable {
     cmbCajero.setItems(cajeros);
     cmbCajero.getSelectionModel().selectFirst();
 
-    // Para operaciones
-    colSocio.setCellValueFactory(
-        cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[0])));
-    colNombre.setCellValueFactory(
-        cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[1])));
-    colFecha.setCellValueFactory(
-        cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[2])));
-    colHora.setCellValueFactory(
-        cellData -> new SimpleStringProperty((String) cellData.getValue()[6]));
-    colOperacion.setCellValueFactory(
-        cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[4])));
-    colMonto.setCellValueFactory(
-        cellData -> new SimpleStringProperty((String) cellData.getValue()[3]));
+    configurarColumnas();
 
-    // Para traslados
-    colTrasID.setCellValueFactory(
-        cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[0])));
+    Platform.runLater(() -> {
+      Stage stage = (Stage) cmbEmpresa.getScene().getWindow();
+      stage.setOnCloseRequest(event -> cierreDeVentana(event));
+    });
+  }
 
-    colTrasUser.setCellValueFactory(
-        cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[1])));
+  // Extracción: configuración de columnas separada del initialize
+  private void configurarColumnas() {
+    colSocio.setCellValueFactory(cd -> new SimpleStringProperty(String.valueOf(cd.getValue()[0])));
+    colNombre.setCellValueFactory(cd -> new SimpleStringProperty(String.valueOf(cd.getValue()[1])));
+    colFecha.setCellValueFactory(cd -> new SimpleStringProperty(String.valueOf(cd.getValue()[2])));
+    colHora.setCellValueFactory(cd -> new SimpleStringProperty((String) cd.getValue()[6]));
+    colOperacion.setCellValueFactory(cd -> new SimpleStringProperty(String.valueOf(cd.getValue()[4])));
+    colMonto.setCellValueFactory(cd -> new SimpleStringProperty((String) cd.getValue()[3]));
 
-    colTrasOrigen.setCellValueFactory(
-        cellData -> {
-          Object valor = cellData.getValue()[5];
+    colTrasID.setCellValueFactory(cd -> new SimpleStringProperty(String.valueOf(cd.getValue()[0])));
+    colTrasUser.setCellValueFactory(cd -> new SimpleStringProperty(String.valueOf(cd.getValue()[1])));
+    colTrasOrigen.setCellValueFactory(cd -> resolverCeldaFlexible(cd.getValue()[5]));
+    colTrasDestino.setCellValueFactory(cd -> resolverCeldaFlexible(cd.getValue()[6]));
+    colTrasMonto.setCellValueFactory(cd -> new SimpleStringProperty(String.valueOf(cd.getValue()[3])));
+    colTrasFecha.setCellValueFactory(cd -> new SimpleStringProperty(String.valueOf(cd.getValue()[7])));
+  }
 
-          if (valor instanceof Number) {
-            return new SimpleStringProperty(String.valueOf(valor));
-          } else if (valor instanceof String) {
-            return new SimpleStringProperty((String) valor);
-          } else {
-            return new SimpleStringProperty("");
-          }
-        });
+  // Extracción: lógica repetida de tipo Number/String en celdas
+  private SimpleStringProperty resolverCeldaFlexible(Object valor) {
+    if (valor instanceof Number) return new SimpleStringProperty(String.valueOf(valor));
+    if (valor instanceof String) return new SimpleStringProperty((String) valor);
+    return new SimpleStringProperty("");
+  }
 
-    colTrasDestino.setCellValueFactory(
-        cellData -> {
-          Object valor = cellData.getValue()[6];
+  // Extracción: obtener empresa y tipo de operación desde los combos
+  private String getEmpresaCodigo() {
+    return cmbEmpresa.getSelectionModel().getSelectedItem().toString()
+            .equals("MUTUALIDAD DOCE DE AGOSTO S.C. DE R.L. DE C.V.") ? "0001" : "0002";
+  }
 
-          if (valor instanceof Number) {
-            return new SimpleStringProperty(String.valueOf(valor));
-          } else if (valor instanceof String) {
-            return new SimpleStringProperty((String) valor);
-          } else {
-            return new SimpleStringProperty("");
-          }
-        });
+  private int getTipoOperacion() {
+    return OPERACIONES_MAP.getOrDefault(
+            cmbOperacion.getSelectionModel().getSelectedItem().toString(), 0);
+  }
 
-    colTrasMonto.setCellValueFactory(
-        cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[3])));
-
-    colTrasFecha.setCellValueFactory(
-        cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue()[7])));
-
-    Platform.runLater(
-        () -> {
-          Stage stage = (Stage) cmbEmpresa.getScene().getWindow();
-          stage.setOnCloseRequest(event -> cierreDeVentana(event));
-        });
+  private boolean esTraslado(int tipo_operacion) {
+    return tipo_operacion == 6 || tipo_operacion == 7;
   }
 
   @FXML
   public void traerOperaciones() {
-    LocalDateTime fecha = LocalDateTime.now();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    String fechaEnviar = fecha.format(formatter);
-
-    String empresa =
-        cmbEmpresa
-                .getSelectionModel()
-                .getSelectedItem()
-                .toString()
-                .equals("MUTUALIDAD DOCE DE AGOSTO S.C. DE R.L. DE C.V.")
-            ? "0001"
-            : "0002";
-    int usuario_id =
-        servicio
-            .traerDatosUsuario(cmbCajero.getSelectionModel().getSelectedItem().toString())
-            .getId();
-    int tipo_operacion = 0;
-
-    // Determina el tipo de operación basado en la selección
-    switch (cmbOperacion.getSelectionModel().getSelectedItem().toString()) {
-      case "ABONO A CUENTA DE AHORRO":
-        tipo_operacion = 1;
-        break;
-      case "ABONO A CUENTA DE CRÉDITO":
-        tipo_operacion = 2;
-        break;
-      case "PROCESAMIENTO DE DESEMBOLSO":
-        tipo_operacion = 3;
-        break;
-      case "PROCESAMIENTO DE RETIRO":
-        tipo_operacion = 4;
-        break;
-      case "ABONO A CUENTA DE CAPITAL SOCIAL":
-        tipo_operacion = 5;
-        break;
-      case "TRASLADO DE BÓVEDA A CAJAS":
-        tipo_operacion = 6;
-        break;
-      case "TRASLADO DE CAJAS A BÓVEDA":
-        tipo_operacion = 7;
-        break;
-      case "ABONO A CUENTA DE PREVISIÓN SOCIAL":
-        tipo_operacion = 10;
-        break;
-    }
+    String fechaEnviar = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    String empresa = getEmpresaCodigo();
+    int usuario_id = servicio.traerDatosUsuario(
+            cmbCajero.getSelectionModel().getSelectedItem().toString()).getId();
+    int tipo_operacion = getTipoOperacion();
 
     List<Object[]> operaciones;
-
-    if (tipo_operacion == 6 || tipo_operacion == 7) {
-      operaciones =
-          servicio.historialTraslados(usuario_id, tipo_operacion, 1, fechaEnviar, turno, empresa);
+    if (esTraslado(tipo_operacion)) {
+      operaciones = servicio.historialTraslados(usuario_id, tipo_operacion, 1, fechaEnviar, turno, empresa);
       tablaOperaciones.setVisible(false);
       tableTraslados.setVisible(true);
     } else {
-      operaciones =
-          servicio.traerHistorial(fechaEnviar, 1, empresa, turno, usuario_id, tipo_operacion, 1);
+      operaciones = servicio.traerHistorial(fechaEnviar, 1, empresa, turno, usuario_id, tipo_operacion, 1);
       tablaOperaciones.setVisible(true);
       tableTraslados.setVisible(false);
     }
 
     ObservableList<Object[]> datosOperaciones = FXCollections.observableArrayList();
-
     for (Object[] resultado : operaciones) {
-      int operacion = (int) resultado[4];
-      if (operacion == tipo_operacion) {
+      if ((int) resultado[4] == tipo_operacion) {
         datosOperaciones.add(resultado);
       }
     }
 
-    // Asignar los datos filtrados al TableView
-    if (tablaOperaciones.isVisible()) {
-      tablaOperaciones.setItems(datosOperaciones);
-    } else {
-      tableTraslados.setItems(datosOperaciones);
-    }
+    (tablaOperaciones.isVisible() ? tablaOperaciones : tableTraslados).setItems(datosOperaciones);
   }
 
   public void setDatos(String turno) {
@@ -235,203 +170,95 @@ public class OperacionesController implements Initializable {
 
   public void cierreDeVentana(Event event) {
     event.consume();
-    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    //    alert.setTitle("CIERRE DE VENTANA");
-    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-    //    alert.setContentText(
-    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-    //
-    //    Optional<ButtonType> result = alert.showAndWait();
-    //    if (result.isPresent() && result.get() == ButtonType.OK) {
-    //
-    //    }
-    Stage ventanaActual = (Stage) cmbEmpresa.getScene().getWindow();
-    ventanaActual.close();
+    ((Stage) cmbEmpresa.getScene().getWindow()).close();
   }
 
   @FXML
   public void cerrarConTecla(KeyEvent event) {
     if (event.getCode().equals(KeyCode.ESCAPE)) {
-      //      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-      //      alert.setTitle("CIERRE DE VENTANA");
-      //      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-      //      alert.setContentText(
-      //          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-      //              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-      //
-      //      Optional<ButtonType> result = alert.showAndWait();
-      //      if (result.isPresent() && result.get() == ButtonType.OK) {
-      //
-      //      }
-      Stage ventanaActual = (Stage) cmbEmpresa.getScene().getWindow();
-      ventanaActual.close();
+      ((Stage) cmbEmpresa.getScene().getWindow()).close();
     }
   }
 
   @FXML
   public void cerrarConBoton() {
-    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    //    alert.setTitle("CIERRE DE VENTANA");
-    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-    //    alert.setContentText(
-    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-    //
-    //    Optional<ButtonType> result = alert.showAndWait();
-    //    if (result.isPresent() && result.get() == ButtonType.OK) {
-    //
-    //    }
-    Stage ventanaActual = (Stage) cmbEmpresa.getScene().getWindow();
-    ventanaActual.close();
+    ((Stage) cmbEmpresa.getScene().getWindow()).close();
   }
 
   @FXML
   public void verOperacion() {
-    String id_traslado = "";
-    String cuenta_origen = " ";
-    String cuenta_destino = " ";
-    String nombre_usuario = "";
-    String numero_socio = "";
-    String id_transaccion = "";
-    String monto = "";
-    String fecha = "";
-    String nombre_socio = "";
-    int tipo_operacion = 0;
-    String capital_pagado = "";
-    String interes_pagado = "";
-    String mora_pagada = "";
-    String iva_pagado = "";
-    String saldo_credito = "";
-    String tipo_credito = "";
-    String cuota_afectada = "";
-    String bonif_aplicada = "";
-    String hora = "";
-    boolean validador = false;
-    String empresa =
-        cmbEmpresa
-                .getSelectionModel()
-                .getSelectedItem()
-                .toString()
-                .equals("MUTUALIDAD DOCE DE AGOSTO S.C. DE R.L. DE C.V.")
-            ? "0001"
-            : "0002";
+    int tipo_operacion = getTipoOperacion();
+    String empresa = getEmpresaCodigo();
+    boolean esTraslado = esTraslado(tipo_operacion);
 
-    switch (cmbOperacion.getSelectionModel().getSelectedItem().toString()) {
-      case "ABONO A CUENTA DE AHORRO":
-        tipo_operacion = 1;
-        break;
-      case "ABONO A CUENTA DE CRÉDITO":
-        tipo_operacion = 2;
-        break;
-      case "PROCESAMIENTO DE DESEMBOLSO":
-        tipo_operacion = 3;
-        break;
-      case "PROCESAMIENTO DE RETIRO":
-        tipo_operacion = 4;
-        break;
-      case "ABONO A CUENTA DE CAPITAL SOCIAL":
-        tipo_operacion = 5;
-        break;
-      case "TRASLADO DE BÓVEDA A CAJAS":
-        tipo_operacion = 6;
-        break;
-      case "TRASLADO DE CAJAS A BÓVEDA":
-        tipo_operacion = 7;
-        break;
-      case "ABONO A CUENTA DE PREVISIÓN SOCIAL":
-        tipo_operacion = 10;
-        break;
-    }
+    // Variables de traslado
+    String id_traslado = "", cuenta_origen = " ", cuenta_destino = " ",
+            nombre_usuario = "", monto = "", fecha = "";
 
-    if (tipo_operacion == 6 || tipo_operacion == 7) {
+    // Variables de operación normal
+    String numero_socio = "", id_transaccion = "", nombre_socio = "", hora = "";
+    String capital_pagado = "", interes_pagado = "", mora_pagada = "",
+            iva_pagado = "", saldo_credito = "", tipo_credito = "",
+            cuota_afectada = "", bonif_aplicada = "";
+
+    if (esTraslado) {
       Object[] selectedRow = (Object[]) tableTraslados.getSelectionModel().getSelectedItem();
-
       if (selectedRow != null) {
-        if (tipo_operacion == 6) {
-          cuenta_origen = (String) selectedRow[5];
-          cuenta_destino = (String) selectedRow[6];
-        } else {
-          cuenta_origen = (String) selectedRow[5];
-          cuenta_destino = (String) selectedRow[6];
-        }
-        id_traslado = (String) String.valueOf(selectedRow[0]);
+        cuenta_origen = (String) selectedRow[5];
+        cuenta_destino = (String) selectedRow[6];
+        id_traslado = String.valueOf(selectedRow[0]);
         monto = (String) selectedRow[3];
         fecha = (String) selectedRow[7];
         nombre_usuario = (String) selectedRow[1];
       }
     } else {
-      validador = true;
       Object[] selectedRow = (Object[]) tablaOperaciones.getSelectionModel().getSelectedItem();
-
       if (selectedRow != null) {
         nombre_usuario = cmbCajero.getSelectionModel().getSelectedItem().toString();
-        numero_socio = (String) String.valueOf(selectedRow[0]);
-        id_transaccion = (String) String.valueOf(selectedRow[11]);
+        numero_socio = String.valueOf(selectedRow[0]);
+        id_transaccion = String.valueOf(selectedRow[11]);
         monto = (String) selectedRow[3];
         fecha = (String) selectedRow[2];
         nombre_socio = (String) selectedRow[1];
-        if(tipo_operacion ==2){
-          capital_pagado = (String) selectedRow[13];
-          interes_pagado = (String) selectedRow[14];
-          mora_pagada = (String) selectedRow[15];
-          iva_pagado = (String) selectedRow[16];
-          saldo_credito = (String) selectedRow[18];
-          tipo_credito = (String) selectedRow[19];
-          cuota_afectada = String.valueOf(Integer.parseInt(selectedRow[20].toString()));
-          bonif_aplicada = (String) selectedRow[17];
-        }
         hora = (String) selectedRow[6];
 
+        if (tipo_operacion == 2) {
+          capital_pagado  = (String) selectedRow[13];
+          interes_pagado  = (String) selectedRow[14];
+          mora_pagada     = (String) selectedRow[15];
+          iva_pagado      = (String) selectedRow[16];
+          saldo_credito   = (String) selectedRow[18];
+          tipo_credito    = (String) selectedRow[19];
+          cuota_afectada  = String.valueOf(Integer.parseInt(selectedRow[20].toString()));
+          bonif_aplicada  = (String) selectedRow[17];
+        }
       }
     }
 
     try {
-
       Stage nuevaVentana = new Stage();
       FXMLLoader fxml = new FXMLLoader(getClass().getResource("/com/java/fx/verOperacion.fxml"));
       fxml.setControllerFactory(Main.context::getBean);
       Scene nuevaEscena = new Scene(fxml.load());
       ReimpresionController controller = fxml.getController();
-      if (validador) {
+
+      if (!esTraslado) {
         controller.setDatosCancelacion(
-            numero_socio,
-            id_transaccion,
-            cmbOperacion.getSelectionModel().getSelectedItem().toString(),
-            cmbEmpresa.getSelectionModel().getSelectedItem().toString(),
-            fecha,
-            monto,
-            nombre_socio,
-            tipo_operacion,
-            turno,
-            nombre_usuario,
-            this,
-            hora,
-            capital_pagado,
-            interes_pagado,
-            mora_pagada,
-            iva_pagado,
-            bonif_aplicada,
-            saldo_credito,
-            tipo_credito,
-            cuota_afectada);
+                numero_socio, id_transaccion,
+                cmbOperacion.getSelectionModel().getSelectedItem().toString(),
+                cmbEmpresa.getSelectionModel().getSelectedItem().toString(),
+                fecha, monto, nombre_socio, tipo_operacion, turno, nombre_usuario,
+                this, hora, capital_pagado, interes_pagado, mora_pagada,
+                iva_pagado, bonif_aplicada, saldo_credito, tipo_credito, cuota_afectada);
       } else {
         controller.setDatosTraslados(
-            id_traslado,
-            nombre_usuario,
-            monto,
-            cmbOperacion.getSelectionModel().getSelectedItem().toString(),
-            cuenta_origen,
-            cuenta_destino,
-            fecha,
-            tipo_operacion,
-            this,
-            turno);
+                id_traslado, nombre_usuario, monto,
+                cmbOperacion.getSelectionModel().getSelectedItem().toString(),
+                cuenta_origen, cuenta_destino, fecha, tipo_operacion, this, turno);
       }
 
-      nuevaEscena
-          .getStylesheets()
-          .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());
+      nuevaEscena.getStylesheets().add(
+              getClass().getResource("/assets/css/estilos.css").toExternalForm());
       nuevaVentana.setTitle("DATOS DE LA OPERACIÓN");
       nuevaVentana.setScene(nuevaEscena);
       nuevaVentana.setResizable(false);

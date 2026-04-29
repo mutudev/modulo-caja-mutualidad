@@ -37,10 +37,8 @@ public class ModelCaja {
     @Column(name = "EMPRESA")
     private String empresa;
 
-
     @Column(name = "AJUSTE")
     private int ajuste;
-
 
     @Column(name = "CIERRE")
     private int cierre;

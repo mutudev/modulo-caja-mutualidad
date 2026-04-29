@@ -21,7 +21,7 @@ public interface SocioRepository extends JpaRepository<ModelSocio, Integer> {
   @Query(
           value =
                   "SELECT " +
-                          "    (PRIMER_NOM + ' ' + SEGUNDO_NOM + ' ' + APELLIDO_P + ' ' + APELLIDO_M) AS NOMBRE, " +
+                          "    (NOMBRES + ' ' + APELLIDO_P + ' ' + APELLIDO_M) AS NOMBRE, " +
                           "    NUM_SOCIO, " +
                           "    TIPO_SOCIO.DESCRIPCION, " +
                           "    EMPRESA.NOMBRE " +
@@ -29,7 +29,7 @@ public interface SocioRepository extends JpaRepository<ModelSocio, Integer> {
                           "INNER JOIN TIPO_SOCIO ON TIPO_SOCIO.ID = SOCIO.CAT_TIPO_ID " +
                           "INNER JOIN EMPRESA ON EMPRESA.CODIGO = SOCIO.EMPRESA_COD " +
                           "WHERE STATUS = 1 " +
-                          "AND (PRIMER_NOM + ' ' + SEGUNDO_NOM + ' ' + APELLIDO_P + ' ' + APELLIDO_M) LIKE '%' + :nombreCompleto + '%'",
+                          "AND (NOMBRES + ' ' + APELLIDO_P + ' ' + APELLIDO_M) LIKE '%' + :nombreCompleto + '%'",
           nativeQuery = true
   )
   List<Object[]> buscarPorNombreCompleto(@Param("nombreCompleto") String nombreCompleto);
@@ -38,7 +38,7 @@ public interface SocioRepository extends JpaRepository<ModelSocio, Integer> {
   @Query(
           value =
                   "SELECT " +
-                          "    (PRIMER_NOM + ' ' + SEGUNDO_NOM + ' ' + APELLIDO_P + ' ' + APELLIDO_M) AS NOMBRE, " +
+                          "    (NOMBRES + ' ' + APELLIDO_P + ' ' + APELLIDO_M) AS NOMBRE, " +
                           "    NUM_SOCIO, " +
                           "    TIPO_SOCIO.DESCRIPCION, " +
                           "    EMPRESA.NOMBRE " +
@@ -46,8 +46,8 @@ public interface SocioRepository extends JpaRepository<ModelSocio, Integer> {
                           "INNER JOIN TIPO_SOCIO ON TIPO_SOCIO.ID = SOCIO.CAT_TIPO_ID " +
                           "INNER JOIN EMPRESA ON EMPRESA.CODIGO = SOCIO.EMPRESA_COD " +
                           "WHERE STATUS = 1 " +
-                          "AND CHARINDEX(:palabra1, PRIMER_NOM + ' ' + SEGUNDO_NOM + ' ' + APELLIDO_P + ' ' + APELLIDO_M) > 0 " +
-                          "AND CHARINDEX(:palabra2, PRIMER_NOM + ' ' + SEGUNDO_NOM + ' ' + APELLIDO_P + ' ' + APELLIDO_M) > 0",
+                          "AND CHARINDEX(:palabra1, NOMBRES + ' ' + APELLIDO_P + ' ' + APELLIDO_M) > 0 " +
+                          "AND CHARINDEX(:palabra2, NOMBRES + ' ' + APELLIDO_P + ' ' + APELLIDO_M) > 0",
           nativeQuery = true
   )
   List<Object[]> buscarPorDospalabras(@Param("palabra1") String palabra1, @Param("palabra2") String palabra2);
@@ -56,7 +56,7 @@ public interface SocioRepository extends JpaRepository<ModelSocio, Integer> {
   @Query(
           value =
                   "SELECT " +
-                          "    (PRIMER_NOM + ' ' + SEGUNDO_NOM + ' ' + APELLIDO_P + ' ' + APELLIDO_M) AS NOMBRE, " +
+                          "    (NOMBRES + ' ' + APELLIDO_P + ' ' + APELLIDO_M) AS NOMBRE, " +
                           "    NUM_SOCIO, " +
                           "    TIPO_SOCIO.DESCRIPCION, " +
                           "    EMPRESA.NOMBRE " +
@@ -64,9 +64,9 @@ public interface SocioRepository extends JpaRepository<ModelSocio, Integer> {
                           "INNER JOIN TIPO_SOCIO ON TIPO_SOCIO.ID = SOCIO.CAT_TIPO_ID " +
                           "INNER JOIN EMPRESA ON EMPRESA.CODIGO = SOCIO.EMPRESA_COD " +
                           "WHERE STATUS = 1 " +
-                          "AND CHARINDEX(:palabra1, PRIMER_NOM + ' ' + SEGUNDO_NOM + ' ' + APELLIDO_P + ' ' + APELLIDO_M) > 0 " +
-                          "AND CHARINDEX(:palabra2, PRIMER_NOM + ' ' + SEGUNDO_NOM + ' ' + APELLIDO_P + ' ' + APELLIDO_M) > 0 " +
-                          "AND CHARINDEX(:palabra3, PRIMER_NOM + ' ' + SEGUNDO_NOM + ' ' + APELLIDO_P + ' ' + APELLIDO_M) > 0",
+                          "AND CHARINDEX(:palabra1, NOMBRES + ' ' + APELLIDO_P + ' ' + APELLIDO_M) > 0 " +
+                          "AND CHARINDEX(:palabra2, NOMBRES + ' ' + APELLIDO_P + ' ' + APELLIDO_M) > 0 " +
+                          "AND CHARINDEX(:palabra3, NOMBRES + ' ' + APELLIDO_P + ' ' + APELLIDO_M) > 0",
           nativeQuery = true
   )
   List<Object[]> buscarPorTresPalabras(@Param("palabra1") String palabra1, @Param("palabra2") String palabra2, @Param("palabra3") String palabra3);

@@ -7,15 +7,16 @@ import lombok.Data;
 @Data
 @Table(name = "USUARIO")
 @NamedStoredProcedureQuery(
-    name = "Usuario.pa_ValidarLogin",
-    procedureName = "pa_ValidarLogin",
-    resultClasses = ModelUsuario.class,
-    parameters = {
-      @StoredProcedureParameter(mode = ParameterMode.IN, name = "Usuario", type = String.class),
-      @StoredProcedureParameter(mode = ParameterMode.IN, name = "Pass", type = String.class),
-      @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Resultado", type = String.class),
-      @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Rol", type = Integer.class)
-    })
+        name = "Usuario.pa_ValidarLogin",
+        procedureName = "pa_ValidarLogin",
+        resultClasses = ModelUsuario.class,
+        parameters = {
+                @StoredProcedureParameter(mode = ParameterMode.IN, name = "Usuario", type = String.class),
+                @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Pass", type = String.class),
+                @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Resultado", type = String.class),
+                @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Rol", type = Integer.class),
+                @StoredProcedureParameter(mode = ParameterMode.OUT, name = "Cajero", type = Integer.class)
+        })
 @NamedStoredProcedureQuery(
     name = "Usuario.pa_ValidarCierre",
     procedureName = "pa_ValidarCierre",

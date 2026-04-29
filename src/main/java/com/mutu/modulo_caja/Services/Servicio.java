@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,9 +40,15 @@ public class Servicio {
 
   @Autowired private CajaRepository repoCaja;
 
+  @Autowired private CuotasRepository repoCuotas;
+
+  @Autowired private ConfiguracionRepository repoConfiguracion;
+
+
+
   @Transactional
-  public HashMap validarLogin(String usuario, String password, String resultado, int rol) {
-    return repoUsuario.pa_validarLogin(usuario, password, resultado, rol);
+  public HashMap validarLogin(String usuario, String password, String resultado, int rol, int cajero) {
+    return repoUsuario.pa_validarLogin(usuario, password, resultado, rol, cajero);
   }
 
   @Transactional
@@ -51,8 +58,8 @@ public class Servicio {
         NumSocio, NombreFomateado, NumSocioEncontrado, TipoDeSocio);
   }
 
-  public List<Object[]> traerModulos(int rolUsuario) {
-    return repoUsuario.traerModulos(rolUsuario);
+  public List<Object[]> traerModulos(int usuarioID) {
+    return repoUsuario.traerModulos(usuarioID);
   }
 
   public ModelAhorro traerCuentaAhorroPorSocio(int socio) {
@@ -352,6 +359,18 @@ public class Servicio {
     return repoCredito.cuotaAnteriorXCredito(credito_id, status);
   }
 
+  public Object[] traerUltimaCuotaPagadaChecar(int credito_id) {
+    return repoCredito.cuotaUltimaSaldada(credito_id);
+  }
+
+  public Object[] cuotaUltimaAfectada(int credito_id) {
+    return repoCredito.cuotaUltimaAfectada(credito_id);
+  }
+
+
+  public Object[] cuotaAnterior(int credito_id, int num_cuota) {
+    return repoCredito.cuotaAnterior(credito_id, num_cuota);
+  }
 
   public Object[] traerUltimaCuotaConNum(int credito_id, int status, int num_cuota) {
     return repoCredito.cuotaAnteriorConNum(credito_id, status, num_cuota);
@@ -403,6 +422,18 @@ public class Servicio {
             Resultado
     );
   }
+
+
+  public ModelCuotas obtenerPrimeraCuotaAfectada(int creditoId) {
+    return repoCuotas
+            .findFirstByCreditoIdAndFechaPRealizadaIsNotNullOrderByNumCuotaDesc(creditoId);
+  }
+
+  public ModelCuotas obtenerCuotaPorNumero(int creditoId, int numeroCuota) {
+    return repoCuotas
+            .findByCreditoIdAndNumCuota(creditoId, numeroCuota);
+  }
+
 
 
 
@@ -464,4 +495,30 @@ public class Servicio {
         capital_devueltos,
             bonif_devuelto);
   }
+
+
+
+  public LocalDate traerFechaHoy() {
+    return repoConfiguracion.findById(1).get().getFechaSistema();
+  }
+
+  public ModelEmpresa traerEmpresaConNombre(String empresa) {
+    return repoEmpresa.findByNombre(empresa);
+  }
+
+
+  //Nuevos
+
+  public List<ModelCaja> traerCajas(int usuarioId, LocalDate fr, int estado, String turno) {
+    return repoCaja.findByUsuarioIdAndFrAndEstadoAndTurno(usuarioId, fr, estado, turno);
+  }
+
+  public ModelCaja traerCajasParaCierre(int usuarioId, LocalDate fr, int estado, String turno, String empresa, int ajuste) {
+    return repoCaja.findByUsuarioIdAndFrAndEstadoAndTurnoAndEmpresaAndAjuste(usuarioId, fr, estado, turno, empresa, ajuste);
+  }
+
+  public ModelCaja traerCuentaDeCaja(int usuarioId, LocalDate fr, int estado, String turno, String empresa) {
+    return repoCaja.findByUsuarioIdAndFrAndEstadoAndTurnoAndEmpresa(usuarioId, fr, estado, turno, empresa);
+  }
+
 }

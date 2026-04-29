@@ -7,7 +7,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,188 +16,178 @@ import javax.print.*;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 @Component
 public class CambioController implements Initializable {
 
-  @FXML TextField txtTotal, txtRecibido, txtCambio;
-  @FXML Button btnCalcular, btnCerrar;
-  @Autowired public Servicio servicio;
+  // ── FXML ────────────────────────────────────────────────────────────────
+  @FXML private TextField txtTotal, txtRecibido, txtCambio;
+  @FXML private Button btnCalcular, btnCerrar;
 
-  public double totalOperaciones;
+  // ── Dependencias ─────────────────────────────────────────────────────────
+  @Autowired private Servicio servicio;
+
+  // ── Estado interno ───────────────────────────────────────────────────────
+  private double totalOperaciones;
   public static double operacionesAnterior = 0;
-  NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
 
+  // ── Formatters reutilizables ─────────────────────────────────────────────
+  private static final NumberFormat      FMT_MONEDA = NumberFormat.getCurrencyInstance(Locale.US);
+  private static final DateTimeFormatter FMT_FECHA  = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+  private static final DateTimeFormatter FMT_HORA   = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+  // ════════════════════════════════════════════════════════════════════════
+  // Inicialización
+  // ════════════════════════════════════════════════════════════════════════
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    txtRecibido.setTextFormatter(
-        new TextFormatter<>(
-            change -> {
-              String newText = change.getControlNewText();
-              // Permitir solo dígitos y un punto decimal
-              if (newText.matches("\\d*(\\.\\d*)?")) {
-                return change;
-              } else {
-                return null; // Rechaza el cambio
-              }
-            }));
-
-    Platform.runLater(
-        () -> {
-          Stage stage = (Stage) btnCerrar.getScene().getWindow();
-          stage.setOnCloseRequest(event -> cerrar());
-        });
+    configurarTextFormatter();
+    configurarCierreDeVentana();
   }
 
+  private void configurarTextFormatter() {
+    txtRecibido.setTextFormatter(new TextFormatter<>(change -> {
+      String newText = change.getControlNewText();
+      return newText.matches("\\d*(\\.\\d*)?") ? change : null;
+    }));
+  }
+
+  private void configurarCierreDeVentana() {
+    Platform.runLater(() -> {
+      Stage stage = (Stage) btnCerrar.getScene().getWindow();
+      stage.setOnCloseRequest(event -> cerrar());
+    });
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  // Datos
+  // ════════════════════════════════════════════════════════════════════════
   public void setDatos(double totalOperaciones) {
     this.totalOperaciones = totalOperaciones;
-    txtTotal.setText(formatoMoneda.format(totalOperaciones));
+    txtTotal.setText(FMT_MONEDA.format(totalOperaciones));
   }
 
+  // ════════════════════════════════════════════════════════════════════════
+  // Acciones principales
+  // ════════════════════════════════════════════════════════════════════════
   @FXML
   public void obtenerCambio() {
-
-    if (txtRecibido.getText().isEmpty()) {
-      Alert alert = new Alert(Alert.AlertType.ERROR);
-      alert.setTitle("ERROR AL REALIZAR EL AJUSTE");
-      alert.setHeaderText("ERROR AL PROCESAR EL CAMBIO");
-      alert.setContentText("POR FAVOR, RELLENE EL CAMPO DEL DINERO RECIBIDO.");
-      alert.showAndWait();
+    if (txtRecibido.getText().isBlank()) {
+      mostrarError("Error al procesar el cambio",
+              "Por favor, rellene el campo del dinero recibido.");
       return;
     }
 
-    double recibido = Double.parseDouble(txtRecibido.getText().trim());
+    double recibido;
+    try {
+      recibido = Double.parseDouble(txtRecibido.getText().trim());
+    } catch (NumberFormatException e) {
+      mostrarError("Error al procesar el cambio", "El monto ingresado no es válido.");
+      return;
+    }
 
     if (recibido < totalOperaciones) {
-      Alert alert = new Alert(Alert.AlertType.ERROR);
-      alert.setTitle("ERROR AL REALIZAR EL AJUSTE");
-      alert.setHeaderText("ERROR AL PROCESAR EL CAMBIO");
-      alert.setContentText("EL MONTO RECIBIDO NO PUEDE SER MENOR AL TOTAL DE OPERACIONES.");
-      alert.showAndWait();
+      mostrarError("Error al procesar el cambio",
+              "El monto recibido no puede ser menor al total de operaciones.");
       return;
     }
 
-    double cambio = recibido - totalOperaciones;
-    txtCambio.setText(formatoMoneda.format(cambio));
+    txtCambio.setText(FMT_MONEDA.format(recibido - totalOperaciones));
   }
-
-  public void limpiarCampos() {
-    txtRecibido.setText("");
-    txtCambio.setText("");
-  }
-
-  @FXML
-  public void obtenerCambioConTecla(KeyEvent event) {
-    switch (event.getCode()) {
-      case KeyCode.ENTER -> obtenerCambio();
-      case KeyCode.CONTROL -> limpiarCampos();
-      case KeyCode.ALT -> cerrar();
-      case KeyCode.F5 -> imprimir();
-    }
-  }
-
-  // COMENTARIO
 
   @FXML
   public void cerrar() {
-    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    //    alert.setTitle("CIERRE DE VENTANA");
-    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-    //    alert.setContentText("SI LA CIERRA, EL TOTAL DE SUS OPERACIONES SE REINICIARÁ A $0.00");
-    //    Optional<ButtonType> result = alert.showAndWait();
-    //    if (result.isPresent() && result.get() == ButtonType.OK) {
-    //
-    //    }
     CajeroController.bufferOperaciones = 0;
     operacionesAnterior = totalOperaciones;
-    Stage ventanaActual = (Stage) btnCerrar.getScene().getWindow();
-    ventanaActual.close();
+    ((Stage) btnCerrar.getScene().getWindow()).close();
   }
 
   @FXML
   public void imprimir() {
-    if (txtCambio.getText().isEmpty() || txtRecibido.getText().isEmpty()) {
-      Alert alert = new Alert(Alert.AlertType.ERROR);
-      alert.setTitle("DATOS FALTANTES");
-      alert.setHeaderText("INGRESE TODO LOS VALORES");
-      alert.setContentText("FAVOR DE INGRESAR TODOS LOS VALORES ");
-      alert.showAndWait();
+    if (txtCambio.getText().isBlank() || txtRecibido.getText().isBlank()) {
+      mostrarError("Datos faltantes", "Favor de ingresar todos los valores.");
       return;
     }
+
     LocalDateTime fecha = LocalDateTime.now();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    String fechaTicket = fecha.format(formatter);
-    LocalTime hora = fecha.toLocalTime();
-    DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm:ss");
-    String horaFormateada = hora.format(formatterHora);
-    String datosusuario = servicio.traerCajeroPorUsuario(LoginController.usuarioLoggeado);
-    String nombre = datosusuario;
-    String totalop = txtTotal.getText();
-    String cambio = txtCambio.getText();
-    String recibido = formatoMoneda.format(Double.parseDouble(txtRecibido.getText()));
+    String fechaTicket   = fecha.format(FMT_FECHA);
+    String horaFormateada = fecha.toLocalTime().format(FMT_HORA);
 
-    PrintService services = PrintServiceLookup.lookupDefaultPrintService();
-    if (services != null) {
-      PrintJob impresion = new PrintJob();
+    // Una sola llamada al servicio — el resultado ya es el nombre
+    String nombre   = servicio.traerCajeroPorUsuario(LoginController.usuarioLoggeado);
+    String totalop  = txtTotal.getText();
+    String cambio   = txtCambio.getText();
+    String recibido = FMT_MONEDA.format(Double.parseDouble(txtRecibido.getText()));
 
-      PrinterMatrix printer =
-          impresion.imprimirCambio(nombre, totalop, cambio, recibido, fechaTicket, horaFormateada);
+    PrintJob impresion = new PrintJob();
+    PrinterMatrix printer = impresion.imprimirCambio(
+            nombre, totalop, cambio, recibido, fechaTicket, horaFormateada);
 
-      printer.toFile("impresion_Cambio.txt");
+    printer.toFile("impresion_Cambio.txt");
+    enviarImpresora("impresion_Cambio.txt");
+  }
 
-      InputStream inputStream = null;
-      try {
-        inputStream = new FileInputStream("impresion_Cambio.txt");
-      } catch (FileNotFoundException a) {
-        a.printStackTrace();
-      }
+  // ════════════════════════════════════════════════════════════════════════
+  // Teclado
+  // ════════════════════════════════════════════════════════════════════════
+  @FXML
+  public void obtenerCambioConTecla(KeyEvent event) {
+    switch (event.getCode()) {
+      case ENTER  -> obtenerCambio();
+      case CONTROL -> limpiarCampos();
+      case ALT    -> cerrar();
+      case F5     -> imprimir();
+      default     -> { /* ignorar */ }
+    }
+  }
 
-      if (inputStream == null) {
-        return;
-      }
+  // ════════════════════════════════════════════════════════════════════════
+  // Métodos auxiliares
+  // ════════════════════════════════════════════════════════════════════════
+  public void limpiarCampos() {
+    txtRecibido.clear();
+    txtCambio.clear();
+  }
 
+  private void mostrarError(String titulo, String mensaje) {
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setTitle(titulo);
+    alert.setHeaderText(titulo);
+    alert.setContentText(mensaje);
+    alert.showAndWait();
+  }
+
+  /**
+   * Envía el archivo al servicio de impresión predeterminado.
+   * Usa try-with-resources para garantizar el cierre del InputStream.
+   * Llama a lookupDefaultPrintService() una sola vez.
+   */
+  private void enviarImpresora(String rutaArchivo) {
+    PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
+    if (printService == null) {
+      mostrarError("Error de impresión", "No se encontró una impresora predeterminada.");
+      return;
+    }
+
+    try (InputStream inputStream = new FileInputStream(rutaArchivo)) {
       DocFlavor docFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
-      Doc document = new SimpleDoc(inputStream, docFormat, null);
+      Doc document        = new SimpleDoc(inputStream, docFormat, null);
       PrintRequestAttributeSet attributeSet = new HashPrintRequestAttributeSet();
-      PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
-      if (defaultPrintService != null) {
-        DocPrintJob printJob = defaultPrintService.createPrintJob();
 
-        try {
-          printJob.print(document, attributeSet);
+      printService.createPrintJob().print(document, attributeSet);
 
-        } catch (PrintException b) {
-          Alert alert2 = new Alert(Alert.AlertType.ERROR);
-          alert2.setTitle("ERROR IMPRIMIENDO");
-          alert2.setHeaderText("ERROR IMPRIMIENDO");
-          alert2.setContentText(b.getMessage());
-          alert2.showAndWait();
-        }
-      } else {
-
-        Alert alert2 = new Alert(Alert.AlertType.ERROR);
-        alert2.setTitle("ERROR IMPRIMIENDO");
-        alert2.setHeaderText("ERROR IMPRIMIENDO");
-        alert2.setContentText("ERROR IMPRIMIENDO");
-        alert2.showAndWait();
-      }
-    } else {
-
-      Alert alert2 = new Alert(Alert.AlertType.ERROR);
-      alert2.setTitle("ERROR IMPRIMIENDO");
-      alert2.setHeaderText("ERROR IMPRIMIENDO");
-      alert2.setContentText("ERROR IMPRIMIENDO");
-      alert2.showAndWait();
+    } catch (IOException e) {
+      mostrarError("Error de impresión", "No se pudo leer el archivo: " + e.getMessage());
+    } catch (PrintException e) {
+      mostrarError("Error de impresión", e.getMessage());
     }
   }
 }

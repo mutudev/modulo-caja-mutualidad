@@ -1,6 +1,8 @@
 package com.mutu.modulo_caja.Controllers;
 
 import com.mutu.modulo_caja.Main;
+import com.mutu.modulo_caja.Models.ModelCaja;
+import com.mutu.modulo_caja.Models.ModelUsuario;
 import com.mutu.modulo_caja.Services.Servicio;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -72,8 +74,6 @@ public class CajeroController implements Initializable {
   private Map<String, Label> labelMap = new HashMap<>();
   public boolean apertura = false;
   public String turno = "";
-  public List<Object[]> CierreMUT = null;
-  public List<Object[]> CierreNGU = null;
   public static double bufferOperaciones = 0;
 
   @Autowired private Servicio servicio;
@@ -161,7 +161,7 @@ public class CajeroController implements Initializable {
       //txtNumeroSocio.setText(txtNumeroSocio.getText());
     } else if(event.getCode() == KeyCode.ESCAPE){
       if (!apertura) {
-        mostrarError("APERTURA");
+        mostrarAlertaError("ERROR AL QUERER PROCESAR LA OPERACIÓN", "EL CAJERO NO TIENE UNA CUENTA ABIERTA PARA HACER OPERACIONES");
         return;
       }
 
@@ -173,588 +173,6 @@ public class CajeroController implements Initializable {
 
     return;
 
-  }
-
-  @FXML
-  public void handlerKeyPressed(KeyEvent event) {
-    String ruta = "";
-    String titulo = "";
-    boolean estilo = false;
-    boolean cargar = false;
-    boolean elegir = false;
-    String tituloEleccion = "";
-    String opcion = "";
-
-    switch (event.getCode()) {
-      case KeyCode.F1:
-        if (!apertura) {
-          mostrarError("APERTURA");
-          return;
-        }
-
-        if (txtNombreCargado.isVisible() && lblAbonoAhorro.isVisible()) {
-          ruta = "/com/java/fx/abonoAhorro.fxml";
-          titulo = "ABONO A AHORRO";
-          estilo = true;
-          cargar = true;
-        } else if (!txtNombreCargado.isVisible() && lblAbonoAhorro.isVisible()) {
-          mostrarError("ABONAR A AHORRO");
-        }
-        break;
-
-      case KeyCode.ENTER:
-        if (!apertura) {
-          mostrarError("APERTURA");
-          return;
-        }
-
-        if (!txtNumeroSocio.getText().isEmpty()) {
-          cargarSocio(true);
-        } else {
-          mostrarError("BUSCAR AL SOCIO");
-        }
-        break;
-
-
-
-      case KeyCode.ALT:
-        if (!apertura) {
-          mostrarError("APERTURA");
-          return;
-        }
-
-        if (!txtNombreCargado.isVisible() && txtNumeroSocio.getText().isEmpty()) {
-          ruta = "/com/java/fx/busquedaSocio.fxml";
-          titulo = "BUSQUEDA DE SOCIO";
-          cargar = true;
-        } else if (!txtNombreCargado.isVisible() && !txtNumeroSocio.getText().isEmpty()) {
-          cargarSocio(true);
-        }
-        break;
-
-      case KeyCode.F2:
-        if (!apertura) {
-          mostrarError("APERTURA");
-          return;
-        }
-
-        if (txtNombreCargado.isVisible() && lblAbonoCredito.isVisible()) {
-          ruta = "/com/java/fx/elegirPrestamo.fxml";
-          titulo = "ELEGIR CRÉDITO";
-          estilo = true;
-          cargar = true;
-          elegir = true;
-          tituloEleccion = "ELECCION DE PRESTAMO";
-        } else if (!txtNombreCargado.isVisible() && lblAbonoCredito.isVisible()) {
-          mostrarError("ABONAR A CRÉDITO");
-        }
-        break;
-
-      case KeyCode.F3:
-        if (!apertura) {
-          mostrarError("APERTURA");
-          return;
-        }
-
-        if (txtNombreCargado.isVisible() && lblDesembolsos.isVisible()) {
-          ruta = "/com/java/fx/desembolso.fxml";
-          titulo = "DESEMBOLSO DE CRÉDITO";
-          estilo = true;
-          cargar = true;
-        } else if (!txtNombreCargado.isVisible() && lblDesembolsos.isVisible()) {
-          mostrarError("DESEMBOLSAR");
-        }
-        break;
-
-      case KeyCode.F4:
-        if (!apertura) {
-          mostrarError("APERTURA");
-          return;
-        }
-
-        if (txtNombreCargado.isVisible() && lblRetiros.isVisible()) {
-          ruta = "/com/java/fx/retiro.fxml";
-          titulo = "RETIRO EN EFECTIVO";
-          estilo = true;
-          cargar = true;
-        } else if (!txtNombreCargado.isVisible() && lblRetiros.isVisible()) {
-          mostrarError("RETIRAR");
-        }
-        break;
-
-      case KeyCode.F5:
-        if (!apertura) {
-          mostrarError("APERTURA");
-          return;
-        }
-
-        if (txtNombreCargado.isVisible() && lblCapitalSocial.isVisible()) {
-          ruta = "/com/java/fx/elegirEmpresa.fxml";
-          titulo = "ELECCIÓN DE EMPRESA";
-          estilo = true;
-          cargar = true;
-          elegir = true;
-          tituloEleccion = "ELECCIÓN DE EMPRESA";
-          opcion = "CS";
-        } else if (!txtNombreCargado.isVisible() && lblCapitalSocial.isVisible()) {
-          mostrarError("PAGAR A CAPITAL SOCIAL");
-        }
-        break;
-
-      case KeyCode.F7:
-        if (txtNombreCargado.isVisible() && lblTraslados.isVisible()) {
-          mostrarError("PROCESAR TRASLADOS");
-        } else if (!txtNombreCargado.isVisible() && lblTraslados.isVisible()) {
-          ruta = "/com/java/fx/elegirEmpresa.fxml";
-          titulo = "ELECCIÓN DE EMPRESA";
-          estilo = true;
-          cargar = true;
-          elegir = true;
-          tituloEleccion = "ELECCIÓN DE EMPRESA";
-          opcion = "TRAS";
-        }
-        break;
-
-      case KeyCode.F8:
-        if (!apertura) {
-          mostrarError("APERTURA");
-          return;
-        }
-
-        if (txtNombreCargado.isVisible() && lblHistorial.isVisible()) {
-          mostrarError("VER EL HISTORIAL");
-        } else if (!txtNombreCargado.isVisible() && lblHistorial.isVisible()) {
-          ruta = "/com/java/fx/historial.fxml";
-          titulo = "HISTORIAL DE OPERACIONES";
-          estilo = true;
-          cargar = true;
-        }
-        break;
-
-      case KeyCode.F10:
-        if (!apertura) {
-          mostrarError("APERTURA");
-          return;
-        }
-
-        if (txtNombreCargado.isVisible() && lblCierreCajero.isVisible()) {
-          mostrarError("REGISTRAR LOS FALTANTES Y SOBRANTES");
-        } else if (!txtNombreCargado.isVisible() && lblCierreCajero.isVisible()) {
-
-          LocalDate fecha = LocalDate.now();
-          List<Object[]> cuentaMUT = servicio.traerCuentaCajero(LoginController.usuarioLoggeado, fecha.toString(), 1, turno, "0001" );
-          List<Object[]> cuentaNGU = servicio.traerCuentaCajero(LoginController.usuarioLoggeado, fecha.toString(), 1, turno, "0002" );
-
-
-
-          if(cuentaMUT.size() == 0 || cuentaNGU.size() == 0){
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE.");
-            alert.setHeaderText("ERROR AL QUERER REALIZAR SU CIERRE.");
-            alert.setContentText("NO CUENTA CON CAJAS ABIERTAS EN ALGUNA O EN AMBAS EMPRESAS");
-            alert.showAndWait();
-            return;
-          }else if(Integer.parseInt(cuentaMUT.getFirst()[8].toString()) != 1  ||
-                  Integer.parseInt(cuentaNGU.getFirst()[8].toString()) != 1  ){
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE.");
-            alert.setHeaderText("ERROR AL QUERER REALIZAR SU CIERRE.");
-            alert.setContentText("NO CUENTA CON LOS PERMISOS PARA REALIZAR SU CIERRE");
-            alert.showAndWait();
-            return;
-          }
-          ruta = "/com/java/fx/cierreCajero.fxml";
-          titulo = "AJUSTE DE SOBRANTES Y FALTANTE";
-          estilo = false;
-          cargar = true;
-        }
-        break;
-
-      case KeyCode.F9:
-        if (!apertura) {
-          mostrarError("APERTURA");
-          return;
-        }
-
-        if (txtNombreCargado.isVisible() && lblPrevisionSocial.isVisible()) {
-          ruta = "/com/java/fx/elegirEmpresa.fxml";
-          titulo = "ELECCIÓN DE EMPRESA";
-          estilo = true;
-          cargar = true;
-          elegir = true;
-          tituloEleccion = "ELECCIÓN DE EMPRESA";
-          opcion = "PRESOC";
-
-        } else if (!txtNombreCargado.isVisible() && lblPrevisionSocial.isVisible()) {
-          mostrarError("PAGAR PREVISIÓN SOCIAL");
-        }
-        break;
-
-      case KeyCode.F6:
-        if (txtNombreCargado.isVisible() && (rolUsuario == 2 || rolUsuario == 3)) {
-          mostrarError("CANCELAR OPERACIONES");
-        } else if (rolUsuario == 2 || rolUsuario == 3) {
-          ruta = "/com/java/fx/operacionesCajero.fxml";
-          titulo = "ELECCIÓN DE OPERACIÓN";
-          estilo = true;
-          cargar = true;
-        }
-        break;
-
-      case KeyCode.F12:
-        if (bufferOperaciones == 0) {
-          mostrarError("SIN OPERACIONES");
-        } else {
-          ruta = "/com/java/fx/otorgarCambio.fxml";
-          titulo = "TOTAL DE OPERACIONES";
-          estilo = true;
-          cargar = true;
-        }
-        break;
-    }
-
-    if (cargar) {
-      mostrarPantalla(estilo, ruta, titulo, elegir, tituloEleccion, opcion);
-    }
-  }
-
-  @FXML
-  public void handlerDeClicks(MouseEvent event) {
-    Object source = event.getSource();
-    String ruta = "";
-    String titulo = "";
-    String tituloEleccion = "";
-    String opcion = "";
-    boolean estilo = false;
-    boolean cargar = false;
-    boolean elegir = false;
-
-    if (source == lblAbonoAhorro) {
-
-      if (!apertura) {
-        mostrarError("APERTURA");
-        return;
-      }
-
-      if (txtNombreCargado.isVisible()) {
-        ruta = "/com/java/fx/abonoAhorro.fxml";
-        titulo = "ABONO A AHORRO";
-        estilo = true;
-        cargar = true;
-      } else mostrarError("ABONAR");
-
-    } else if (source == lblAbonoCredito) {
-
-      if (!apertura) {
-        mostrarError("APERTURA");
-        return;
-      }
-
-      if (txtNombreCargado.isVisible()) {
-        ruta = "/com/java/fx/elegirPrestamo.fxml";
-        titulo = "ELEGIR CRÉDITO";
-        estilo = true;
-        cargar = true;
-        elegir = true;
-        tituloEleccion = "ELECCION DE PRESTAMO";
-      } else mostrarError("ABONAR");
-
-    } else if (source == lblDesembolsos) {
-
-      if (!apertura) {
-        mostrarError("APERTURA");
-        return;
-      }
-
-      if (txtNombreCargado.isVisible()) {
-        ruta = "/com/java/fx/desembolso.fxml";
-        titulo = "DESEMBOLSO DE CRÉDITO";
-        estilo = true;
-        cargar = true;
-      } else mostrarError("DESEMBOLSAR");
-
-    } else if (source == lblRetiros) {
-
-      if (!apertura) {
-        mostrarError("APERTURA");
-        return;
-      }
-
-      if (txtNombreCargado.isVisible()) {
-        ruta = "/com/java/fx/retiro.fxml";
-        titulo = "RETIRO EN EFECTIVO";
-        estilo = true;
-        cargar = true;
-      } else mostrarError("RETIRAR");
-
-    } else if (source == lblCapitalSocial) {
-
-      if (!apertura) {
-        mostrarError("APERTURA");
-        return;
-      }
-
-      if (txtNombreCargado.isVisible()) {
-        ruta = "/com/java/fx/elegirEmpresa.fxml";
-        titulo = "ELECCIÓN DE EMPRESA";
-        estilo = true;
-        cargar = true;
-        elegir = true;
-        tituloEleccion = "ELECCIÓN DE EMPRESA";
-        opcion = "CS";
-      } else mostrarError("ACCEDER A CAPITAL SOCIAL");
-
-    } else if (source == imgBusqueda) {
-
-      if (!apertura) {
-        mostrarError("APERTURA");
-        return;
-      }
-
-      if (txtNumeroSocio.getText().isEmpty()) {
-        ruta = "/com/java/fx/busquedaSocio.fxml";
-        titulo = "BUSCAR SOCIO";
-        cargar = true;
-      } else {
-        cargarSocio(true);
-      }
-
-    } else if (source == lblTraslados) {
-      if (txtNombreCargado.isVisible()) {
-        mostrarError("PROCESAR TRASLADOS");
-      } else {
-        ruta = "/com/java/fx/elegirEmpresa.fxml";
-        titulo = "ELECCIÓN DE EMPRESA";
-        estilo = true;
-        cargar = true;
-        elegir = true;
-        tituloEleccion = "ELECCIÓN DE EMPRESA";
-        opcion = "TRAS";
-      }
-
-    } else if (source == lblHistorial) {
-
-      if (!apertura) {
-        mostrarError("APERTURA");
-        return;
-      }
-
-      if (txtNombreCargado.isVisible()) {
-        mostrarError("VER EL HISTORIAL");
-      } else {
-        ruta = "/com/java/fx/historial.fxml";
-        titulo = "HISTORIAL DE OPERACIONES";
-        estilo = true;
-        cargar = true;
-      }
-
-    } else if (source == lblCierreCajero) {
-
-      if (!apertura) {
-        mostrarError("APERTURA");
-        return;
-      }
-
-      if (txtNombreCargado.isVisible()) {
-        mostrarError("REGISTRAR LOS FALTANTES Y SOBRANTES");
-      } else {
-
-
-        LocalDate fecha = LocalDate.now();
-
-        List<Object[]> cuentaMUT = servicio.traerCuentaCajero(LoginController.usuarioLoggeado, fecha.toString(), 1, turno, "0001" );
-        List<Object[]> cuentaNGU = servicio.traerCuentaCajero(LoginController.usuarioLoggeado, fecha.toString(), 1, turno, "0002" );
-        if(cuentaMUT.size() == 0 || cuentaNGU.size() == 0){
-          Alert alert = new Alert(Alert.AlertType.ERROR);
-          alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE.");
-          alert.setHeaderText("ERROR AL QUERER REALIZAR SU CIERRE.");
-          alert.setContentText("NO CUENTA CON CAJAS ABIERTAS EN ALGUNA O EN AMBAS EMPRESAS");
-          alert.showAndWait();
-          return;
-        } else if(Integer.parseInt(cuentaMUT.getFirst()[8].toString()) != 1  ||
-                Integer.parseInt(cuentaNGU.getFirst()[8].toString()) != 1  ){
-          Alert alert = new Alert(Alert.AlertType.ERROR);
-          alert.setTitle("ERROR AL QUERER REALIZAR SU CIERRE.");
-          alert.setHeaderText("ERROR AL QUERER REALIZAR SU CIERRE.");
-          alert.setContentText("NO CUENTA CON LOS PERMISOS PARA REALIZAR SU CIERRE");
-          alert.showAndWait();
-          return;
-        }
-
-        ruta = "/com/java/fx/cierreCajero.fxml";
-        titulo = "CIERRE DE CAJA";
-        estilo = false;
-        cargar = true;
-      }
-
-    } else if (source == lblPrevisionSocial) {
-
-      if (!apertura) {
-        mostrarError("APERTURA");
-        return;
-      }
-
-      if (txtNombreCargado.isVisible() && apertura) {
-        ruta = "/com/java/fx/elegirEmpresa.fxml";
-        titulo = "ELECCIÓN DE EMPRESA";
-        estilo = true;
-        cargar = true;
-        elegir = true;
-        tituloEleccion = "ELECCIÓN DE EMPRESA";
-        opcion = "PRESOC";
-      } else {
-        mostrarError("PAGAR PREVISIÓN SOCIAL");
-      }
-
-    } else if (source == lblCancelacion) {
-      if (txtNombreCargado.isVisible() && (rolUsuario == 1 || rolUsuario == 2)) {
-        mostrarError("CANCELAR OPERACIONES");
-      } else if (rolUsuario == 1 || rolUsuario == 2) {
-        ruta = "/com/java/fx/operacionesCajero.fxml";
-        titulo = "OPERACIONES DE CAJERO";
-        estilo = true;
-        cargar = true;
-      }
-    } else if (source == lblCambio) {
-      if (bufferOperaciones == 0) {
-        mostrarError("SIN OPERACIONES");
-      } else {
-        ruta = "/com/java/fx/otorgarCambio.fxml";
-        titulo = "TOTAL DE OPERACIONES";
-        estilo = true;
-        cargar = true;
-      }
-    }
-
-    if (cargar) {
-      mostrarPantalla(estilo, ruta, titulo, elegir, tituloEleccion, opcion);
-    }
-
-    ruta = "";
-    cargar = false;
-  }
-
-  public void mostrarError(String accion) {
-    if (accion.equals("REGISTRAR LOS FALTANTES Y SOBRANTES")
-        || accion.equals("PROCESAR TRASLADOS")
-        || accion.equals("VER EL HISTORIAL")
-        || accion.equals("CERRAR")
-        || accion.equals("CANCELAR OPERACIONES")) {
-      Alert alert = new Alert(Alert.AlertType.ERROR);
-      alert.setTitle("ERROR AL QUERER " + accion);
-      alert.setHeaderText("HAY UN SOCIO CARGADO");
-      alert.setContentText("POR FAVOR, LIMPIE EL CAMPO DEL SOCIO PARA REALIZAR ESTA OPERACIÓN.");
-      alert.showAndWait();
-    } else if (accion.equals("APERTURA")) {
-      Alert alert = new Alert(Alert.AlertType.ERROR);
-      alert.setTitle("ERROR AL QUERER PROCESAR LA OPERACIÓN");
-      alert.setHeaderText("EL CAJERO NO TIENE UNA CUENTA ABIERTA PARA HACER OPERACIONES");
-      alert.setContentText("POR FAVOR, HAGA SU TRASLADO DE APERTURA.");
-      alert.showAndWait();
-    } else if (accion.equals("SIN OPERACIONES")) {
-      Alert alert = new Alert(Alert.AlertType.ERROR);
-      alert.setTitle("ERROR AL QUERER OTORGAR CAMBIO");
-      alert.setHeaderText("NO HA HECHO NINGUNA OPERACIÓN");
-      alert.setContentText("POR FAVOR, HAGA ALGUNA OPERACIÓN.");
-      alert.showAndWait();
-    } else {
-      Alert alert = new Alert(Alert.AlertType.ERROR);
-      alert.setTitle("ERROR AL QUERER " + accion);
-      alert.setHeaderText("NO HA CARGADO A NINGÚN SOCIO");
-      alert.setContentText("POR FAVOR, BUSQUE A ALGÚN SOCIO PARA REALIZAR LAS OPERACIONES.");
-      alert.showAndWait();
-    }
-  }
-
-  public void mostrarPantalla(
-      boolean estilo,
-      String ruta,
-      String titulo,
-      boolean elegir,
-      String tituloEleccion,
-      String opcion) {
-    try {
-      Stage nuevaVentana = new Stage();
-      FXMLLoader fxml = new FXMLLoader(getClass().getResource(ruta));
-      fxml.setControllerFactory(Main.context::getBean);
-      Scene nuevaEscena = new Scene(fxml.load());
-
-      if (elegir) {
-        ElegirController controlador = fxml.getController();
-        controlador.setTitulo(tituloEleccion.trim());
-        controlador.setOpcion(opcion);
-      }
-
-      if (ruta.contains("busquedaSocio") || ruta.endsWith("busquedaSocio.fxml")) {
-        BusquedaController controlador = fxml.getController();
-        controlador.setCajeroController(this);
-      } else if (ruta.contains("abonoAhorro") || ruta.endsWith("abonoAhorro.fxml")) {
-        AhorroController controller = fxml.getController();
-        controller.setDatos(
-            Integer.parseInt(txtNumeroSocio.getText()), txtNombreCargado.getText(), usuario);
-      } else if (ruta.contains("elegirPrestamo") || ruta.endsWith("elegirPrestamo.fxml")) {
-        ElegirController controller = fxml.getController();
-        controller.setSocio(Integer.parseInt(txtNumeroSocio.getText().toString()), turno);
-      } else if (ruta.contains("desembolso") || ruta.endsWith("desembolso.fxml")) {
-        DesembolsoController controller = fxml.getController();
-        controller.setDatos(Integer.parseInt(txtNumeroSocio.getText().trim()), usuario);
-      } else if (ruta.contains("cierre") || ruta.endsWith("Cajero.fxml")) {
-        CierreController controller = fxml.getController();
-        controller.settearDatos(lblCierreCajero, turno);
-      } else if (ruta.contains("retiro") || ruta.endsWith("retiro.fxml")) {
-        RetiroController controller = fxml.getController();
-        controller.setDatos(Integer.parseInt(txtNumeroSocio.getText().trim()), usuario, turno);
-      } else if (ruta.contains("elegirEmpresa")
-          && ruta.endsWith("elegirEmpresa.fxml")
-          && opcion.equals("CS")) {
-        ElegirController controller = fxml.getController();
-        controller.setSocioCapitalSocial(
-            Integer.parseInt(txtNumeroSocio.getText().trim()),
-            txtNombreCargado.getText().trim(),
-            usuario);
-      } else if (ruta.contains("elegirEmpresa")
-          && ruta.endsWith("elegirEmpresa.fxml")
-          && opcion.equals("TRAS")) {
-        ElegirController controller = fxml.getController();
-        controller.setUsuarioTralado(usuario, turno, this);
-      } else if (ruta.contains("historial") || ruta.endsWith("historial.fxml")) {
-        HistorialController controller = fxml.getController();
-        controller.setDatos(usuario, turno);
-      } else if (ruta.contains("elegirEmpresa")
-          && ruta.endsWith("elegirEmpresa.fxml")
-          && opcion.equals("PRESOC")) {
-        ElegirController controller = fxml.getController();
-        controller.setSocioCapitalSocial(
-            Integer.parseInt(txtNumeroSocio.getText().trim()),
-            txtNombreCargado.getText().trim(),
-            usuario);
-      } else if (ruta.contains("otorgarCambio") && ruta.endsWith("otorgarCambio.fxml")) {
-        CambioController controller = fxml.getController();
-        controller.setDatos(bufferOperaciones);
-      } else if (ruta.contains("operacionesCajero") && ruta.endsWith("operacionesCajero.fxml")) {
-        OperacionesController controller = fxml.getController();
-        controller.setDatos(turno);
-      }
-
-      nuevaEscena
-          .getStylesheets()
-          .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());
-
-      if (estilo) {
-        JMetro jMetro = new JMetro(Style.LIGHT);
-        jMetro.setScene(nuevaEscena);
-      }
-      nuevaVentana.setTitle(titulo);
-      Image icon = new Image(getClass().getResourceAsStream("/assets/images/logo.png"));
-      nuevaVentana.getIcons().add(icon);
-      nuevaVentana.setScene(nuevaEscena);
-      nuevaVentana.setResizable(false);
-      nuevaVentana.centerOnScreen();
-      nuevaVentana.initModality(Modality.APPLICATION_MODAL);
-      nuevaVentana.show();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
 
   public void cargarSocio(boolean eleccion) {
@@ -827,8 +245,7 @@ public class CajeroController implements Initializable {
     }
     generarModulos();
     LocalDateTime fecha = LocalDateTime.now();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    String fechaEnviar = fecha.format(formatter);
+    LocalDate fechaEnviar = servicio.traerFechaHoy();
 
     turno = "";
 
@@ -839,25 +256,25 @@ public class CajeroController implements Initializable {
     }
 
     if (rolUsuario == 1) {
-      List<Object[]> verifApertura =
-          servicio.verificarAperturaCajero(usuario, fechaEnviar, 1, turno);
+
+      int usuarioId = servicio.traerDatosUsuario(usuario).getId();
+      List<ModelCaja> verifApertura =
+          servicio.traerCajas(usuarioId, fechaEnviar, 1, turno);
 
       if (verifApertura.size() == 0) {
 
-        String empresa_cod = "0001";
-        String empresa_cod2 = "0002";
-        List<Object[]> cuentaMUT =
-            servicio.CuentasdeCierre(
-                LoginController.usuarioLoggeado, fecha.toString(), 0, turno, empresa_cod, 0);
-        List<Object[]> cuentaNGU =
-            servicio.CuentasdeCierre(
-                LoginController.usuarioLoggeado, fecha.toString(), 0, turno, empresa_cod2, 0);
+        ModelCaja cuentaMUT =
+            servicio.traerCajasParaCierre(
+                usuarioId, fechaEnviar, 0, turno, "0001", 0);
+        ModelCaja cuentaNGU =
+            servicio.traerCajasParaCierre(
+                usuarioId, fechaEnviar, 0, turno, "0002", 0);
 
-        if (cuentaMUT.size() != 0 && cuentaNGU.size() != 0) {
+        if (cuentaMUT != null && cuentaNGU != null) {
           return;
-        } else if (cuentaMUT.isEmpty() && cuentaNGU.size() != 0) {
+        } else if (cuentaMUT == null && cuentaNGU != null) {
           return;
-        } else if (cuentaMUT.size() != 0 && cuentaNGU.isEmpty()) {
+        } else if (cuentaMUT != null && cuentaNGU == null) {
           return;
         }
 
@@ -906,7 +323,9 @@ public class CajeroController implements Initializable {
   // GENERACIÓN DE MÓDULOS
   public void generarModulos() {
 
-    List<Object[]> result = servicio.traerModulos(rolUsuario);
+    ModelUsuario usuario = servicio.traerDatosUsuario(LoginController.usuarioLoggeado);
+
+    List<Object[]> result = servicio.traerModulos(usuario.getId());
     List<String> modulos = new ArrayList<>();
 
     for (Object[] row : result) {
@@ -1012,4 +431,281 @@ public class CajeroController implements Initializable {
       }
     }
   }
+
+
+  //Métodos nuevos
+  private void procesarAccion(String accion) {
+
+    if (!apertura && !accion.equals("TRASLADOS") && !accion.equals("CANCELACION") && !accion.equals("CAMBIO")) {
+      mostrarAlertaError("ERROR AL QUERER PROCESAR LA OPERACIÓN", "EL CAJERO NO TIENE UNA CUENTA ABIERTA PARA HACER OPERACIONES");
+      return;
+    }
+
+    switch (accion) {
+
+      case "ABONO_AHORRO" -> {
+        if (txtNombreCargado.isVisible())
+          mostrarPantalla(false, "/com/java/fx/abonoAhorro.fxml", "ABONO A AHORRO", false, "", "");
+        else
+          mostrarAlertaError("ERROR AL QUERER ABONAR A AHORRO", "POR FAVOR, BUSQUE A ALGÚN SOCIO PARA REALIZAR LAS OPERACIONES");
+      }
+
+      case "ABONO_CREDITO" -> {
+        if (txtNombreCargado.isVisible())
+          mostrarPantalla(true, "/com/java/fx/elegirPrestamo.fxml", "ELEGIR CRÉDITO", true, "ELECCION DE PRESTAMO", "");
+        else
+          mostrarAlertaError("ERROR AL QUERER ABONAR A CRÉDITO", "POR FAVOR, BUSQUE A ALGÚN SOCIO PARA REALIZAR LAS OPERACIONES");
+      }
+
+      case "DESEMBOLSO" -> {
+        if (txtNombreCargado.isVisible())
+          mostrarPantalla(true, "/com/java/fx/desembolso.fxml", "DESEMBOLSO DE CRÉDITO", false, "", "");
+        else
+          mostrarAlertaError("ERROR AL QUERER DESEMBOLSAR", "POR FAVOR, BUSQUE A ALGÚN SOCIO PARA REALIZAR LAS OPERACIONES");
+      }
+
+      case "RETIRO" -> {
+        if (txtNombreCargado.isVisible())
+          mostrarPantalla(true, "/com/java/fx/retiro.fxml", "RETIRO EN EFECTIVO", false, "", "");
+        else
+          mostrarAlertaError("ERROR AL QUERER RETIRAR", "POR FAVOR, BUSQUE A ALGÚN SOCIO PARA REALIZAR LAS OPERACIONES.");
+      }
+
+      case "CAPITAL_SOCIAL" -> {
+        if (txtNombreCargado.isVisible())
+          mostrarPantalla(true, "/com/java/fx/elegirEmpresa.fxml", "ELECCIÓN DE EMPRESA", true, "ELECCIÓN DE EMPRESA", "CS");
+        else
+          mostrarAlertaError("ERROR AL QUERER PAGAR A CAPITAL SOCIAL", "POR FAVOR, BUSQUE A ALGÚN SOCIO PARA REALIZAR LAS OPERACIONES");
+      }
+
+      case "TRASLADOS" -> {
+        if (txtNombreCargado.isVisible())
+          mostrarAlertaError("ERROR AL QUERER PROCESAR TRASLADOS", "POR FAVOR, LIMPIE EL CAMPO DEL SOCIO PARA REALIZAR ESTA OPERACIÓN");
+        else
+          mostrarPantalla(true, "/com/java/fx/elegirEmpresa.fxml", "ELECCIÓN DE EMPRESA", true, "ELECCIÓN DE EMPRESA", "TRAS");
+      }
+
+      case "HISTORIAL" -> {
+        if (txtNombreCargado.isVisible())
+          mostrarAlertaError("ERROR AL QUERER VER EL HISTORIAL", "POR FAVOR, LIMPIE EL CAMPO DEL SOCIO PARA REALIZAR ESTA OPERACIÓN");
+        else
+          mostrarPantalla(false, "/com/java/fx/historial.fxml", "HISTORIAL DE OPERACIONES", false, "", "");
+      }
+
+      case "CIERRE_CAJERO" -> {
+        if (txtNombreCargado.isVisible()) {
+          mostrarAlertaError("ERROR AL QUERER REGISTRAR LOS FALTANTES Y SOBRANTES", "POR FAVOR, LIMPIE EL CAMPO DEL SOCIO PARA REALIZAR ESTA OPERACIÓN");
+        } else {
+          if (validarCierreCaja())
+            mostrarPantalla(false, "/com/java/fx/cierreCajero.fxml", "AJUSTE DE SOBRANTES Y FALTANTE", false, "", "");
+        }
+      }
+
+      case "PREVISION_SOCIAL" -> {
+        if (txtNombreCargado.isVisible())
+          mostrarPantalla(true, "/com/java/fx/elegirEmpresa.fxml", "ELECCIÓN DE EMPRESA", true, "ELECCIÓN DE EMPRESA", "PRESOC");
+        else
+          mostrarAlertaError("ERROR AL QUERER PAGAR PREVISIÓN SOCIAL", "POR FAVOR, BUSQUE A ALGÚN SOCIO PARA REALIZAR LAS OPERACIONES");
+      }
+
+      case "CANCELACION" -> {
+        if (txtNombreCargado.isVisible() && (rolUsuario == 2 || rolUsuario == 3))
+          mostrarAlertaError("ERROR AL QUERER CANCELAR OPERACIONES", "POR FAVOR, LIMPIE EL CAMPO DEL SOCIO PARA REALIZAR ESTA OPERACIÓN");
+        else if (rolUsuario == 2 || rolUsuario == 3)
+          mostrarPantalla(true, "/com/java/fx/operacionesCajero.fxml", "ELECCIÓN DE OPERACIÓN", false, "", "");
+      }
+
+      case "CAMBIO" -> {
+        if (bufferOperaciones == 0)
+          mostrarAlertaError("ERROR AL QUERER OTORGAR CAMBIO", "NO HA HECHO NINGUNA OPERACIÓN");
+        else
+          mostrarPantalla(true, "/com/java/fx/otorgarCambio.fxml", "TOTAL DE OPERACIONES", false, "", "");
+      }
+
+      case "BUSCAR_SOCIO" -> {
+        if (txtNumeroSocio.getText().isEmpty())
+          mostrarPantalla(false, "/com/java/fx/busquedaSocio.fxml", "BUSQUEDA DE SOCIO", false, "", "");
+        else
+          cargarSocio(true);
+      }
+    }
+  }
+
+  private boolean validarCierreCaja() {
+    LocalDate fecha = servicio.traerFechaHoy();
+    int usuarioId = servicio.traerDatosUsuario(LoginController.usuarioLoggeado).getId();
+    ModelCaja cuentaMUT = servicio.traerCuentaDeCaja(usuarioId, fecha, 1, turno, "0001");
+    ModelCaja cuentaNGU = servicio.traerCuentaDeCaja(usuarioId, fecha, 1, turno, "0002");
+
+    if (cuentaMUT == null || cuentaNGU == null) {
+      mostrarAlertaError(
+              "ERROR AL QUERER REALIZAR SU CIERRE.",
+              "NO CUENTA CON CAJAS ABIERTAS EN ALGUNA O EN AMBAS EMPRESAS"
+      );
+      return false;
+    }
+
+    if (cuentaMUT.getCierre() != 1 || cuentaNGU.getCierre() != 1) {
+      mostrarAlertaError(
+              "ERROR AL QUERER REALIZAR SU CIERRE.",
+              "NO CUENTA CON LOS PERMISOS PARA REALIZAR SU CIERRE"
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  private void mostrarAlertaError(String header, String contenido) {
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setTitle(header);
+    alert.setHeaderText(header);
+    alert.setContentText(contenido);
+    alert.showAndWait();
+  }
+
+  public void mostrarPantalla(boolean estilo, String ruta, String titulo,
+                              boolean elegir, String tituloEleccion, String opcion) {
+    try {
+      FXMLLoader fxml = new FXMLLoader(getClass().getResource(ruta));
+      fxml.setControllerFactory(Main.context::getBean);
+      Scene nuevaEscena = new Scene(fxml.load());
+
+      configurarControlador(fxml, ruta, opcion, elegir, tituloEleccion);
+
+      nuevaEscena.getStylesheets()
+              .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());
+
+      if (estilo) {
+        new JMetro(Style.LIGHT).setScene(nuevaEscena);
+      }
+
+      Stage nuevaVentana = new Stage();
+      nuevaVentana.setTitle(titulo);
+      nuevaVentana.getIcons().add(new Image(getClass().getResourceAsStream("/assets/images/logo.png")));
+      nuevaVentana.setScene(nuevaEscena);
+      nuevaVentana.setResizable(false);
+      nuevaVentana.centerOnScreen();
+      nuevaVentana.initModality(Modality.APPLICATION_MODAL);
+      nuevaVentana.show();
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void configurarControlador(FXMLLoader fxml, String ruta,
+                                     String opcion, boolean elegir, String tituloEleccion) {
+    if (elegir) {
+      ElegirController controlador = fxml.getController();
+      controlador.setTitulo(tituloEleccion.trim());
+      controlador.setOpcion(opcion);
+    }
+
+    if (ruta.contains("busquedaSocio")) {
+      BusquedaController c = fxml.getController();
+      c.setCajeroController(this);
+
+    } else if (ruta.contains("abonoAhorro")) {
+      AhorroController c = fxml.getController();
+      c.setDatos(Integer.parseInt(txtNumeroSocio.getText()), txtNombreCargado.getText(), usuario);
+
+    } else if (ruta.contains("elegirPrestamo")) {
+      ElegirController c = fxml.getController();
+      c.setSocio(Integer.parseInt(txtNumeroSocio.getText()), turno);
+
+    } else if (ruta.contains("desembolso")) {
+      DesembolsoController c = fxml.getController();
+      c.setDatos(Integer.parseInt(txtNumeroSocio.getText().trim()), usuario);
+
+    } else if (ruta.contains("retiro")) {
+      RetiroController c = fxml.getController();
+      c.setDatos(Integer.parseInt(txtNumeroSocio.getText().trim()), usuario, turno);
+
+    } else if (ruta.contains("elegirEmpresa") && opcion.equals("CS")) {
+      ElegirController c = fxml.getController();
+      c.setSocioCapitalSocial(Integer.parseInt(txtNumeroSocio.getText().trim()),
+              txtNombreCargado.getText().trim(), usuario);
+
+    } else if (ruta.contains("elegirEmpresa") && opcion.equals("TRAS")) {
+      ElegirController c = fxml.getController();
+      c.setUsuarioTraslado(usuario, turno, this, opcion);
+
+    } else if (ruta.contains("elegirEmpresa") && opcion.equals("PRESOC")) {
+      ElegirController c = fxml.getController();
+      c.setSocioCapitalSocial(Integer.parseInt(txtNumeroSocio.getText().trim()),
+              txtNombreCargado.getText().trim(), usuario);
+
+    } else if (ruta.contains("historial")) {
+      HistorialController c = fxml.getController();
+      c.setDatos(usuario, turno);
+
+    } else if (ruta.contains("cierre")) {
+      CierreController c = fxml.getController();
+      c.settearDatos(lblCierreCajero, turno);
+
+    } else if (ruta.contains("otorgarCambio")) {
+      CambioController c = fxml.getController();
+      c.setDatos(bufferOperaciones);
+
+    } else if (ruta.contains("operacionesCajero")) {
+      OperacionesController c = fxml.getController();
+      c.setDatos(turno);
+    }
+  }
+
+  @FXML
+  public void handlerKeyPressed(KeyEvent event) {
+    switch (event.getCode()) {
+      case F1     -> procesarAccion("ABONO_AHORRO");
+      case F2     -> procesarAccion("ABONO_CREDITO");
+      case F3     -> procesarAccion("DESEMBOLSO");
+      case F4     -> procesarAccion("RETIRO");
+      case F5     -> procesarAccion("CAPITAL_SOCIAL");
+      case F6     -> procesarAccion("CANCELACION");
+      case F7     -> procesarAccion("TRASLADOS");
+      case F8     -> procesarAccion("HISTORIAL");
+      case F9     -> procesarAccion("PREVISION_SOCIAL");
+      case F10    -> procesarAccion("CIERRE_CAJERO");
+      case F12    -> procesarAccion("CAMBIO");
+      case ENTER  -> procesarAccion("BUSCAR_SOCIO");
+      case ALT    -> procesarAccion("BUSCAR_SOCIO");
+    }
+  }
+
+  @FXML
+  public void handlerDeClicks(MouseEvent event) {
+    Object source = event.getSource();
+
+    if      (source == lblAbonoAhorro)    procesarAccion("ABONO_AHORRO");
+    else if (source == lblAbonoCredito)   procesarAccion("ABONO_CREDITO");
+    else if (source == lblDesembolsos)    procesarAccion("DESEMBOLSO");
+    else if (source == lblRetiros)        procesarAccion("RETIRO");
+    else if (source == lblCapitalSocial)  procesarAccion("CAPITAL_SOCIAL");
+    else if (source == lblCancelacion)    procesarAccion("CANCELACION");
+    else if (source == lblTraslados)      procesarAccion("TRASLADOS");
+    else if (source == lblHistorial)      procesarAccion("HISTORIAL");
+    else if (source == lblPrevisionSocial)procesarAccion("PREVISION_SOCIAL");
+    else if (source == lblCierreCajero)   procesarAccion("CIERRE_CAJERO");
+    else if (source == lblCambio)         procesarAccion("CAMBIO");
+    else if (source == imgBusqueda)       procesarAccion("BUSCAR_SOCIO");
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

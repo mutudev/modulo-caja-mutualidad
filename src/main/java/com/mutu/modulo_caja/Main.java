@@ -1,8 +1,10 @@
 package com.mutu.modulo_caja;
 
+import com.mutu.modulo_caja.Services.Servicio;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
@@ -12,6 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import javax.swing.*;
+import java.time.LocalDate;
 
 @SpringBootApplication
 
@@ -31,6 +34,20 @@ public class Main extends Application {
 	public void start(Stage stage) throws Exception {
 		// Inicia contexto de Spring
 		context = SpringApplication.run(Main.class);
+
+		Servicio servicio = context.getBean(Servicio.class);
+
+		LocalDate fechaSistema = servicio.traerFechaHoy();
+		LocalDate fechaCompu = LocalDate.now();
+
+		if (!fechaCompu.isEqual(fechaSistema)) {
+			Alert alert = new Alert(Alert.AlertType.ERROR);
+			alert.setTitle("ERROR");
+			alert.setHeaderText("ERROR AL INICIAR LA APLICACIÓN");
+			alert.setContentText("LA FECHA DE SU COMPUTADORA NO COINCIDE CON LA FECHA DEL SISTEMA, CORRIJA.");
+			alert.showAndWait();
+			System.exit(0);
+		}
 
 		// Carga FXML con controlador Spring
 		FXMLLoader fxml = new FXMLLoader(getClass().getResource("/com/java/fx/login.fxml"));

@@ -2,6 +2,8 @@ package com.mutu.modulo_caja.Controllers;
 
 import com.mutu.modulo_caja.Main;
 import com.mutu.modulo_caja.Services.Servicio;
+import de.mkammerer.argon2.Argon2;
+import de.mkammerer.argon2.Argon2Factory;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -50,6 +52,9 @@ public class LoginController implements Initializable {
   public static int rolusuarioLoggeado = 0;
 
   @Autowired private Servicio usuarioService;
+
+  Argon2 argon2 = Argon2Factory.create();
+
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -135,30 +140,67 @@ public class LoginController implements Initializable {
   @FXML
   public void validarLogin() {
     Map<String, Object> result =
-        usuarioService.validarLogin(txtUsuario.getText().trim(), txtPass.getText().trim(), "", 0);
+        usuarioService.validarLogin(txtUsuario.getText().trim(), "", "", 0, 0);
     if (validator.validate() && result.get("Resultado").toString().equals("CORRECTO")) {
       try {
-        rol = Integer.parseInt(result.get("Rol").toString());
-        rolusuarioLoggeado = Integer.parseInt(result.get("Rol").toString());
-        usuarioLoggeado = txtUsuario.getText().trim();
-        Stage ventanaActual = (Stage) btnIngresar.getScene().getWindow();
-        Stage nuevaVentana = new Stage();
-        FXMLLoader fxml = new FXMLLoader(getClass().getResource("/com/java/fx/InicioCajero.fxml"));
-        fxml.setControllerFactory(Main.context::getBean);
-        Scene nuevaEscena = new Scene(fxml.load());
-        CajeroController controlador = fxml.getController();
-        controlador.setUsuario(txtUsuario.getText().trim(), rol);
-        nuevaEscena
-            .getStylesheets()
-            .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());
-        nuevaVentana.setTitle("INICIO - CAJERO");
-        Image icon = new Image(getClass().getResourceAsStream("/assets/images/logo.png"));
-        nuevaVentana.getIcons().add(icon);
-        nuevaVentana.setScene(nuevaEscena);
-        nuevaVentana.setResizable(false);
-        nuevaVentana.centerOnScreen();
-        nuevaVentana.show();
-        ventanaActual.close();
+
+
+        boolean accesar = false;
+        char[] passwordDada = txtPass.getText().trim().toCharArray();
+        try {
+          if (argon2.verify(result.get("Pass").toString(), passwordDada)) {
+            accesar = true;
+          }
+        } finally {
+          // Wipe confidential data
+          argon2.wipeArray(passwordDada);
+        }
+
+        if (accesar) {
+          rol = Integer.parseInt(result.get("Rol").toString());
+
+          int cajero = Integer.parseInt(result.get("Cajero").toString());
+
+          if (cajero != 1) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("ERROR");
+            alert.setHeaderText("ERROR AL INICIAR SESIÓN");
+            alert.setContentText(
+                    "SU USUARIO NO ESTÁ CONFIGURADO COMO CAJERO, ACCESO DENEGADO.");
+            alert.showAndWait();
+            return;
+          }
+
+          rolusuarioLoggeado = Integer.parseInt(result.get("Rol").toString());
+          usuarioLoggeado = txtUsuario.getText().trim();
+          Stage ventanaActual = (Stage) btnIngresar.getScene().getWindow();
+          Stage nuevaVentana = new Stage();
+          FXMLLoader fxml = new FXMLLoader(getClass().getResource("/com/java/fx/InicioCajero.fxml"));
+          fxml.setControllerFactory(Main.context::getBean);
+          Scene nuevaEscena = new Scene(fxml.load());
+          CajeroController controlador = fxml.getController();
+          controlador.setUsuario(txtUsuario.getText().trim(), rol);
+          nuevaEscena
+                  .getStylesheets()
+                  .add(getClass().getResource("/assets/css/estilos.css").toExternalForm());
+          nuevaVentana.setTitle("INICIO - CAJERO");
+          Image icon = new Image(getClass().getResourceAsStream("/assets/images/logo.png"));
+          nuevaVentana.getIcons().add(icon);
+          nuevaVentana.setScene(nuevaEscena);
+          nuevaVentana.setResizable(false);
+          nuevaVentana.centerOnScreen();
+          nuevaVentana.show();
+          ventanaActual.close();
+        } else {
+          Alert alert = new Alert(Alert.AlertType.ERROR);
+          alert.setTitle("ERROR");
+          alert.setHeaderText("ERROR AL INICIAR SESIÓN");
+          alert.setContentText(
+                  "CREDENCIALES INCORRECTAS.");
+          alert.showAndWait();
+          return;
+        }
+
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -166,7 +208,7 @@ public class LoginController implements Initializable {
       Alert alert = new Alert(Alert.AlertType.ERROR);
       alert.setTitle("ERROR AL INTENTAR INICIAR SESIÓN");
       alert.setHeaderText(result.get("Resultado").toString().toUpperCase());
-      alert.setContentText("ERROR CON SEVERIDAD: " + result.get("Rol"));
+      alert.setContentText("CREDENCIALES INCORRECTAS");
       alert.showAndWait();
     }
   }
@@ -186,10 +228,5 @@ public class LoginController implements Initializable {
     }
   }
 
-  @FXML
-  public void EntrarConBoton(KeyEvent event) {
-    if (event.getCode().equals(KeyCode.ENTER)) {
-      validarLogin();
-    }
-  }
+
 }

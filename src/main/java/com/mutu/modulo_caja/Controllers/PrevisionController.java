@@ -1,7 +1,7 @@
 package com.mutu.modulo_caja.Controllers;
 
-import br.com.adilson.util.Extenso;
 import br.com.adilson.util.PrinterMatrix;
+import com.mutu.modulo_caja.Models.ModelEmpresa;
 import com.mutu.modulo_caja.Services.Servicio;
 import com.mutu.modulo_caja.utils.PrintJob;
 import com.tenpisoft.n2w.MoneyConverters;
@@ -31,7 +31,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 @Component
@@ -41,7 +40,6 @@ public class PrevisionController implements Initializable {
 
   @FXML private TextField txtMontoC, txtNombre, txtEmpresa, txtSocio, txtMontoP;
   @FXML private Button btnProceder, btnCancelar;
-
   @FXML private Label lblError;
 
   public Validator validator = new Validator();
@@ -51,242 +49,179 @@ public class PrevisionController implements Initializable {
   public int socio;
   public double montoCubierto;
 
+  private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+  private static final DateTimeFormatter FORMATO_HORA  = DateTimeFormatter.ofPattern("HH:mm:ss");
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     validator
-        .createCheck()
-        .dependsOn("input", txtMontoP.textProperty())
-        .withMethod(
-            c -> {
+            .createCheck()
+            .dependsOn("input", txtMontoP.textProperty())
+            .withMethod(c -> {
               String texto = c.get("input");
-              if (texto == null || texto.equals("")) {
-                c.error("Ingrese un valor mayor a cero");
-                lblError.setText("Ingrese un valor mayor a cero");
-              } else {
-                lblError.setText("");
-              }
+              boolean vacio = texto == null || texto.isEmpty();
+              lblError.setText(vacio ? "Ingrese un valor mayor a cero" : "");
+              if (vacio) c.error("Ingrese un valor mayor a cero");
             })
-        .decorates(txtMontoP)
-        .immediate();
+            .decorates(txtMontoP)
+            .immediate();
 
-    txtMontoP.setTextFormatter(
-        new TextFormatter<>(
-            change -> {
-              // Permite solo dígitos y el punto decimal
-              change.setText(change.getText().replaceAll("[^0-9.]", ""));
+    txtMontoP.setTextFormatter(new TextFormatter<>(change -> {
+      change.setText(change.getText().replaceAll("[^0-9.]", ""));
+      String texto = change.getText();
+      if (texto.matches(".*\\..*\\..*")) {
+        change.setText(texto.substring(0, texto.lastIndexOf('.')));
+      }
+      return change;
+    }));
 
-              // Verifica si ya hay más de un punto decimal
-              if (change.getText().matches(".*\\..*\\..*")) {
-                change.setText(change.getText().substring(0, change.getText().lastIndexOf('.')));
-              }
-
-              return change;
-            }));
-
-    Platform.runLater(
-        () -> {
-          Stage stage = (Stage) btnCancelar.getScene().getWindow();
-          stage.setOnCloseRequest(event -> cierreDeVentana(event));
-        });
+    Platform.runLater(() -> {
+      Stage stage = (Stage) btnCancelar.getScene().getWindow();
+      stage.setOnCloseRequest(this::cierreDeVentana);
+    });
   }
 
-  public void obtenerDatos(
-      String empresa, String usuario, int socio, String nombreSocio, double montoCubierto) {
-    this.empresa = empresa;
-    txtEmpresa.setText(empresa);
-    this.usuario = usuario;
-    this.socio = socio;
-    txtSocio.setText(String.valueOf(socio));
-    this.nombreSocio = nombreSocio;
-    txtNombre.setText(nombreSocio);
+  public void obtenerDatos(String empresa, String usuario, int socio,
+                           String nombreSocio, double montoCubierto) {
+    this.empresa      = empresa;
+    this.usuario      = usuario;
+    this.socio        = socio;
+    this.nombreSocio  = nombreSocio;
     this.montoCubierto = montoCubierto;
+
+    txtEmpresa.setText(empresa);
+    txtSocio.setText(String.valueOf(socio));
+    txtNombre.setText(nombreSocio);
     txtMontoC.setText(formatoMoneda.format(montoCubierto));
+  }
+
+  // Extracción: lógica de cierre repetida en 3 métodos → un solo método privado
+  private void cerrarVentana() {
+    validator = new Validator();
+    ((Stage) btnCancelar.getScene().getWindow()).close();
   }
 
   public void cierreDeVentana(Event event) {
     event.consume();
-    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    //    alert.setTitle("CIERRE DE VENTANA");
-    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-    //    alert.setContentText(
-    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-    //
-    //    Optional<ButtonType> result = alert.showAndWait();
-    //    if (result.isPresent() && result.get() == ButtonType.OK) {
-    //
-    //    }
-    validator = new Validator();
-    Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
-    ventanaActual.close();
+    cerrarVentana();
   }
 
   @FXML
   public void cerrarConTecla(KeyEvent event) {
     if (event.getCode().equals(KeyCode.ESCAPE)) {
-      //      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-      //      alert.setTitle("CIERRE DE VENTANA");
-      //      alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-      //      alert.setContentText(
-      //          "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-      //              + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-      //
-      //      Optional<ButtonType> result = alert.showAndWait();
-      //      if (result.isPresent() && result.get() == ButtonType.OK) {
-      //
-      //      }
-      validator = new Validator();
-      Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
-      ventanaActual.close();
-    }
-    else if  (event.getCode().equals(KeyCode.ENTER) && !txtMontoP.getText().isEmpty() ) {
-      event.consume();
-      AbonarPrevision();
+      cerrarVentana();
     }
   }
 
   @FXML
   public void cerrarConBoton() {
-    //    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    //    alert.setTitle("CIERRE DE VENTANA");
-    //    alert.setHeaderText("¿ESTÁ SEGURO QUE DESEA CERRAR LA VENTANA?");
-    //    alert.setContentText(
-    //        "EN CASO DE QUE SÍ, PRESIONE ACEPTAR, EN CASO CONTRARIO PRESIONE CANCELAR"
-    //            + ". LOS CAMBIOS NO PROCESADOS NO SE GUARDARÁN.");
-    //
-    //    Optional<ButtonType> result = alert.showAndWait();
-    //    if (result.isPresent() && result.get() == ButtonType.OK) {
-    //
-    //    }
-    validator = new Validator();
-    Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
-    ventanaActual.close();
+    cerrarVentana();
+  }
+
+  // Extracción: obtener hora formateada actual
+  private String getHoraFormateada() {
+    return LocalTime.now().format(FORMATO_HORA);
   }
 
   @FXML
   public void AbonarPrevision() {
-
-    if (validator.validate()) {
-      double monto = Double.parseDouble(txtMontoP.getText().trim());
-      int numSocio = Integer.parseInt(txtSocio.getText().trim());
-      String empresa = "";
-      if (txtEmpresa.getText().trim().equals("MUTUALIDAD 12 DE AGOSTO, S.C. DE R.L. DE C.V.")) {
-        empresa = "0001";
-      } else {
-        empresa = "0002";
-      }
-
-      LocalDateTime fecha = LocalDateTime.now();
-      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-      LocalTime hora = fecha.toLocalTime();
-      DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm:ss");
-      String horaFormateada = hora.format(formatterHora);
-      Map<String, Object> resultado =
-          servicio.AbonarPrevisionSocial(
-              numSocio, empresa, horaFormateada, monto, usuario, "", 0, 0, 0);
-
-      if (resultado.get("Resultado").toString().equals("ABONADO")
-          || resultado.get("Resultado").toString().equals("ACTUALIZADO")) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("PAGO DE PREVISIÓN SOCIAL EXITOSO");
-        alert.setHeaderText("PAGO DE PREVISIÓN SOCIAL HECHO CORRECTAMENTE");
-        alert.setContentText("PAGO PROCESADO CORRECTAMENTE PARA EL SOCIO: " + numSocio);
-        alert.showAndWait();
-
-        String nombreEmpresa = servicio.traerEmpresa(empresa).getRazonSocial();
-        String rfcEmpresa = servicio.traerEmpresa(empresa).getRfc();
-        String direcEmpresa =
-            servicio.traerEmpresa(empresa).getCalle()
-                + " "
-                + servicio.traerEmpresa(empresa).getCruzamiento()
-                + " COL. CENTRO";
-        String fechaTicket = fecha.format(formatter);
-        String socio = String.valueOf(numSocio);
-        String folio = resultado.get("transaccion_id").toString();
-        NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.US);
-        String montoCubierto =
-            formatoMoneda.format(Double.parseDouble(resultado.get("monto_ticket").toString()));
-        String montoAbonado = formatoMoneda.format(monto);
-        MoneyConverters converter = MoneyConverters.SPANISH_BANKING_MONEY_VALUE;
-        String moneyAsWords = converter.asWords(BigDecimal.valueOf(monto)).toUpperCase() + " MXN";
-        String montoAsignado =
-            formatoMoneda.format(Double.parseDouble(resultado.get("monto_asignado").toString()));
-        ;
-
-        // Contar chars para mejor visualizacion
-        PrintJob impresion = new PrintJob();
-        PrinterMatrix printer =
-            impresion.imprimirPrevision(
-                nombreEmpresa,
-                rfcEmpresa,
-                direcEmpresa,
-                socio,
-                folio,
-                nombreSocio,
-                montoAbonado,
-                moneyAsWords,
-                fechaTicket,
-                horaFormateada,
-                montoAsignado,
-                montoCubierto);
-
-        printer.toFile("impresion_PRESOC.txt");
-
-        InputStream inputStream = null;
-        try {
-          inputStream = new FileInputStream("impresion_PRESOC.txt");
-        } catch (FileNotFoundException a) {
-          a.printStackTrace();
-        }
-
-        if (inputStream == null) {
-          return;
-        }
-
-        DocFlavor docFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
-        Doc document = new SimpleDoc(inputStream, docFormat, null);
-        PrintRequestAttributeSet attributeSet = new HashPrintRequestAttributeSet();
-        PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
-        if (defaultPrintService != null) {
-          DocPrintJob printJob = defaultPrintService.createPrintJob();
-
-          try {
-            printJob.print(document, attributeSet);
-            Alert alert2 = new Alert(Alert.AlertType.INFORMATION);
-            alert2.setTitle("IMPRESIÓN REALIZADA CON ÉXITO");
-            alert2.setHeaderText("IMPRESIÓN REALIZADA CON ÉXITO");
-          } catch (PrintException b) {
-
-            Alert alert2 = new Alert(Alert.AlertType.ERROR);
-            alert2.setTitle("ERROR IMPRIMIENDO");
-            alert2.setHeaderText("ERROR IMPRIMIENDO");
-            alert2.showAndWait();
-          }
-        } else {
-
-          Alert alert2 = new Alert(Alert.AlertType.ERROR);
-          alert2.setTitle("ERROR IMPRIMIENDO");
-          alert2.setHeaderText("ERROR IMPRIMIENDO");
-          alert2.showAndWait();
-        }
-
-        CajeroController.bufferOperaciones += monto;
-        Stage ventanaActual = (Stage) btnCancelar.getScene().getWindow();
-        ventanaActual.close();
-      } else {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("ERROR AL QUERER PAGAR LA PREVISIÓN SOCIAL");
-        alert.setHeaderText("ERROR EN EL PAGO DE PREVISIÓN SOCIAL");
-        alert.setContentText(resultado.get("Resultado").toString().toUpperCase());
-        alert.showAndWait();
-      }
-
-    } else {
-      Alert alert = new Alert(Alert.AlertType.ERROR);
-      alert.setTitle("ERROR AL QUERER PAGAR LA PREVISIÓN SOCIAL");
-      alert.setHeaderText("ERROR EN EL PAGO DE PREVISIÓN SOCIAL");
-      alert.setContentText("POR FAVOR, CUMPLA CON LAS VALIDACIONES DEL CAMPO");
-      alert.showAndWait();
+    if (!validator.validate()) {
+      mostrarAlerta(Alert.AlertType.ERROR,
+              "ERROR AL QUERER PAGAR LA PREVISIÓN SOCIAL",
+              "ERROR EN EL PAGO DE PREVISIÓN SOCIAL",
+              "POR FAVOR, CUMPLA CON LAS VALIDACIONES DEL CAMPO");
+      return;
     }
+
+    double monto       = Double.parseDouble(txtMontoP.getText().trim());
+    int numSocio       = Integer.parseInt(txtSocio.getText().trim());
+    String codigoEmp   = servicio.traerEmpresaConRS(txtEmpresa.getText().trim()).getCodigo();
+    String horaFormateada = getHoraFormateada();
+    LocalDateTime fecha = LocalDateTime.now();
+
+    Map<String, Object> resultado =
+            servicio.AbonarPrevisionSocial(numSocio, codigoEmp, horaFormateada, monto, usuario, "", 0, 0, 0);
+
+    String resultadoStr = resultado.get("Resultado").toString();
+
+    if (resultadoStr.equals("ABONADO") || resultadoStr.equals("ACTUALIZADO")) {
+      mostrarAlerta(Alert.AlertType.INFORMATION,
+              "PAGO DE PREVISIÓN SOCIAL EXITOSO",
+              "PAGO DE PREVISIÓN SOCIAL HECHO CORRECTAMENTE",
+              "PAGO PROCESADO CORRECTAMENTE PARA EL SOCIO: " + numSocio);
+
+      imprimirTicket(codigoEmp, numSocio, monto, fecha, horaFormateada, resultado);
+
+      CajeroController.bufferOperaciones += monto;
+      cerrarVentana();
+    } else {
+      mostrarAlerta(Alert.AlertType.ERROR,
+              "ERROR AL QUERER PAGAR LA PREVISIÓN SOCIAL",
+              "ERROR EN EL PAGO DE PREVISIÓN SOCIAL",
+              resultadoStr.toUpperCase());
+    }
+  }
+
+  // Extracción: bloque de impresión separado de la lógica de negocio
+  private void imprimirTicket(String codigoEmp, int numSocio, double monto,
+                              LocalDateTime fecha, String horaFormateada,
+                              Map<String, Object> resultado) {
+    ModelEmpresa empresaModel = servicio.traerEmpresa(codigoEmp);
+    String nombreEmpresa = empresaModel.getRazonSocial();
+    String rfcEmpresa    = empresaModel.getRfc();
+    String direcEmpresa  = empresaModel.getCalle() + " "
+            + empresaModel.getCruzamiento() + " COL. CENTRO";
+
+    String fechaTicket    = fecha.format(FORMATO_FECHA);
+    String folio          = resultado.get("transaccion_id").toString();
+    String montoCubierto  = formatoMoneda.format(
+            Double.parseDouble(resultado.get("monto_ticket").toString()));
+    String montoAbonado   = formatoMoneda.format(monto);
+    String montoAsignado  = formatoMoneda.format(
+            Double.parseDouble(resultado.get("monto_asignado").toString()));
+    String moneyAsWords   = MoneyConverters.SPANISH_BANKING_MONEY_VALUE
+            .asWords(BigDecimal.valueOf(monto)).toUpperCase() + " MXN";
+
+    PrintJob impresion = new PrintJob();
+    PrinterMatrix printer = impresion.imprimirPrevision(
+            nombreEmpresa, rfcEmpresa, direcEmpresa,
+            String.valueOf(numSocio), folio, nombreSocio,
+            montoAbonado, moneyAsWords, fechaTicket, horaFormateada,
+            montoAsignado, montoCubierto);
+
+    printer.toFile("impresion_PRESOC.txt");
+
+    InputStream inputStream = null;
+    try {
+      inputStream = new FileInputStream("impresion_PRESOC.txt");
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+      return;
+    }
+
+    DocFlavor docFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
+    Doc document = new SimpleDoc(inputStream, docFormat, null);
+    PrintRequestAttributeSet attributeSet = new HashPrintRequestAttributeSet();
+    PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
+
+    if (defaultPrintService == null) {
+      mostrarAlerta(Alert.AlertType.ERROR, "ERROR IMPRIMIENDO", "ERROR IMPRIMIENDO", null);
+      return;
+    }
+
+    try {
+      defaultPrintService.createPrintJob().print(document, attributeSet);
+    } catch (PrintException e) {
+      mostrarAlerta(Alert.AlertType.ERROR, "ERROR IMPRIMIENDO", "ERROR IMPRIMIENDO", null);
+    }
+  }
+
+  // Extracción: construcción repetida de Alert → un solo método utilitario
+  private void mostrarAlerta(Alert.AlertType tipo, String titulo, String header, String contenido) {
+    Alert alert = new Alert(tipo);
+    alert.setTitle(titulo);
+    alert.setHeaderText(header);
+    if (contenido != null) alert.setContentText(contenido);
+    alert.showAndWait();
   }
 }

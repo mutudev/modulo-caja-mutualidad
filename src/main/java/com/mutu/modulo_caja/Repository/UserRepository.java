@@ -13,16 +13,16 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<ModelUsuario, Integer> {
 
   @Procedure(name = "Usuario.pa_ValidarLogin")
-  HashMap pa_validarLogin(String Usuario, String Pass, String Resultado, int Rol);
+  HashMap pa_validarLogin(String Usuario, String Pass, String Resultado, int Rol, int Cajero);
 
   @Query(
       value =
-          "SELECT ROL_ID, MODULO_ID, MODULO.DESCRIPCION "
+          "SELECT USUARIO_ID, MODULO_ID, MODULO.DESCRIPCION "
               + "FROM CONF_MODULO "
               + "INNER JOIN MODULO ON MODULO.ID = CONF_MODULO.MODULO_ID "
-              + "WHERE ROL_ID = :RolUsuario",
+              + "WHERE USUARIO_ID = :usuarioID",
       nativeQuery = true)
-  List<Object[]> traerModulos(@Param("RolUsuario") int rolUsuario);
+  List<Object[]> traerModulos(@Param("usuarioID") int usuarioID);
 
   @Query(
       value =

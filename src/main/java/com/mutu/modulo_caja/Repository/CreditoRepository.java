@@ -92,4 +92,23 @@ public interface CreditoRepository extends JpaRepository<ModelCredito, Integer> 
           value = "SELECT TOP 1 * FROM VW_CUOTAS_CREDITO WHERE CREDITO_ID = :credito_id AND STATUS = :status AND NUM_CUOTA = :num_cuota",
           nativeQuery = true)
   Object[] cuotaAnteriorConNum(@Param("credito_id") int credito_id, @Param("status") int status, @Param("num_cuota") int num_cuota);
+
+
+  @Query(
+          value = "SELECT TOP 1 * FROM VW_CUOTAS_CREDITO WHERE FECHA_P_REALIZADA IS NULL AND CREDITO_ID = :numCredito ORDER BY NUM_CUOTA ASC",
+          nativeQuery = true)
+  Object[] cuotaUltimaSaldada(@Param("numCredito") int credito_id);
+
+  @Query(
+          value = "SELECT TOP 1 * FROM VW_CUOTAS_CREDITO WHERE FECHA_P_REALIZADA IS NOT NULL AND CREDITO_ID = :numCredito ORDER BY NUM_CUOTA ASC",
+          nativeQuery = true)
+  Object[] cuotaUltimaAfectada(@Param("numCredito") int credito_id);
+
+
+  @Query(
+          value = "SELECT TOP 1 * FROM VW_CUOTAS_CREDITO WHERE CREDITO_ID = :credito_id AND NUM_CUOTA = :num_cuota",
+          nativeQuery = true)
+  Object[] cuotaAnterior(@Param("credito_id") int credito_id, @Param("num_cuota") int num_cuota);
+
+
 }
