@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.text.NumberFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -165,8 +166,9 @@ public class AhorroController implements Initializable {
     }
 
     String empresaCod = resolverCodigoEmpresa();
-    LocalDateTime fecha = LocalDateTime.now();
-    String horaFormateada = fecha.toLocalTime().format(FMT_HORA);
+    LocalDate fecha = servicio.traerFechaHoy();
+    LocalTime hora = LocalTime.now();
+    String horaFormateada = hora.format(FMT_HORA);
 
     Map<String, Object> result = servicio.AbonarAhorro(
             abono,
@@ -224,7 +226,7 @@ public class AhorroController implements Initializable {
    */
   private void imprimirTicket(
           String empresaCod,
-          LocalDateTime fecha,
+          LocalDate fecha,
           String horaFormateada,
           double abono,
           Map<String, Object> result
@@ -235,7 +237,7 @@ public class AhorroController implements Initializable {
     String direcEmpresa  = empresa.getCalle()
             + " " + empresa.getCruzamiento()
             + " COL. CENTRO";
-
+    System.out.println(result);
     String fechaTicket = fecha.format(FMT_FECHA);
     String folio       = result.get("transaccion_id").toString();
     String monto       = FMT_MONEDA.format(abono);

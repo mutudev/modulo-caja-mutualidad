@@ -39,6 +39,7 @@ public class Main extends Application {
 
 		LocalDate fechaSistema = servicio.traerFechaHoy();
 		LocalDate fechaCompu = LocalDate.now();
+		
 
 		if (!fechaCompu.isEqual(fechaSistema)) {
 			Alert alert = new Alert(Alert.AlertType.ERROR);

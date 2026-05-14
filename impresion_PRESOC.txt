@@ -2,8 +2,8 @@
  NUEVA GENERACION DE UMAN, AC.                              
  RFC: NGU081125HL9                                          
  CALLE 23 No. 100-B ENTRE 18 Y 20 COL. CENTRO               
- FECHA: 29/04/2026                                          
- SOCIO: 8995                  FOLIO: 3                      
+ FECHA: 15/05/2026                                          
+ SOCIO: 8995                  FOLIO: 6                      
  NOMBRE: JOSE YAEL MEX MONTERO                              
  TIPO DE CUENTA: PREVISION SOCIAL - ABONO A PS              
                                                             
@@ -14,9 +14,9 @@
  NOMBRE: JOSE YAEL MEX MONTERO                              
  LA NO OBJECION A ESTE COMPROBANTE                          
  IMPLICA SU ACEPTACION                                      
- HORA: 10:06:50 USUARIO: JMEX                               
- MONTO CUBIERTO: $200.00                                    
- MONTO ASIGNADO: $3,500.00                                  
+ HORA: 09:08:05 USUARIO: JMEX                               
+ MONTO CUBIERTO: $100.00                                    
+ MONTO ASIGNADO: $1,750.00                                  
                                                             
                                                             
                                                             

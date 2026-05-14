@@ -30,6 +30,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 @Component
 public class OperacionesController implements Initializable {
@@ -45,21 +46,23 @@ public class OperacionesController implements Initializable {
           colHora, colOperacion, colMonto;
 
   // Mapa centralizado para resolución de tipo de operación
-  private static final Map<String, Integer> OPERACIONES_MAP = Map.of(
-          "ABONO A CUENTA DE AHORRO", 1,
-          "ABONO A CUENTA DE CRÉDITO", 2,
-          "PROCESAMIENTO DE DESEMBOLSO", 3,
-          "PROCESAMIENTO DE RETIRO", 4,
-          "ABONO A CUENTA DE CAPITAL SOCIAL", 5,
-          "TRASLADO DE BÓVEDA A CAJAS", 6,
-          "TRASLADO DE CAJAS A BÓVEDA", 7,
-          "ABONO A CUENTA DE PREVISIÓN SOCIAL", 10
-  );
+  /** Mapeo operación (label) → tipo_operacion (id). */
+    public Map<String, Integer> OPERACIONES_MAP;
+
 
   String turno = "";
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
+
+
+    OPERACIONES_MAP = servicio.traerOperaciones()
+            .stream()
+            .collect(Collectors.toMap(
+                    op -> op.getOperacion().toUpperCase(),
+                    ModelOperaciones::getId
+            ));
+
     // Empresas
     List<ModelEmpresa> empresas = servicio.traerEmpresas();
     ObservableList<String> empresasProcesadas = FXCollections.observableArrayList();
@@ -119,11 +122,6 @@ public class OperacionesController implements Initializable {
     return new SimpleStringProperty("");
   }
 
-  // Extracción: obtener empresa y tipo de operación desde los combos
-  private String getEmpresaCodigo() {
-    return cmbEmpresa.getSelectionModel().getSelectedItem().toString()
-            .equals("MUTUALIDAD DOCE DE AGOSTO S.C. DE R.L. DE C.V.") ? "0001" : "0002";
-  }
 
   private int getTipoOperacion() {
     return OPERACIONES_MAP.getOrDefault(
@@ -136,8 +134,8 @@ public class OperacionesController implements Initializable {
 
   @FXML
   public void traerOperaciones() {
-    String fechaEnviar = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-    String empresa = getEmpresaCodigo();
+    String fechaEnviar = servicio.traerFechaHoy().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    String empresa = servicio.traerEmpresaConRS(cmbEmpresa.getSelectionModel().getSelectedItem().toString()).getCodigo();
     int usuario_id = servicio.traerDatosUsuario(
             cmbCajero.getSelectionModel().getSelectedItem().toString()).getId();
     int tipo_operacion = getTipoOperacion();
@@ -188,9 +186,21 @@ public class OperacionesController implements Initializable {
   @FXML
   public void verOperacion() {
     int tipo_operacion = getTipoOperacion();
-    String empresa = getEmpresaCodigo();
+    String empresa = servicio.traerEmpresaConRS(cmbEmpresa.getSelectionModel().getSelectedItem().toString()).getCodigo();
     boolean esTraslado = esTraslado(tipo_operacion);
 
+    boolean historialVisible  = tablaOperaciones.isVisible();
+    Object[] fila             = (Object[]) (historialVisible
+                ? tablaOperaciones.getSelectionModel().getSelectedItem()
+                : tableTraslados.getSelectionModel().getSelectedItem());
+
+    System.out.println(historialVisible);
+    if (fila == null) {
+      mostrarError("NO HA SELECCIONADO NINGUNA OPERACIÓN",
+              "SIN OPERACIÓN SELECCIONADA",
+              "POR FAVOR, SELECCIONE UNA OPERACIÓN.");
+      return;
+    }
     // Variables de traslado
     String id_traslado = "", cuenta_origen = " ", cuenta_destino = " ",
             nombre_usuario = "", monto = "", fecha = "";
@@ -268,6 +278,14 @@ public class OperacionesController implements Initializable {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  private void mostrarError(String titulo, String header, String contenido) {
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setTitle(titulo);
+    alert.setHeaderText(header);
+    alert.setContentText(contenido);
+    alert.showAndWait();
   }
 
   @FXML

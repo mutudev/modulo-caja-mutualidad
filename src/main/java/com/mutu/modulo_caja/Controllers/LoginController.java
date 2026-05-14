@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Map;
@@ -54,6 +55,8 @@ public class LoginController implements Initializable {
   @Autowired private Servicio usuarioService;
 
   Argon2 argon2 = Argon2Factory.create();
+
+  public Servicio servicio;
 
 
   @Override
@@ -92,7 +95,7 @@ public class LoginController implements Initializable {
 
     iniciarReloj();
 
-    LocalDateTime fecha = LocalDateTime.now();
+    LocalDate fecha = LocalDate.now();
     lblFecha.setText(
         "FECHA: " + fecha.getDayOfMonth() + "/" + fecha.getMonthValue() + "/" + fecha.getYear());
 
@@ -159,17 +162,7 @@ public class LoginController implements Initializable {
         if (accesar) {
           rol = Integer.parseInt(result.get("Rol").toString());
 
-          int cajero = Integer.parseInt(result.get("Cajero").toString());
 
-          if (cajero != 1) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("ERROR");
-            alert.setHeaderText("ERROR AL INICIAR SESIÓN");
-            alert.setContentText(
-                    "SU USUARIO NO ESTÁ CONFIGURADO COMO CAJERO, ACCESO DENEGADO.");
-            alert.showAndWait();
-            return;
-          }
 
           rolusuarioLoggeado = Integer.parseInt(result.get("Rol").toString());
           usuarioLoggeado = txtUsuario.getText().trim();

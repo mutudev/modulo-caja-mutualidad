@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane onKeyPressed="#cerrarConTecla" prefHeight="603.0" prefWidth="1230.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.CreditoController">
+<AnchorPane prefHeight="603.0" prefWidth="1230.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mutu.modulo_caja.Controllers.CreditoController">
 
     <children>
         <TextField fx:id="txtMonto" layoutX="800.0" layoutY="512.0" onKeyPressed="#pagarCredito" prefHeight="39.0" prefWidth="363.0" style="-fx-border-color: black;" />
@@ -63,15 +59,15 @@
         </TableView>
 
         <!-- Datos informativos -->
-        <Label fx:id="lblPlazo" layoutX="32.0" layoutY="411.0" style="-fx-text-fill: #39577C;" text="Plazo: 18 meses">
+        <Label fx:id="lblPlazo" layoutX="32.0" layoutY="411.0" style="-fx-text-fill: #39577C;" text="Plazo: ## meses">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></Label>
-        <Label fx:id="lblTasa" layoutX="32.0" layoutY="441.0" style="-fx-text-fill: #39577C;" text="Tasa Ordinaria: 2%">
+        <Label fx:id="lblTasa" layoutX="32.0" layoutY="441.0" style="-fx-text-fill: #39577C;" text="Tasa Ordinaria: #.##%">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></Label>
-        <Label fx:id="lblMora" layoutX="32.0" layoutY="471.0" style="-fx-text-fill: #39577C;" text="Tasa Moratoria: 2%">
+        <Label fx:id="lblMora" layoutX="32.0" layoutY="471.0" style="-fx-text-fill: #39577C;" text="Tasa Moratoria: #.##%">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></Label>
@@ -93,24 +89,11 @@
         <Label layoutX="700" layoutY="290" text="" />
 
         <!-- Botones -->
-        <Button fx:id="btnCancelar" layoutX="444.0" layoutY="512.0" onAction="#cerrarConBoton" prefWidth="143.0" style="-fx-background-color: #C0392B; -fx-text-fill: white; -fx-font-weight: bold;" text="Cancelar" />
+        <Button fx:id="btnCancelar" layoutX="444.0" layoutY="512.0" prefWidth="143.0" style="-fx-background-color: #C0392B; -fx-text-fill: white; -fx-font-weight: bold;" text="Cancelar" />
 
         <Button fx:id="btnAbonar" layoutX="617.0" layoutY="512.0" prefHeight="39.0" prefWidth="143.0" style="-fx-background-color: #39577C; -fx-text-fill: white; -fx-font-weight: bold;" text="Abonar" />
-
-        <!-- Campo adicional -->
-
-      <Label fx:id="lblCodigo" layoutX="32.0" layoutY="531.0" style="-fx-text-fill: #39577C;" text="Código: TRA1">
-         <font>
-            <Font name="System Bold" size="14.0" />
-         </font>
-      </Label>
       <TextField fx:id="txtInmediatas" alignment="CENTER_RIGHT" editable="false" layoutX="999.0" layoutY="358.0" prefHeight="39.0" prefWidth="164.0" style="-fx-border-color: black;" />
       <TextField fx:id="txtSaldoCredito" alignment="CENTER_RIGHT" editable="false" layoutX="999.0" layoutY="413.0" prefHeight="39.0" prefWidth="164.0" style="-fx-border-color: black;" text="\$1,500.00" />
-      <Label fx:id="lblError" alignment="TOP_LEFT" focusTraversable="false" layoutX="801.0" layoutY="491.0" prefHeight="27.0" prefWidth="363.0" style="-fx-text-fill: red;">
-         <font>
-            <Font size="12.0" />
-         </font>
-      </Label>
       <Label fx:id="lblPlazo1" alignment="CENTER" layoutX="30.0" layoutY="350.0" prefHeight="17.0" prefWidth="143.0" style="-fx-text-fill: #39577C;" text="[F1] APARTE EL INTERÉS">
          <font>
             <Font name="System Bold" size="12.0" />
@@ -129,6 +112,11 @@
       <Label fx:id="lblPlazo1111" alignment="CENTER" layoutX="236.0" layoutY="369.0" prefHeight="17.0" prefWidth="175.0" style="-fx-text-fill: #39577C;">
          <font>
             <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblPrimerasN" layoutX="766.0" layoutY="365.0" style="-fx-text-fill: #39577C;" text="Total # Cuotas Inmediatas:">
+         <font>
+            <Font name="System Bold" size="18.0" />
          </font>
       </Label>
     </children>

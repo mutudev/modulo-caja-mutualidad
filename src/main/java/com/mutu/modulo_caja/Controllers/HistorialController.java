@@ -29,6 +29,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 @Component
 public class HistorialController implements Initializable {
@@ -38,16 +39,7 @@ public class HistorialController implements Initializable {
   private static final DateTimeFormatter FORMATTER_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
   /** Mapeo operación (label) → tipo_operacion (id). */
-  private static final Map<String, Integer> OPERACION_ID = Map.of(
-          "ABONO A CUENTA DE AHORRO",           1,
-          "ABONO A CUENTA DE CRÉDITO",          2,
-          "PROCESAMIENTO DE DESEMBOLSO",         3,
-          "PROCESAMIENTO DE RETIRO",             4,
-          "ABONO A CUENTA DE CAPITAL SOCIAL",   5,
-          "TRASLADO DE BÓVEDA A CAJAS",          6,
-          "TRASLADO DE CAJAS A BÓVEDA",          7,
-          "ABONO A CUENTA DE PREVISIÓN SOCIAL", 10
-  );
+  public Map<String, Integer> OPERACION_ID;
 
   // ─── FXML ─────────────────────────────────────────────────────────────────
 
@@ -72,6 +64,15 @@ public class HistorialController implements Initializable {
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
+
+
+    OPERACION_ID = servicio.traerOperaciones()
+            .stream()
+            .collect(Collectors.toMap(
+                    op -> op.getOperacion().toUpperCase(),
+                    ModelOperaciones::getId
+            ));
+
     if (cmbEmpresa != null && cmbOperacion != null) {
       List<String> empresaNames = servicio.traerEmpresas().stream()
               .map(ModelEmpresa::getRazonSocial)
@@ -117,8 +118,8 @@ public class HistorialController implements Initializable {
 
   @FXML
   public void traerOperaciones() {
-    String fechaEnviar    = LocalDate.now().format(FORMATTER_FECHA);
-    String empresa        = resolverCodigoEmpresa();
+    String fechaEnviar    = servicio.traerFechaHoy().format(FORMATTER_FECHA);
+    String empresa        = servicio.traerEmpresaConRS(cmbEmpresa.getSelectionModel().getSelectedItem().toString()).getCodigo();
     int    usuario_id     = servicio.traerDatosUsuario(LoginController.usuarioLoggeado).getId();
     int    tipo_operacion = resolverTipoOperacion();
 
@@ -151,6 +152,7 @@ public class HistorialController implements Initializable {
             ? tableHistorial.getSelectionModel().getSelectedItem()
             : tableTraslados.getSelectionModel().getSelectedItem();
 
+    System.out.println(historialVisible);
     if (fila == null) {
       mostrarError("NO HA SELECCIONADO NINGUNA OPERACIÓN",
               "SIN OPERACIÓN SELECCIONADA",
@@ -168,7 +170,7 @@ public class HistorialController implements Initializable {
       Scene escena = new Scene(fxml.load());
       ReimpresionController controller = fxml.getController();
 
-      if (historialVisible) {
+      if (historialVisible ) {
         controller.setDatos(
                 String.valueOf(fila[0]),   // numSocio
                 String.valueOf(fila[11]),  // IdOperacion
@@ -244,12 +246,6 @@ public class HistorialController implements Initializable {
 
   private void cerrarVentanaActual() {
     ((Stage) btnCancelar.getScene().getWindow()).close();
-  }
-
-  /** Devuelve "0001" o "0002" según la empresa seleccionada. */
-  private String resolverCodigoEmpresa() {
-    return cmbEmpresa.getSelectionModel().getSelectedItem()
-            .equals("MUTUALIDAD DOCE DE AGOSTO S.C. DE R.L. DE C.V.") ? "0001" : "0002";
   }
 
   /** Devuelve el tipo_operacion numérico según el ComboBox, o 0 si no se reconoce. */

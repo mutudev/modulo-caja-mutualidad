@@ -1,6 +1,7 @@
 package com.mutu.modulo_caja.Controllers;
 
 import com.mutu.modulo_caja.Models.ModelCredito;
+import com.mutu.modulo_caja.Models.ModelEmpresa;
 import com.mutu.modulo_caja.Services.Servicio;
 import com.tenpisoft.n2w.MoneyConverters;
 import javafx.application.Platform;
@@ -37,6 +38,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.text.NumberFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -137,7 +139,7 @@ public class DesembolsoController implements Initializable {
     String nomSocio    = String.valueOf(fila[3]);
     double monto       = parseMonto(String.valueOf(fila[1]));
 
-    LocalDateTime fecha     = LocalDateTime.now();
+    LocalDate fecha     = servicio.traerFechaHoy();
     String fechaTicket      = fecha.format(FORMATTER_FECHA);
     String fechaVencTicket  = fecha.plusYears(1).format(FORMATTER_FECHA);
     String horaTicket       = LocalTime.now().format(FORMATTER_HORA);
@@ -193,7 +195,7 @@ public class DesembolsoController implements Initializable {
           String codigoEmpresa, String creditoId, String socioStr, String nomSocio,
           double monto, String folio, String fechaTicket, String fechaVencTicket, String horaTicket) {
 
-    var empresa     = servicio.traerEmpresa(codigoEmpresa);
+    ModelEmpresa empresa     = servicio.traerEmpresa(codigoEmpresa);
     String nomEmp   = empresa.getRazonSocial();
     String rfcEmp   = empresa.getRfc();
     String dirEmp   = empresa.getCalle() + " " + empresa.getCruzamiento() + " COL. CENTRO";

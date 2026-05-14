@@ -17,6 +17,8 @@ public interface SocioRepository extends JpaRepository<ModelSocio, Integer> {
   HashMap pa_BuscarSocioXNumero(
       int NumSocio, String NombreFormateado, int NumSocioEncontrado, String TipoDeSocio);
 
+  ModelSocio findByNumSocio(int numSocio);
+
   // OPCIÓN 1: Query más simple - buscar el texto completo en el nombre concatenado
   @Query(
           value =

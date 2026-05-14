@@ -36,6 +36,7 @@ import org.springframework.stereotype.Component;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -140,7 +141,7 @@ public class RetiroController implements Initializable {
     Object[] fila      = (Object[]) tableRetiros.getItems().get(0);
     double   monto     = parseMonto(String.valueOf(fila[3]));
     int      id        = Integer.parseInt(txtIdentificador.getText().trim());
-    LocalDateTime fecha = LocalDateTime.now();
+    LocalDate fecha = LocalDate.now();
     String   fechaTicket = fecha.format(FORMATTER_FECHA);
 
     Map<String, Object> result = servicio.ProcesarRetiro(
@@ -152,7 +153,7 @@ public class RetiroController implements Initializable {
               "RETIRO DEL SOCIO: " + socio + " POR: " + monto + " HECHO CON EXITO");
 
       Stage loadingStage = crearLoadingStage();
-      generarReporteAsync(fila, monto, fecha.toLocalTime(), fechaTicket, result, loadingStage);
+      generarReporteAsync(fila, monto, LocalTime.now(), fechaTicket, result, loadingStage);
       cerrarVentana();
     } else {
       mostrarError("ERROR AL QUERER PROCESAR EL RETIRAR", "ERROR EN EL RETIRO",

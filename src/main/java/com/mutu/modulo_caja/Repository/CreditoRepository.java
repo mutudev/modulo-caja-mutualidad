@@ -104,6 +104,9 @@ public interface CreditoRepository extends JpaRepository<ModelCredito, Integer> 
           nativeQuery = true)
   Object[] cuotaUltimaAfectada(@Param("numCredito") int credito_id);
 
+;
+
+
 
   @Query(
           value = "SELECT TOP 1 * FROM VW_CUOTAS_CREDITO WHERE CREDITO_ID = :credito_id AND NUM_CUOTA = :num_cuota",

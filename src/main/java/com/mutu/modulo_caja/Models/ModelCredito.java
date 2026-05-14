@@ -63,6 +63,8 @@ import java.util.Date;
 
         })
 
+
+
 public class ModelCredito {
 
   @Id
@@ -95,14 +97,18 @@ public class ModelCredito {
   private LocalDate fv;
 
   @Column(name = "TASA")
-  private float tasa;
+  private double tasa;
 
   @Column(name = "MORA")
-  private float mora;
+  private double mora;
 
   @Column(name = "IVA")
-  private float iva;
+  private double iva;
 
   @Column(name = "STATUS")
   private int status;
+
+
+  @Column(name = "SALDO")
+  private double saldo;
 }

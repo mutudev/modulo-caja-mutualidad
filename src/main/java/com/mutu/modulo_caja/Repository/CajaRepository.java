@@ -19,4 +19,5 @@ public interface CajaRepository extends JpaRepository<ModelCaja,Integer> {
 
     ModelCaja findByUsuarioIdAndFrAndEstadoAndTurnoAndEmpresaAndAjuste(int usuarioId, LocalDate fr, int estado, String turno, String empresa, int ajuste);
 
+    List<ModelCaja> findByUsuarioIdAndEstadoAndFrNot(int usuarioId, int estado, LocalDate fr);
 }

@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.text.NumberFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -137,7 +138,7 @@ public class PrevisionController implements Initializable {
     int numSocio       = Integer.parseInt(txtSocio.getText().trim());
     String codigoEmp   = servicio.traerEmpresaConRS(txtEmpresa.getText().trim()).getCodigo();
     String horaFormateada = getHoraFormateada();
-    LocalDateTime fecha = LocalDateTime.now();
+    LocalDate fecha = servicio.traerFechaHoy();
 
     Map<String, Object> resultado =
             servicio.AbonarPrevisionSocial(numSocio, codigoEmp, horaFormateada, monto, usuario, "", 0, 0, 0);
@@ -164,7 +165,7 @@ public class PrevisionController implements Initializable {
 
   // Extracción: bloque de impresión separado de la lógica de negocio
   private void imprimirTicket(String codigoEmp, int numSocio, double monto,
-                              LocalDateTime fecha, String horaFormateada,
+                              LocalDate fecha, String horaFormateada,
                               Map<String, Object> resultado) {
     ModelEmpresa empresaModel = servicio.traerEmpresa(codigoEmp);
     String nombreEmpresa = empresaModel.getRazonSocial();

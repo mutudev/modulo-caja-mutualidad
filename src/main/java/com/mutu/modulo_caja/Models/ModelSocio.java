@@ -26,16 +26,14 @@ public class ModelSocio {
 
   @Id
   @Column(name = "NUM_SOCIO")
-  private Integer NumSocio;
+  private Integer numSocio;
 
   @Column(name = "EMPRESA_COD")
   private String Empresa;
 
-  @Column(name = "PRIMER_NOM")
-  private String PrimerNom;
+  @Column(name = "NOMBRES")
+  private String Nombres;
 
-  @Column(name = "SEGUNDO_NOM")
-  private String SegundoNom;
 
   @Column(name = "APELLIDO_P")
   private String ApellidoP;

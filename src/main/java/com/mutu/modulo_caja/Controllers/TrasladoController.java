@@ -1,5 +1,6 @@
 package com.mutu.modulo_caja.Controllers;
 
+import com.mutu.modulo_caja.Models.ModelCaja;
 import com.mutu.modulo_caja.Services.Servicio;
 import com.tenpisoft.n2w.MoneyConverters;
 import javafx.application.Platform;
@@ -36,6 +37,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.text.NumberFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -151,10 +153,19 @@ public class TrasladoController implements Initializable {
     int opcion = tipoTraslado.equals("BOVEDA - CAJA") ? 6 : 7;
 
     double        monto_trasladar = Double.parseDouble(txtCantidad.getText().trim());
-    LocalDateTime fecha           = LocalDateTime.now();
-    LocalTime     hora            = fecha.toLocalTime();
+    LocalDate fecha           = servicio.traerFechaHoy();
+    LocalTime     hora            = LocalTime.now();
     String        fechaTicket     = fecha.format(FORMATTER_FECHA);
     String        horaticket      = hora.format(FORMATTER_HORA);
+    int usuarioId = servicio.traerDatosUsuario(LoginController.usuarioLoggeado).getId();
+
+    List<ModelCaja> cajas = servicio.traerCajasDiferentesAHoy(usuarioId, 1, fecha);
+    if (cajas.size() != 0) {
+      mostrarError("ERROR AL PROCESAR EL TRASLADO",
+              "ERROR AL INTENTAR LA OPERACIÓN DESEADA",
+              "EL CAJERO TIENE CUENTAS ABIERTAS CON ANTERIORIDAD");
+      return;
+    }
 
     // Verificación de ajuste de sobrantes/faltantes para CAJA→BÓVEDA
     if (opcion == 7 && !confirmarAjusteSobrantes(fecha, cod_empresa)) return;
@@ -239,7 +250,7 @@ public class TrasladoController implements Initializable {
 
   // ─── Helpers de lógica ────────────────────────────────────────────────────
 
-  private boolean confirmarAjusteSobrantes(LocalDateTime fecha, String cod_empresa) {
+  private boolean confirmarAjusteSobrantes(LocalDate fecha, String cod_empresa) {
     List<Object[]> permisos = servicio.traerCuentaCajero(
             LoginController.usuarioLoggeado, fecha.toString(), 1, turno, cod_empresa);
     for (Object[] fila : permisos) {

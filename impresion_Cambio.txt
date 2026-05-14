@@ -1,12 +1,12 @@
                                                             
- FECHA DE OPERACIONES: 21/07/2025                           
- HORA DE OPERACIONES: 10:30:24                              
- CAJERO: JOSE MEX MONTERO                                   
+ FECHA DE OPERACIONES: 02/05/2026                           
+ HORA DE OPERACIONES: 15:53:23                              
+ CAJERO: JOSE YAEL MEX MONTERO                              
                                                             
  --LISTADO DE OPERACIONES--                                 
- TOTAL OPERACIONES: $100.00                                 
- TOTAL RECIBIDO: $600.00                                    
- CAMBIO: $500.00                                            
+ TOTAL OPERACIONES: $250.00                                 
+ TOTAL RECIBIDO: $300.00                                    
+ CAMBIO: $50.00                                             
                                                             
  LA NO OBJECION A ESTE COMPROBANTE                          
  IMPLICA SU ACEPTACION                                      

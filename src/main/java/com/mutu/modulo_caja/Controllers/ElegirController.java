@@ -7,7 +7,6 @@ import com.mutu.modulo_caja.Models.ModelPrevisionSocial;
 import com.mutu.modulo_caja.Services.Servicio;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -19,8 +18,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import jfxtras.styles.jmetro.JMetro;
-import jfxtras.styles.jmetro.Style;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -144,24 +141,12 @@ public class ElegirController implements Initializable {
     }
 
     try {
+      System.out.println(String.valueOf(fila[0]));
       FXMLLoader fxml = cargarFxml("/com/java/fx/abonoCredito.fxml");
+      Parent  root = fxml.load();
       CreditoController controlador = fxml.getController();
-      controlador.setDatos(
-              String.valueOf(fila[5]),
-              (String) fila[6],
-              String.valueOf(fila[0]),
-              String.valueOf(fila[8]),
-              String.valueOf(fila[9]),
-              String.valueOf(fila[10]),
-              String.valueOf(fila[11]),
-              (String) fila[12],
-              (String) fila[1],
-              (String) fila[2],
-              String.valueOf(fila[3]),
-              (Boolean) fila[13],
-              3,
-              turno);
-      abrirVentana(fxml.load(), "INICIO - CAJERO", true);
+      controlador.setDatos(Integer.parseInt(String.valueOf(fila[0])));
+      abrirVentana(root, "ABONO A CRÉDITO", true);
     } catch (IOException e) {
       e.printStackTrace();
     }

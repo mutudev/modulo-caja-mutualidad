@@ -26,7 +26,9 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.text.NumberFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
@@ -177,10 +179,10 @@ public class CapitalSocialController implements Initializable {
       return;
     }
 
-    System.out.println(txtEmpresa.getText());
     String empresaCod     = servicio.traerEmpresaConRS(txtEmpresa.getText().trim()).getCodigo();
-    LocalDateTime fecha   = LocalDateTime.now();
-    String horaFormateada = fecha.toLocalTime().format(FMT_HORA);
+    LocalDate fecha   = servicio.traerFechaHoy();
+    LocalTime hora = LocalTime.now();
+    String horaFormateada = hora.format(FMT_HORA);
 
     Map<String, Object> res = servicio.AbonarCapitalSocial(
             socio, empresaCod, horaFormateada, montoP, usuario, "", 0, 0, 0);
@@ -225,7 +227,7 @@ public class CapitalSocialController implements Initializable {
    */
   private void imprimirTicket(
           String empresaCod,
-          LocalDateTime fecha,
+          LocalDate fecha,
           String horaFormateada,
           double montoP,
           Map<String, Object> res

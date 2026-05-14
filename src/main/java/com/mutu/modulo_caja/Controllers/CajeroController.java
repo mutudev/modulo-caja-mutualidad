@@ -82,7 +82,7 @@ public class CajeroController implements Initializable {
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     iniciarReloj();
-    LocalDateTime fecha = LocalDateTime.now();
+    LocalDate fecha = servicio.traerFechaHoy();
     lblFecha.setText(
             "FECHA: " + fecha.getDayOfMonth() + "/"
                     + fecha.getMonthValue() + "/"
@@ -452,28 +452,28 @@ public class CajeroController implements Initializable {
 
       case "ABONO_CREDITO" -> {
         if (txtNombreCargado.isVisible())
-          mostrarPantalla(true, "/com/java/fx/elegirPrestamo.fxml", "ELEGIR CRÉDITO", true, "ELECCION DE PRESTAMO", "");
+          mostrarPantalla(false, "/com/java/fx/elegirPrestamo.fxml", "ELEGIR CRÉDITO", true, "ELECCION DE PRESTAMO", "");
         else
           mostrarAlertaError("ERROR AL QUERER ABONAR A CRÉDITO", "POR FAVOR, BUSQUE A ALGÚN SOCIO PARA REALIZAR LAS OPERACIONES");
       }
 
       case "DESEMBOLSO" -> {
         if (txtNombreCargado.isVisible())
-          mostrarPantalla(true, "/com/java/fx/desembolso.fxml", "DESEMBOLSO DE CRÉDITO", false, "", "");
+          mostrarPantalla(false, "/com/java/fx/desembolso.fxml", "DESEMBOLSO DE CRÉDITO", false, "", "");
         else
           mostrarAlertaError("ERROR AL QUERER DESEMBOLSAR", "POR FAVOR, BUSQUE A ALGÚN SOCIO PARA REALIZAR LAS OPERACIONES");
       }
 
       case "RETIRO" -> {
         if (txtNombreCargado.isVisible())
-          mostrarPantalla(true, "/com/java/fx/retiro.fxml", "RETIRO EN EFECTIVO", false, "", "");
+          mostrarPantalla(false, "/com/java/fx/retiro.fxml", "RETIRO EN EFECTIVO", false, "", "");
         else
           mostrarAlertaError("ERROR AL QUERER RETIRAR", "POR FAVOR, BUSQUE A ALGÚN SOCIO PARA REALIZAR LAS OPERACIONES.");
       }
 
       case "CAPITAL_SOCIAL" -> {
         if (txtNombreCargado.isVisible())
-          mostrarPantalla(true, "/com/java/fx/elegirEmpresa.fxml", "ELECCIÓN DE EMPRESA", true, "ELECCIÓN DE EMPRESA", "CS");
+          mostrarPantalla(false, "/com/java/fx/elegirEmpresa.fxml", "ELECCIÓN DE EMPRESA", true, "ELECCIÓN DE EMPRESA", "CS");
         else
           mostrarAlertaError("ERROR AL QUERER PAGAR A CAPITAL SOCIAL", "POR FAVOR, BUSQUE A ALGÚN SOCIO PARA REALIZAR LAS OPERACIONES");
       }
@@ -482,7 +482,7 @@ public class CajeroController implements Initializable {
         if (txtNombreCargado.isVisible())
           mostrarAlertaError("ERROR AL QUERER PROCESAR TRASLADOS", "POR FAVOR, LIMPIE EL CAMPO DEL SOCIO PARA REALIZAR ESTA OPERACIÓN");
         else
-          mostrarPantalla(true, "/com/java/fx/elegirEmpresa.fxml", "ELECCIÓN DE EMPRESA", true, "ELECCIÓN DE EMPRESA", "TRAS");
+          mostrarPantalla(false, "/com/java/fx/elegirEmpresa.fxml", "ELECCIÓN DE EMPRESA", true, "ELECCIÓN DE EMPRESA", "TRAS");
       }
 
       case "HISTORIAL" -> {
@@ -503,7 +503,7 @@ public class CajeroController implements Initializable {
 
       case "PREVISION_SOCIAL" -> {
         if (txtNombreCargado.isVisible())
-          mostrarPantalla(true, "/com/java/fx/elegirEmpresa.fxml", "ELECCIÓN DE EMPRESA", true, "ELECCIÓN DE EMPRESA", "PRESOC");
+          mostrarPantalla(false, "/com/java/fx/elegirEmpresa.fxml", "ELECCIÓN DE EMPRESA", true, "ELECCIÓN DE EMPRESA", "PRESOC");
         else
           mostrarAlertaError("ERROR AL QUERER PAGAR PREVISIÓN SOCIAL", "POR FAVOR, BUSQUE A ALGÚN SOCIO PARA REALIZAR LAS OPERACIONES");
       }
@@ -512,14 +512,14 @@ public class CajeroController implements Initializable {
         if (txtNombreCargado.isVisible() && (rolUsuario == 2 || rolUsuario == 3))
           mostrarAlertaError("ERROR AL QUERER CANCELAR OPERACIONES", "POR FAVOR, LIMPIE EL CAMPO DEL SOCIO PARA REALIZAR ESTA OPERACIÓN");
         else if (rolUsuario == 2 || rolUsuario == 3)
-          mostrarPantalla(true, "/com/java/fx/operacionesCajero.fxml", "ELECCIÓN DE OPERACIÓN", false, "", "");
+          mostrarPantalla(false, "/com/java/fx/operacionesCajero.fxml", "ELECCIÓN DE OPERACIÓN", false, "", "");
       }
 
       case "CAMBIO" -> {
         if (bufferOperaciones == 0)
           mostrarAlertaError("ERROR AL QUERER OTORGAR CAMBIO", "NO HA HECHO NINGUNA OPERACIÓN");
         else
-          mostrarPantalla(true, "/com/java/fx/otorgarCambio.fxml", "TOTAL DE OPERACIONES", false, "", "");
+          mostrarPantalla(false, "/com/java/fx/otorgarCambio.fxml", "TOTAL DE OPERACIONES", false, "", "");
       }
 
       case "BUSCAR_SOCIO" -> {

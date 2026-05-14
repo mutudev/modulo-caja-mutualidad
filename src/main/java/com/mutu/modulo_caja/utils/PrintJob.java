@@ -22,7 +22,7 @@ public class PrintJob {
     PrinterMatrix printer = new PrinterMatrix();
     Extenso e = new Extenso();
     e.setNumber(21.59);
-    printer.setOutSize(30, 60); // Columna 1
+    printer.setOutSize(22, 60);
     printer.printTextWrap(1, 2, 1, 60, "FECHA DE OPERACIONES: " + fechaTicket); // Columna 2
     printer.printTextWrap(2, 3, 1, 60, "HORA DE OPERACIONES: " + horaFormateada); // Columna 2
     printer.printTextWrap(3, 4, 1, 60, Cajero);
@@ -249,7 +249,7 @@ public class PrintJob {
 
     Extenso e = new Extenso();
     e.setNumber(21.59);
-    printer.setOutSize(30, 60);
+    printer.setOutSize(22, 60);
     printer.printTextWrap(1, 2, 1, 60, empresa); // Columna 1
 
     printer.printTextWrap(2, 3, 1, 60, "RFC: " + rfc); // Columna 2
@@ -351,7 +351,7 @@ public class PrintJob {
 
     Extenso e = new Extenso();
     e.setNumber(21.59);
-    printer.setOutSize(30, 60);
+    printer.setOutSize(22, 60);
     printer.printTextWrap(1, 2, 1, 60, empresa); // Columna 1
 
     printer.printTextWrap(2, 3, 1, 60, "RFC: " + rfc); // Columna 2
@@ -439,7 +439,7 @@ public class PrintJob {
     String cajero = "USUARIO: " + LoginController.usuarioLoggeado;
     Extenso e = new Extenso();
     e.setNumber(21.59);
-    printer.setOutSize(30, 60);
+    printer.setOutSize(22, 60);
     printer.printTextWrap(1, 2, 1, 60, empresa); // Columna 1
     printer.printTextWrap(2, 3, 1, 60, "RFC: " + rfc); // Columna 2
     printer.printTextWrap(3, 4, 1, 60, direc); // Columna 3
@@ -506,14 +506,14 @@ public class PrintJob {
     PrinterMatrix printer = new PrinterMatrix();
     String numSocio = "SOCIO: " + numsocio;
     String nombre = "NOMBRE: " + nomsocio;
-    String tipoCuenta = "COMPROBANTE DE CANCELACION ABONO A PREVISION SOCIAL";
+    String tipoCuenta = "COMPROBANTE DE CANCELACION ABONO A PS";
     String efectivo = "MONTO CANCELADO: ";
     String descripcion1 = "LA NO OBJECION A ESTE COMPROBANTE";
     String descripcion2 = "IMPLICA SU ACEPTACION";
     String cajero = "USUARIO: " + LoginController.usuarioLoggeado;
     Extenso e = new Extenso();
     e.setNumber(21.59);
-    printer.setOutSize(30, 60);
+    printer.setOutSize(22, 60);
     printer.printTextWrap(1, 2, 1, 60, empresa); // Columna 1
     printer.printTextWrap(2, 3, 1, 60, "RFC: " + rfc); // Columna 2
     printer.printTextWrap(3, 4, 1, 60, direc); // Columna 3
@@ -569,7 +569,7 @@ public class PrintJob {
     //    String totalAhorro = "AHORRO: " + ahorro;
     Extenso e = new Extenso();
     e.setNumber(21.59);
-    printer.setOutSize(30, 60);
+    printer.setOutSize(22, 60);
     printer.printTextWrap(1, 2, 1, 60, empresa); // Columna 1
     printer.printTextWrap(2, 3, 1, 60, "RFC: " + rfc); // Columna 2
     printer.printTextWrap(3, 4, 1, 60, direc); // Columna 3
@@ -593,7 +593,7 @@ public class PrintJob {
       printer.printTextWrap(18, 19, 25, 60, psngunuev);
     } else {
       printer.printTextWrap(17, 18, 1, 60, psnguantigua);
-      printer.printTextWrap(18, 19, 25, 60, psngunuev);
+      printer.printTextWrap(18, 19, 1, 60, psngunuev);
     }
 
     return printer;

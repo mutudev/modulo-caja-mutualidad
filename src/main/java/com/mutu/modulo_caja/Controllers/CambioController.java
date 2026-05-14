@@ -20,7 +20,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.text.NumberFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -101,6 +103,7 @@ public class CambioController implements Initializable {
     }
 
     txtCambio.setText(FMT_MONEDA.format(recibido - totalOperaciones));
+    txtRecibido.setEditable(false);
   }
 
   @FXML
@@ -117,9 +120,10 @@ public class CambioController implements Initializable {
       return;
     }
 
-    LocalDateTime fecha = LocalDateTime.now();
+    LocalDate fecha = servicio.traerFechaHoy();
+    LocalTime hora = LocalTime.now();
     String fechaTicket   = fecha.format(FMT_FECHA);
-    String horaFormateada = fecha.toLocalTime().format(FMT_HORA);
+    String horaFormateada = hora.format(FMT_HORA);
 
     // Una sola llamada al servicio — el resultado ya es el nombre
     String nombre   = servicio.traerCajeroPorUsuario(LoginController.usuarioLoggeado);
@@ -141,7 +145,7 @@ public class CambioController implements Initializable {
   @FXML
   public void obtenerCambioConTecla(KeyEvent event) {
     switch (event.getCode()) {
-      case ENTER  -> obtenerCambio();
+
       case CONTROL -> limpiarCampos();
       case ALT    -> cerrar();
       case F5     -> imprimir();
@@ -154,6 +158,7 @@ public class CambioController implements Initializable {
   // ════════════════════════════════════════════════════════════════════════
   public void limpiarCampos() {
     txtRecibido.clear();
+    txtRecibido.setEditable(true);
     txtCambio.clear();
   }
 

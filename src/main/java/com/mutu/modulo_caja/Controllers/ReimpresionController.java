@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -87,11 +88,6 @@ public class ReimpresionController {
   /** Cierra la ventana asociada a un nodo cualquiera de la escena. */
   private void cerrarVentana(javafx.scene.Node nodo) {
     ((Stage) nodo.getScene().getWindow()).close();
-  }
-
-  /** Convierte código de empresa largo → corto. */
-  private String resolverCodigoEmpresa(String nombre) {
-    return nombre.equals("MUTUALIDAD DOCE DE AGOSTO S.C. DE R.L. DE C.V.") ? "0001" : "0002";
   }
 
   /** Datos de empresa cacheados en un solo objeto para evitar 4 llamadas al servicio. */
@@ -402,9 +398,9 @@ public class ReimpresionController {
     }
 
     try {
-      LocalDateTime now = LocalDateTime.now();
+      LocalDate now = servicio.traerFechaHoy();
       String fechaTicket    = now.format(FORMATO_FECHA);
-      String horaticket     = now.toLocalTime().format(FORMATO_HORA);
+      String horaticket     = LocalTime.now().format(FORMATO_HORA);
       String nomcajero      = servicio.traerCajeroPorUsuario(usuario);
       String[] datosEmp     = getDatosEmpresa(empresaEnviar);
       String moneyAsWords   = enPalabras(montoExtraido);
@@ -463,7 +459,7 @@ public class ReimpresionController {
 
   // Extracción: lógica de cancelación de operaciones normales separada
   private void cancelarOperacionNormal() {
-    String cod = resolverCodigoEmpresa(empresa);
+    String cod = servicio.traerEmpresaConRS(empresa).getCodigo();
     empresa = cod;
 
     double montooriginal = 0;
@@ -513,8 +509,8 @@ public class ReimpresionController {
             "ID DE OPERACIÓN: " + txtID.getText().trim() + " CANCELADA CON ÉXITO");
 
     // Preparar datos comunes de impresión
-    LocalDateTime now     = LocalDateTime.now();
-    String horaFormateada = now.toLocalTime().format(FORMATO_HORA);
+    LocalDate now     = servicio.traerFechaHoy();
+    String horaFormateada = LocalTime.now().format(FORMATO_HORA);
     String fechaTicket    = now.format(FORMATO_FECHA);
     String[] datosEmp     = getDatosEmpresa(empresa);
     String moneyAsWords   = enPalabras(montoExtraido);
@@ -554,7 +550,7 @@ public class ReimpresionController {
       case 3: {
         try {
           int colCredito = servicio.traerDatosDesembolsoCancelado(
-                  Integer.parseInt(socio), 2, montoExtraido, "0002").getId();
+                  Integer.parseInt(socio), 0, montoExtraido, "0002").getId();
           ModelCredito credito = servicio.traerDatosCredito(colCredito);
           isLogo = getClass().getResourceAsStream("/assets/images/logo-ngu.jpg");
           Map<String, Object> pars = new HashMap<>();
@@ -640,7 +636,7 @@ public class ReimpresionController {
         }
         printer = impresora.imprimirCancelacionCapSocial(datosEmp[0], datosEmp[1], datosEmp[2],
                 socio, idoperacion, nombre, montoTxt, moneyAsWords, fechaTicket, horaFormateada,
-                montoantiguomutFmt, formatoMoneda.format(montonuevongu),
+                montoantiguomutFmt, montoantiguonguFmt,
                 formatoMoneda.format(montonuevomut), formatoMoneda.format(montonuevongu));
         break;
       }
@@ -674,7 +670,7 @@ public class ReimpresionController {
     }
 
     parsearMontoExtraido();
-    String empresacod  = resolverCodigoEmpresa(empresa);
+    String empresacod  = servicio.traerEmpresaConRS(empresa).getCodigo();
     String[] datosEmp  = getDatosEmpresa(empresacod);
     PrintJob impresora = new PrintJob();
     MoneyConverters converter = MoneyConverters.SPANISH_BANKING_MONEY_VALUE;

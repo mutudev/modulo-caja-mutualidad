@@ -1,6 +1,7 @@
 package com.mutu.modulo_caja.Services;
 
 import com.mutu.modulo_caja.Models.*;
+import com.mutu.modulo_caja.Models.DTO.PagoCuotaDTO;
 import com.mutu.modulo_caja.Repository.TrasladoRepository;
 import com.mutu.modulo_caja.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +46,8 @@ public class Servicio {
 
   @Autowired private ConfiguracionRepository repoConfiguracion;
 
+  @Autowired private TipoCreditoRepository repoTipoCredito;
+
 
 
   @Transactional
@@ -58,6 +62,48 @@ public class Servicio {
         NumSocio, NombreFomateado, NumSocioEncontrado, TipoDeSocio);
   }
 
+  @Transactional
+  public List<PagoCuotaDTO> calcularPagoDeCuotas(
+          Integer creditoId,
+          Double tasaInteres,
+          Double tasaMora,
+          Double tasaIva,
+          LocalDate fechaDesembolso) {
+
+    List<Object[]> resultados = repoCuotas.pa_CalcularPagoDeCuotas(
+            creditoId,
+            tasaInteres,
+            tasaMora,
+            tasaIva,
+            fechaDesembolso
+    );
+
+    List<PagoCuotaDTO> lista = new ArrayList<>();
+
+    for (Object[] row : resultados) {
+      PagoCuotaDTO dto = new PagoCuotaDTO(
+              row[0] != null ? ((Number) row[0]).intValue()                        : null,
+              row[1] != null ? ((Number) row[1]).intValue()                        : null,
+              row[2] != null ? ((java.sql.Date) row[2]).toLocalDate()              : null,
+              row[3] != null ? new BigDecimal(row[3].toString())                   : BigDecimal.ZERO,
+              row[4] != null ? new BigDecimal(row[4].toString())                   : BigDecimal.ZERO,
+              row[5] != null ? new BigDecimal(row[5].toString())                   : BigDecimal.ZERO,
+              row[6] != null ? new BigDecimal(row[6].toString())                   : BigDecimal.ZERO,
+              row[7] != null ? new BigDecimal(row[7].toString())                   : BigDecimal.ZERO,
+              row[8] != null ? new BigDecimal(row[8].toString())                   : BigDecimal.ZERO,
+              row[9] != null ? ((Number) row[9]).intValue()                        : null,
+              row[10] != null ? ((java.sql.Date) row[10]).toLocalDate()              : null,
+              row[11] != null ? ((java.sql.Date) row[11]).toLocalDate()              : null,
+              row[12] != null ? ((java.sql.Date) row[12]).toLocalDate()              : null,
+              row[13] != null ? new BigDecimal(row[13].toString())                   : BigDecimal.ZERO,
+              row[14] != null ? new BigDecimal(row[14].toString())                   : BigDecimal.ZERO
+      );
+      lista.add(dto);
+    }
+
+    return lista;
+  }
+
   public List<Object[]> traerModulos(int usuarioID) {
     return repoUsuario.traerModulos(usuarioID);
   }
@@ -66,6 +112,9 @@ public class Servicio {
     return repoAhorro.findBySocio(socio);
   }
 
+
+
+  public ModelSocio traerSocioXNumero(int numSocio){return  repoSocio.findByNumSocio(numSocio);}
   @Transactional
   public Map<String, Object> AbonarAhorro(
       double cant_ahorro,
@@ -137,6 +186,8 @@ public class Servicio {
   public List<ModelCapitalSocial> traerCuentasCS(int socio) {
     return repoCS.findByNumSocio(socio);
   }
+
+  public ModelTipoCredito traerTipoCredito(int id){return repoTipoCredito.findById(id);}
 
   @Transactional
   public Map<String, Object> AbonarCapitalSocial(
@@ -429,11 +480,6 @@ public class Servicio {
             .findFirstByCreditoIdAndFechaPRealizadaIsNotNullOrderByNumCuotaDesc(creditoId);
   }
 
-  public ModelCuotas obtenerCuotaPorNumero(int creditoId, int numeroCuota) {
-    return repoCuotas
-            .findByCreditoIdAndNumCuota(creditoId, numeroCuota);
-  }
-
 
 
 
@@ -520,5 +566,124 @@ public class Servicio {
   public ModelCaja traerCuentaDeCaja(int usuarioId, LocalDate fr, int estado, String turno, String empresa) {
     return repoCaja.findByUsuarioIdAndFrAndEstadoAndTurnoAndEmpresa(usuarioId, fr, estado, turno, empresa);
   }
+
+  public List<ModelOperaciones> traerOperaciones() {
+    return repoOperaciones.findAll();
+  }
+
+  public List<ModelCaja> traerCajasDiferentesAHoy(int usuarioId, int estado, LocalDate fr) {
+    return repoCaja.findByUsuarioIdAndEstadoAndFrNot(usuarioId, estado, fr);
+  }
+
+  public ModelConfiguracion obtenerConfiguraciones() {
+    return repoConfiguracion.findById(1).get();
+  }
+
+  //Pagar Crédito
+  @Transactional
+  public void pagarCredito(List<PagoCuotaDTO> cuotas, int creditoId) {
+
+    //Obtenemos el crédito
+    ModelCredito credito = repoCredito.findById(creditoId);
+
+    //Recorremos las cuotas ya procesadas en el controller
+    for (PagoCuotaDTO dto : cuotas) {
+      //Obtenemos la cuota una por una
+      ModelCuotas cuota = repoCuotas.findByCreditoIdAndNumCuota(creditoId, dto.getNumCuota());
+
+      //Iteramos la cuota una por una
+      //Primero afecta el capital
+      //Aquí no hay mucho problema, solo es settear lo que trajo la cuota de capital
+      cuota.setCapital(dto.getCapital());
+
+      //Settear los intereses
+      //Primero ver si es el primer pago, si lo es, settear directamente lo que trajo el DTO
+      if (cuota.getFechaPRealizada() == null) {
+        cuota.setIntereses(dto.getIntereses());
+      } else {
+        //Si no es el primer pago, es decir, fecha realizada ya tenía algo (Sumamos a lo que ya tenía lo que trajo)
+        cuota.setIntereses(cuota.getIntereses().add(dto.getIntereses()));
+      }
+
+      //Settear el IVA, es lo mismo que como funcionan los intereses
+      if (cuota.getFechaPRealizada() == null) {
+        cuota.setIva(dto.getIva());
+      } else {
+        //Si no es el primer pago, es decir, fecha realizada ya tenía algo (Sumamos a lo que ya tenía lo que trajo)
+        cuota.setIva(cuota.getIva().add(dto.getIva()));
+      }
+
+      //Settear la mora
+      if (cuota.getFechaPRealizada() == null) {
+        cuota.setMora(dto.getMora());
+      } else {
+        //Si no es el primer pago, es decir, fecha realizada ya tenía algo (Sumamos a lo que ya tenía lo que trajo)
+        cuota.setMora(cuota.getMora().add(dto.getMora()));
+      }
+
+      //Settear la bonificación
+      if (cuota.getFechaPRealizada() == null) {
+        cuota.setBonif(dto.getBonif());
+      } else {
+        //Si no es el primer pago, es decir, fecha realizada ya tenía algo (Sumamos a lo que ya tenía lo que trajo)
+        cuota.setBonif(cuota.getBonif().add(dto.getBonif()));
+      }
+
+      //Settear el total
+      if (cuota.getFechaPRealizada() == null) {
+        cuota.setTotal(dto.getTotal());
+      } else {
+        //Si no es el primer pago, es decir, fecha realizada ya tenía algo (Sumamos a lo que ya tenía lo que trajo)
+        cuota.setTotal(cuota.getTotal().add(dto.getTotal()));
+      }
+
+      //Actualizar el status, si el capital es 0 pues ya se cubrió toda la cuota
+      if (dto.getCapital().doubleValue() == 0) {
+          cuota.setStatus(dto.getStatus());
+      }
+
+      //Como las fechas ya las setteamos directamente en el método del controller y ya iteramos ahí, aquí solo hace falta
+      //settearlas
+      cuota.setFechaAnterior(dto.getFechaAnterior());
+      cuota.setFechaPRealizada(dto.getFechaRealizada());
+      cuota.setFechaTerminoPago(dto.getFechaTerminoPago());
+
+      //Settear acumulados de interes y de mora
+      //El hecho de que sea cero indica que no tiene acumulados entonces le guardamos lo que haya traido el DTO
+      //Si el DTO trajo 0 de acumulados entonces no hay problema seguirá siendo cero
+      if (cuota.getInteresAcumulado().doubleValue() == 0) {
+        cuota.setInteresAcumulado(dto.getInteresesAcumulados());
+      } else {
+        //Si tenía algo, hay que ver si lo cubrió, es decir, ver si el acumulado llegó en cero
+        if (dto.getInteresesAcumulados().doubleValue() != 0) {
+          //Si no llegó en cero es que aún debe algo
+          //Por lo tanto le almacenamos ese algo
+          cuota.setInteresAcumulado(dto.getInteresesAcumulados());
+        } else {
+          //Si llegó en cero ahora el acumulado y antes tenía algo quiere decir que lo cubrió el gaysito
+          cuota.setInteresAcumulado(BigDecimal.ZERO);
+        }
+      }
+
+      //Repetir misma lógica con la mora
+      if (cuota.getMoraAcumulado().doubleValue() == 0) {
+        cuota.setMoraAcumulado(dto.getMoraAcumulados());
+      } else {
+        //Si tenía algo, hay que ver si lo cubrió, es decir, ver si el acumulado llegó en cero
+        if (dto.getMoraAcumulados().doubleValue() != 0) {
+          //Si no llegó en cero es que aún debe algo
+          //Por lo tanto le almacenamos ese algo
+          cuota.setMoraAcumulado(dto.getMoraAcumulados());
+        } else {
+          //Si llegó en cero ahora el acumulado y antes tenía algo quiere decir que lo cubrió el gaysito
+          cuota.setMoraAcumulado(BigDecimal.ZERO);
+        }
+      }
+
+
+      repoCuotas.save(cuota);
+    }
+  }
+
 
 }

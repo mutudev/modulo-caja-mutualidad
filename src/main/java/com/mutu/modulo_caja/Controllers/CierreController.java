@@ -209,10 +209,8 @@ public class CierreController implements Initializable {
     ModelUsuario usuario = servicio.traerDatosUsuario(LoginController.usuarioLoggeado);
     ModelCaja cajaMut = servicio.traerDatosCaja(usuario.getId(), turno, "0001", 1);
     ModelCaja cajaNgu = servicio.traerDatosCaja(usuario.getId(), turno, "0002", 1);
-
     this.cajaMut = cajaMut;
     this.cajaNgu = cajaNgu;
-
   }
 
   @FXML
@@ -240,7 +238,7 @@ public class CierreController implements Initializable {
       return;
     }
 
-    LocalDate fecha = LocalDate.now();
+    LocalDate fecha = servicio.traerFechaHoy();
 
     //Declarar la pantalla de carga
     Stage loadingStage = new Stage();
@@ -294,23 +292,9 @@ public class CierreController implements Initializable {
                 Object[] datosNGU = servicio.traerCierreCajero(cierreNgu);
 
                 String folio = "";
-                String fechad = "";
                 String hora = "";
-                String empresa = "";
-                String rfcEmpresa = "";
-                String direcEmpresa = "";
                 InputStream isLogo = null;
                 InputStream isLogo2 = null;
-
-                ModelTraslado trasladoCMut =
-                    servicio.traerTrasladoCajero(String.valueOf(cajaMut.getId()));
-                ModelTraslado trasladoCNgu =
-                    servicio.traerTrasladoCajero(String.valueOf(cajaNgu.getId()));
-
-                ModelTraslado trasladoAMut =
-                    servicio.traerTrasladoApertura(String.valueOf(cajaMut.getId()));
-                ModelTraslado trasladoANgu =
-                    servicio.traerTrasladoApertura(String.valueOf(cajaNgu.getId()));
 
                 String nomcajero = "";
                 String ahorros = "";
@@ -331,11 +315,8 @@ public class CierreController implements Initializable {
                 double cierreCant = 0;
                 String total = "";
                 double totalcant = 0;
-                String saldoFisicoMut = "";
                 double cantSaldoFisicoMut = 0;
-                String sobranteMUT = "";
                 double sobranteCantMUT = 0;
-                String faltanteMUT = "";
                 double faltanteCantMUT = 0;
 
                 // NGU var
@@ -357,13 +338,7 @@ public class CierreController implements Initializable {
                 double cierreCantNGU = 0;
                 String totalNGU = "";
                 double totalcantNGU = 0;
-                String saldoFisicoNgu = "";
                 double cantSaldoFisicoNgu = 0;
-                String sobranteNGU = "";
-                double sobranteCantNGU = 0;
-                String faltanteNGU = "";
-                double faltanteCantNGU = 0;
-
                 // Totales
                 String ahorrosTOT = "";
                 double ahorrosCantTOT = 0;
@@ -425,15 +400,6 @@ public class CierreController implements Initializable {
                     cierreCant = Double.parseDouble(String.valueOf(fila[9]));
                     cierre = formatoMoneda.format(cierreCant);
 
-                    sobranteCantMUT = Double.parseDouble(String.valueOf(fila[10]));
-                    sobranteMUT = formatoMoneda.format(sobranteCantMUT);
-
-                    faltanteCantMUT = Double.parseDouble(String.valueOf(fila[11]));
-                    faltanteMUT = formatoMoneda.format(faltanteCantMUT);
-
-                    cantSaldoFisicoMut = Double.parseDouble(String.valueOf(fila[12]));
-                    saldoFisicoMut = formatoMoneda.format(cantSaldoFisicoMut);
-
                     totalcant =
                         creditosCant
                             + ahorrosCant
@@ -473,15 +439,6 @@ public class CierreController implements Initializable {
 
                     cierreCantNGU = Double.parseDouble(String.valueOf(fila[9]));
                     cierreNGU = formatoMoneda.format(cierreCantNGU);
-
-                    sobranteCantNGU = Double.parseDouble(String.valueOf(fila[10]));
-                    sobranteNGU = formatoMoneda.format(sobranteCantNGU);
-
-                    faltanteCantNGU = Double.parseDouble(String.valueOf(fila[11]));
-                    faltanteNGU = formatoMoneda.format(faltanteCantNGU);
-
-                    cantSaldoFisicoNgu = Double.parseDouble(String.valueOf(fila[12]));
-                    saldoFisicoNgu = formatoMoneda.format(cantSaldoFisicoNgu);
 
                     totalcantNGU =
                         creditosCantNGU
