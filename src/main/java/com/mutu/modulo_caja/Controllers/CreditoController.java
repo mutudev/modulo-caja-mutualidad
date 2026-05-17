@@ -95,6 +95,16 @@ public class CreditoController implements Initializable {
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
+
+    txtMonto.setTextFormatter(new TextFormatter<>(change -> {
+      // Solo dígitos y un único punto decimal
+      String newText = change.getControlNewText();
+      if (!newText.matches("\\d*\\.?\\d*")) {
+        return null; // Rechaza el cambio
+      }
+      return change;
+    }));
+
     configurarTabla();
   }
 
@@ -261,20 +271,31 @@ public class CreditoController implements Initializable {
     String jsonEnviar = "";
     LocalDate hoy = servicio.traerFechaHoy();
 
+
     switch (event.getCode()) {
 
       case F1: //Pagar aparte el interés
+
+        if (txtMonto.getText().trim().isEmpty()) {
+          Alert alert = new Alert(Alert.AlertType.ERROR);
+          alert.setTitle("ERROR");
+          alert.setHeaderText("ERROR AL INTENTAR PAGAR EL CRÉDITO");
+          alert.setContentText("POR FAVOR, DIGITE UN MONTO Y SELECCIONE UNA FORMA DE PAGAR.");
+          alert.showAndWait();
+          return;
+        }
+
         capital = Double.parseDouble(txtMonto.getText().trim());
         int indice = 0;
 
         // 1) Contar cuántas cuotas cubre el capital enviado
         for (PagoCuotaDTO cuotaDTO : copiaCuotas) {
-          if (cuotaDTO.getCapital().doubleValue() > capital) {
-            break;
-          }
+//          if (cuotaDTO.getCapital().doubleValue() > capital) {
+//            break;
+//          }
           capital -= cuotaDTO.getCapital().doubleValue();
           indice++;
-          if (capital == 0) {
+          if (capital <= 0) {
             break;
           }
         }
@@ -289,12 +310,27 @@ public class CreditoController implements Initializable {
 
           if (capital >= capCuota) {
             pagoCuotaDTO.setCapital(BigDecimal.ZERO);  // cuota cubierta completa
+
+            //Aquí en el total no hace falta hacer nada ya que pues lo envíado superó el capital de la cuota
+            //y como se paga aparte el interés el total que dice la tabla se mantiene
+
             capital -= capCuota;                       // restar ANTES de poner a 0
           } else {
             pagoCuotaDTO.setCapital(
                     BigDecimal.valueOf(capCuota - capital)
                             .setScale(2, RoundingMode.HALF_UP)
             );
+
+            //Sumamos el total si el capital de la cuota fue mayor a lo envíado de capital
+            //Se suma intereses + mora + iva + lo envíado o bien el restante de lo que fue capital antes de ponerlo a 0
+
+            pagoCuotaDTO.setTotal(BigDecimal.valueOf(
+                    pagoCuotaDTO.getIntereses().doubleValue() +
+                            pagoCuotaDTO.getMora().doubleValue() +
+                            pagoCuotaDTO.getIva().doubleValue() +
+                            capital
+            ).setScale(2, RoundingMode.HALF_UP));
+
             capital = 0;
           }
 
@@ -320,7 +356,7 @@ public class CreditoController implements Initializable {
         }
 
         // Acumular cuotas no tocadas (desde indice+1 en adelante)
-        for (int j = indice + 1; j < copiaCuotas.size(); j++) {
+        for (int j = indice; j < copiaCuotas.size(); j++) {
           PagoCuotaDTO cuotaPendiente = copiaCuotas.get(j);
 
           if (cuotaPendiente.getIntereses().doubleValue() > 0) {
@@ -331,25 +367,65 @@ public class CreditoController implements Initializable {
             cuotaPendiente.setIntereses(BigDecimal.ZERO);
           }
 
+          cuotaPendiente.setTotal(BigDecimal.ZERO);
+
+          //Poner la bonificación en 0 si no se procesó ya que pues ya se acumula sin bonificación
+          cuotaPendiente.setBonif(BigDecimal.ZERO);
+
           if (cuotaPendiente.getMora().doubleValue() > 0) {
             cuotaPendiente.setMoraAcumulados(
                     cuotaPendiente.getMora().add(cuotaPendiente.getMoraAcumulados())
             );
             cuotaPendiente.setMora(BigDecimal.ZERO);
           }
+
+          cuotaPendiente.setIva(BigDecimal.ZERO);
         }
 
         jsonEnviar = buildJsonCuotas();
         System.out.println(jsonEnviar);
 
+        //Mandar CopiaCuotas al método
+//        ModelTransaccion transaccion = servicio.pagarCredito(copiaCuotas, creditoEncontrado.getId());
+//
+//        if (transaccion.getId() != 0) {
+//          Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//          alert.setTitle("Pago Exitoso");
+//          alert.setHeaderText("Crédito #" + transaccion.getCreditoAfectado() + " — Cuota #" + transaccion.getCuotaAfectada());
+//          alert.setContentText(
+//                  "Total pagado:     Q" + transaccion.getSaldo() + "\n" +
+//                          "Capital pagado:   Q" + transaccion.getCapitalCreditoPagado() + "\n" +
+//                          "Intereses:        Q" + transaccion.getInteresesCreditoPagado() + "\n" +
+//                          "Mora:             Q" + transaccion.getMoraCreditoPagado() + "\n" +
+//                          "IVA:              Q" + transaccion.getIvaCreditoPagado() + "\n" +
+//                          "Bonificación:     Q" + transaccion.getBonifCreditoPagado() + "\n" +
+//                          "Saldo crédito:    Q" + transaccion.getSaldoCredito() + "\n" +
+//                          "Fecha:            "  + transaccion.getFechaRegistro() + "\n" +
+//                          "Hora:             "  + transaccion.getHora() + "\n" +
+//                          "Caja #:           "  + transaccion.getCajaId()
+//          );
+//          alert.showAndWait();
+//        }
+
         break;
 
       case F2:
+
+        if (txtMonto.getText().trim().isEmpty()) {
+          Alert alert = new Alert(Alert.AlertType.ERROR);
+          alert.setTitle("ERROR");
+          alert.setHeaderText("ERROR AL INTENTAR PAGAR EL CRÉDITO");
+          alert.setContentText("POR FAVOR, DIGITE UN MONTO Y SELECCIONE UNA FORMA DE PAGAR.");
+          alert.showAndWait();
+          return;
+        }
+
         montoDadoF2 = Double.parseDouble(txtMonto.getText().trim());
         double total = 0;
         int i = 0;
         for (; i < copiaCuotas.size(); i++) {
 
+          System.out.println("When el pepe: " + montoDadoF2);
 
           PagoCuotaDTO pagoCuotaDTO = copiaCuotas.get(i);
 
@@ -374,6 +450,8 @@ public class CreditoController implements Initializable {
             pagoCuotaDTO.setCapital(BigDecimal.ZERO);
             montoDadoF2 -= pagoCuotaDTO.getTotal().doubleValue();
 
+            System.out.println("1ero: " + montoDadoF2);
+
             //settear fechas
             if (pagoCuotaDTO.getFechaRealizada() != null) {
               pagoCuotaDTO.setFechaAnterior(pagoCuotaDTO.getFechaRealizada());
@@ -387,6 +465,9 @@ public class CreditoController implements Initializable {
 
           } else {
 
+            System.out.println("2do: " + montoDadoF2);
+
+
             // Fechas primero, antes de cualquier break
             if (pagoCuotaDTO.getFechaRealizada() != null) {
               pagoCuotaDTO.setFechaAnterior(pagoCuotaDTO.getFechaRealizada());
@@ -395,14 +476,38 @@ public class CreditoController implements Initializable {
 
             //El total de la cuota es tal cual monto dado
             pagoCuotaDTO.setTotal(BigDecimal.valueOf(montoDadoF2));
+            System.out.println("Total: " + pagoCuotaDTO.getTotal());
             // El monto dado es menor, por lo tanto vamos a ir descontando uno por uno
             //Si aplica IVA
+
             if (creditoEncontrado.getIva() != 0) {
-              //Saco el Iva de lo que me queda
-              double ivaMontoDado = montoDadoF2 * (creditoEncontrado.getIva() / 100);
-              //Se lo resto al monto que me queda asegurando el IVA y ya ir repartiendo en el orden: mora -> interes -> Capital
-              montoDadoF2 -= ivaMontoDado;
-              pagoCuotaDTO.setIva(BigDecimal.valueOf(ivaMontoDado).setScale(2, RoundingMode.HALF_UP));
+              //Evaluo las dos condiciones
+
+              //Si hay algo de mora evaluo solo eso sin pasar por intereses
+              if (pagoCuotaDTO.getMora().doubleValue() != 0) {
+                if (pagoCuotaDTO.getMora().doubleValue() >= montoDadoF2) {
+                  //Saco el Iva de lo que me queda
+                  double ivaMontoDado = montoDadoF2 * (creditoEncontrado.getIva() / 100);
+                  //Se lo resto al monto que me queda asegurando el IVA y ya ir repartiendo en el orden: mora -> interes -> Capital
+                  montoDadoF2 -= ivaMontoDado;
+                  pagoCuotaDTO.setIva(BigDecimal.valueOf(ivaMontoDado).setScale(2, RoundingMode.HALF_UP));
+                } else if (pagoCuotaDTO.getMora().doubleValue() < montoDadoF2) {
+                  montoDadoF2 -= pagoCuotaDTO.getIva().doubleValue();
+                }
+              } else {
+                //Si la mora es 0, en lugar de evaluar con mora evalúo con intereses
+                if (pagoCuotaDTO.getIntereses().doubleValue() >= montoDadoF2) {
+                  //Saco el Iva de lo que me queda
+                  double ivaMontoDado = montoDadoF2 * (creditoEncontrado.getIva() / 100);
+                  //Se lo resto al monto que me queda asegurando el IVA y ya ir repartiendo en el orden: mora -> interes -> Capital
+                  montoDadoF2 -= ivaMontoDado;
+                  pagoCuotaDTO.setIva(BigDecimal.valueOf(ivaMontoDado).setScale(2, RoundingMode.HALF_UP));
+                } else if (pagoCuotaDTO.getIntereses().doubleValue() < montoDadoF2) {
+                  montoDadoF2 -= pagoCuotaDTO.getIva().doubleValue();
+                }
+              }
+
+
             }
 
             //PAGO DE MORA
@@ -417,6 +522,7 @@ public class CreditoController implements Initializable {
                 pagoCuotaDTO.setIntereses(BigDecimal.ZERO);
                 //Por parte de la mora, acumulo solo lo que no pude cubrir, es decir, lo que era menos lo que tenia montoDado
                 montoDadoF2 = 0;
+
               } else {
                 //Aquí, como montoDado fue igual a la mora pues ponemos monto dado en cero, de mora no acumulamos nada ya que la cubrí toda y de interes
                 //Acumulamos todo
@@ -482,7 +588,7 @@ public class CreditoController implements Initializable {
         }
 
         // Después del loop principal, acumular en las cuotas no tocadas
-        for (int j = i; j < copiaCuotas.size(); j++) {
+        for (int j = i + 1; j < copiaCuotas.size(); j++) {
           PagoCuotaDTO cuotaPendiente = copiaCuotas.get(j);
 
           cuotaPendiente.setTotal(BigDecimal.ZERO);
@@ -505,6 +611,9 @@ public class CreditoController implements Initializable {
             );
             cuotaPendiente.setMora(BigDecimal.ZERO);
           }
+
+          cuotaPendiente.setIva(BigDecimal.ZERO);
+
         }
 
 
@@ -512,14 +621,38 @@ public class CreditoController implements Initializable {
         jsonEnviar = buildJsonCuotas();
         System.out.println(jsonEnviar);
 
+        //Mandar CopiaCuotas al método
+//         transaccion = servicio.pagarCredito(copiaCuotas, creditoEncontrado.getId());
+//
+//        if (transaccion.getId() != 0) {
+//          Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//          alert.setTitle("Pago Exitoso");
+//          alert.setHeaderText("Crédito #" + transaccion.getCreditoAfectado() + " — Cuota #" + transaccion.getCuotaAfectada());
+//          alert.setContentText(
+//                  "Total pagado:     Q" + transaccion.getSaldo() + "\n" +
+//                          "Capital pagado:   Q" + transaccion.getCapitalCreditoPagado() + "\n" +
+//                          "Intereses:        Q" + transaccion.getInteresesCreditoPagado() + "\n" +
+//                          "Mora:             Q" + transaccion.getMoraCreditoPagado() + "\n" +
+//                          "IVA:              Q" + transaccion.getIvaCreditoPagado() + "\n" +
+//                          "Bonificación:     Q" + transaccion.getBonifCreditoPagado() + "\n" +
+//                          "Saldo crédito:    Q" + transaccion.getSaldoCredito() + "\n" +
+//                          "Fecha:            "  + transaccion.getFechaRegistro() + "\n" +
+//                          "Hora:             "  + transaccion.getHora() + "\n" +
+//                          "Caja #:           "  + transaccion.getCajaId()
+//          );
+//          alert.showAndWait();
+//        }
+
         break;
 
       default:
         break;
     }
 
-    //Mandar CopiaCuotas al método
-    servicio.pagarCredito(copiaCuotas, creditoId);
+
+
+
+
 
 
   }

@@ -1,5 +1,6 @@
 package com.mutu.modulo_caja.Services;
 
+import com.mutu.modulo_caja.Controllers.LoginController;
 import com.mutu.modulo_caja.Models.*;
 import com.mutu.modulo_caja.Models.DTO.PagoCuotaDTO;
 import com.mutu.modulo_caja.Repository.TrasladoRepository;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +50,9 @@ public class Servicio {
 
   @Autowired private TipoCreditoRepository repoTipoCredito;
 
+  @Autowired private TransaccionRepository repoTransaccion;
+
+  @Autowired private HistorialCreditoRepository repoHistorialCredito;
 
 
   @Transactional
@@ -567,6 +572,10 @@ public class Servicio {
     return repoCaja.findByUsuarioIdAndFrAndEstadoAndTurnoAndEmpresa(usuarioId, fr, estado, turno, empresa);
   }
 
+  public ModelCaja traerCaja(int usuarioId, LocalDate fr, int estado, String empresa) {
+    return repoCaja.findByUsuarioIdAndFrAndEstadoAndEmpresa(usuarioId, fr, estado, empresa);
+  }
+
   public List<ModelOperaciones> traerOperaciones() {
     return repoOperaciones.findAll();
   }
@@ -581,19 +590,118 @@ public class Servicio {
 
   //Pagar Crédito
   @Transactional
-  public void pagarCredito(List<PagoCuotaDTO> cuotas, int creditoId) {
+  public ModelTransaccion pagarCredito(List<PagoCuotaDTO> cuotas, int creditoId) {
 
     //Obtenemos el crédito
+    System.out.println(creditoId);
     ModelCredito credito = repoCredito.findById(creditoId);
+
+    //Cargar las cuotas
+    Map<Integer, ModelCuotas> cuotasMap = new HashMap<>();
+    for (PagoCuotaDTO dto : cuotas) {
+      ModelCuotas cuota = repoCuotas.findByCreditoIdAndNumCuota(creditoId, dto.getNumCuota());
+      cuotasMap.put(dto.getNumCuota(), cuota);
+    }
+
+    ModelUsuario usuario = traerDatosUsuario(LoginController.usuarioLoggeado);
+    //Traer la caja
+    ModelCaja caja = traerCaja(usuario.getId(), traerFechaHoy(), 1, credito.getEmpresa());
+
+    double capitalPagado = 0;
+    double totalPagado = 0;
+    double bonifPagado = 0;
+    double interesesPagado = 0;
+    double ivaPagado = 0;
+    double moraPagado = 0;
+
+    //Primero guardar la transacción para despúes guardar en el Historial Credito Detalle
+    ModelTransaccion transaccion = new ModelTransaccion();
+    transaccion.setUsuarioId(usuario.getId());
+    transaccion.setOperacionId(2);
+    transaccion.setSocioId(credito.getSocio());
+
+    int cuotaInmediata = 0;
+    //Crear el primer ciclo solo para obtener acumulados
+    for(PagoCuotaDTO dto : cuotas) {
+      capitalPagado += (cuotasMap.get(dto.getNumCuota()).getCapital().doubleValue() - dto.getCapital().doubleValue());
+      totalPagado += dto.getTotal().doubleValue();
+      bonifPagado += dto.getBonif().doubleValue();
+      interesesPagado += dto.getIntereses().doubleValue();
+      moraPagado += dto.getMora().doubleValue();
+      ivaPagado += dto.getIva().doubleValue();
+
+      if (cuotaInmediata == 0) {
+        cuotaInmediata = dto.getNumCuota();
+      }
+    }
+
+    //Actualizar el saldo de cajas
+    if (caja.getSal_final() == 0) {
+      caja.setSal_final(caja.getSal_inicial() + totalPagado);
+    } else {
+      caja.setSal_final(caja.getSal_final() + totalPagado);
+    }
+
+    transaccion.setSaldo(BigDecimal.valueOf(totalPagado));
+    transaccion.setStatus(true);
+    transaccion.setFechaRegistro(traerFechaHoy());
+    transaccion.setHora(LocalTime.now());
+    transaccion.setEmpresa(credito.getEmpresa());
+    transaccion.setCajaId(caja.getId());
+    transaccion.setCapitalCreditoPagado(BigDecimal.valueOf(capitalPagado));
+    transaccion.setInteresesCreditoPagado(BigDecimal.valueOf(interesesPagado));
+    transaccion.setMoraCreditoPagado(BigDecimal.valueOf(moraPagado));
+    transaccion.setBonifCreditoPagado(BigDecimal.valueOf(bonifPagado));
+    transaccion.setIvaCreditoPagado(BigDecimal.valueOf(ivaPagado));
+    transaccion.setSaldoCredito(BigDecimal.valueOf(credito.getSaldo() - capitalPagado));
+    transaccion.setCuotaAfectada(cuotaInmediata);
+    transaccion.setCreditoAfectado(creditoId);
+    transaccion.setAhorroAlMomento(null);
+    transaccion.setTotalCuotaPagada(BigDecimal.valueOf(totalPagado));
+
+    //Insertar transacción
+    ModelTransaccion transaccionInsertada = repoTransaccion.save(transaccion);
+
+
+    double capitalCreditoIterable = credito.getSaldo();
+    //Ahora, generar con un ciclo la inserción de Historial Credito Detalle
+    for (PagoCuotaDTO dto : cuotas) {
+      //Obtenemos la cuota
+
+      if (dto.getFechaRealizada() != null) {
+        //Creamos un nuevo ModelHistorialCredito
+        ModelHistorialCredito historialCredito = new ModelHistorialCredito();
+        historialCredito.setFechaP(traerFechaHoy());
+        historialCredito.setFechaV(dto.getFechaP());
+        historialCredito.setNumCuota(dto.getNumCuota());
+        historialCredito.setCapitalPagado(BigDecimal.valueOf(cuotasMap.get(dto.getNumCuota()).getCapital().doubleValue() - dto.getCapital().doubleValue()));
+        historialCredito.setInteresPagado(dto.getIntereses());
+        historialCredito.setMoraPagado(dto.getMora());
+        historialCredito.setIvaPagado(dto.getIva());
+        historialCredito.setTotalPagado(dto.getTotal());
+        //Es la resta de lo que tiene el capital menos lo que realmente pagué
+        //Lo que realmente pagué es el monto de CUOTAS_EJEMPLO - LO QUE ENVÍO EN MI DTO
+        historialCredito.setSaldoCredito(BigDecimal.valueOf(capitalCreditoIterable - (cuotasMap.get(dto.getNumCuota()).getCapital().doubleValue() - dto.getCapital().doubleValue())));
+        capitalCreditoIterable -= (cuotasMap.get(dto.getNumCuota()).getCapital().doubleValue() - dto.getCapital().doubleValue());
+        historialCredito.setOperacionId(transaccionInsertada.getId());
+        repoHistorialCredito.save(historialCredito);
+      }
+
+
+    }
+
+
 
     //Recorremos las cuotas ya procesadas en el controller
     for (PagoCuotaDTO dto : cuotas) {
       //Obtenemos la cuota una por una
-      ModelCuotas cuota = repoCuotas.findByCreditoIdAndNumCuota(creditoId, dto.getNumCuota());
-
       //Iteramos la cuota una por una
       //Primero afecta el capital
       //Aquí no hay mucho problema, solo es settear lo que trajo la cuota de capital
+
+      //Obtener la cuota
+      ModelCuotas cuota = cuotasMap.get(dto.getNumCuota());
+
       cuota.setCapital(dto.getCapital());
 
       //Settear los intereses
@@ -680,9 +788,19 @@ public class Servicio {
         }
       }
 
-
       repoCuotas.save(cuota);
     }
+
+    //Una vez actualizadas las cuotas
+    //Actualizamos el saldo del crédito en CAT_CREDITOS
+    credito.setSaldo(credito.getSaldo() - capitalPagado);
+    repoCredito.save(credito);
+
+    return transaccionInsertada;
+
+
+
+
   }
 
 

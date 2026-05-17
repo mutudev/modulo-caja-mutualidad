@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 @Entity
 @Data
-@Table(name = "VW_CUOTAS_CREDITO")
+@Table(name = "CUOTAS_EJEMPLO")
 @NamedStoredProcedureQuery(
         name = "Cuotas_Credito.pa_CalcularPagoDeCuotas",
         procedureName = "pa_CalcularPagoDeCuotas",
