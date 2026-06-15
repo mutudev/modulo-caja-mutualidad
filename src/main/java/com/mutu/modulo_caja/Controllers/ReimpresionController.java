@@ -247,12 +247,16 @@ public class ReimpresionController {
   public void setDatosTraslados(String id, String usuario, String monto, String tipo_traslado,
                                 String cuenta_origen, String cuenta_destino, String fecha,
                                 int opcion, OperacionesController controller, String turno) {
-    this.id = id;         this.opcion = opcion;  this.usuario = usuario;
-    this.monto = monto;   this.controller = controller;
+    this.id = id;
+    this.opcion = opcion;
+    this.usuario = usuario;
+    this.monto = monto;
+    this.controller = controller;
     this.tipo_traslado = tipo_traslado;
     this.cuenta_origen = cuenta_origen;
     this.cuenta_destino = cuenta_destino;
-    this.fecha = fecha;   this.turno = turno;
+    this.fecha = fecha;
+    this.turno = turno;
 
     rellenarCamposTraslado(opcion, cuenta_origen, cuenta_destino, tipo_traslado, fecha, monto, usuario, id);
     lblTitulo.setText("CANCELAR TRASLADO");
@@ -263,14 +267,18 @@ public class ReimpresionController {
                                          String cuenta_origen, String cuenta_destino, String fecha,
                                          int operacionreimpresion, HistorialController controller,
                                          String turno, String empresa, String hora) {
-    this.id = id;           this.operaciontipo = operacionreimpresion;
-    this.usuario = usuario; this.monto = monto;
+    this.id = id;
+    this.operaciontipo = operacionreimpresion;
+    this.usuario = usuario;
+    this.monto = monto;
     this.controllerhisto = controller;
     this.tipo_traslado = tipo_traslado;
     this.cuenta_origen = cuenta_origen;
     this.cuenta_destino = cuenta_destino;
-    this.fecha = fecha;     this.turno = turno;
-    this.empresa = empresa; this.hora = hora;
+    this.fecha = fecha;
+    this.turno = turno;
+    this.empresa = empresa;
+    this.hora = hora;
 
     rellenarCamposTraslado(operacionreimpresion, cuenta_origen, cuenta_destino, tipo_traslado, fecha, monto, usuario, id);
     lblTitulo.setText("REIMPRIMIR TRASLADO");
@@ -282,14 +290,21 @@ public class ReimpresionController {
                        String capital_pagado, String interes_pagado, String mora_pagada,
                        String iva_pagado, String bonif_aplicada, String saldo_credito,
                        String tipo_credito) {
-    this.nombre = nombre;           this.socio = socio;
-    this.id = id;                   this.operacion = operacion;
-    this.empresa = empresa;         this.fecha = fecha;
-    this.monto = monto;             this.hora = hora;
+    this.nombre = nombre;
+    this.socio = socio;
+    this.id = id;
+    this.operacion = operacion;
+    this.empresa = empresa;
+    this.fecha = fecha;
+    this.monto = monto;
+    this.hora = hora;
     this.operaciontipo = operaciontipo;
-    this.capital_pagado = capital_pagado; this.interes_pagado = interes_pagado;
-    this.mora_pagada = mora_pagada;       this.iva_pagado = iva_pagado;
-    this.saldo_credito = saldo_credito;   this.tipo_credito = tipo_credito;
+    this.capital_pagado = capital_pagado;
+    this.interes_pagado = interes_pagado;
+    this.mora_pagada = mora_pagada;
+    this.iva_pagado = iva_pagado;
+    this.saldo_credito = saldo_credito;
+    this.tipo_credito = tipo_credito;
     this.bonif_aplicada = bonif_aplicada;
 
     txtSocio.setText(socio);       txtID.setText(id);
@@ -308,21 +323,33 @@ public class ReimpresionController {
                                   String hora, String capital_pagado, String interes_pagado,
                                   String mora_pagada, String iva_pagado, String bonif_aplicada,
                                   String saldo_credito, String tipo_credito, String cuota_afectada) {
-    this.nombre = nombre;           this.socio = socio;
-    this.capital_pagado = capital_pagado; this.usuario = usuario;
-    this.id = id;                   this.operacion = operacion;
-    this.empresa = empresa;         this.hora = hora;
+    this.nombre = nombre;
+    this.socio = socio;
+    this.capital_pagado = capital_pagado;
+    this.usuario = usuario;
+    this.id = id;
+    this.operacion = operacion;
+    this.empresa = empresa;
+    this.hora = hora;
     this.cuota_afectada = cuota_afectada;
-    this.interes_pagado = interes_pagado; this.mora_pagada = mora_pagada;
-    this.iva_pagado = iva_pagado;   this.bonif_aplicada = bonif_aplicada;
-    this.saldo_credito = saldo_credito;   this.tipo_credito = tipo_credito;
-    this.fecha = fecha;             this.monto = monto;
-    this.opcion = opcion;           this.turno = turno;
+    this.interes_pagado = interes_pagado;
+    this.mora_pagada = mora_pagada;
+    this.iva_pagado = iva_pagado;
+    this.bonif_aplicada = bonif_aplicada;
+    this.saldo_credito = saldo_credito;
+    this.tipo_credito = tipo_credito;
+    this.fecha = fecha;
+    this.monto = monto;
+    this.opcion = opcion;
+    this.turno = turno;
     this.controller = controller;
 
-    txtSocio.setText(socio);       txtID.setText(id);
-    txtOperacion.setText(operacion); txtEmpresa.setText(empresa);
-    txtFecha.setText(fecha);       txtMonto.setText(monto);
+    txtSocio.setText(socio);
+    txtID.setText(id);
+    txtOperacion.setText(operacion);
+    txtEmpresa.setText(empresa);
+    txtFecha.setText(fecha);
+    txtMonto.setText(monto);
     txtNomSocio.setText(nombre);
     lblTitulo.setText("CANCELACIÓN DE OPERACIONES");
     btnReimprimir.setText("CANCELAR");
@@ -459,7 +486,7 @@ public class ReimpresionController {
 
   // Extracción: lógica de cancelación de operaciones normales separada
   private void cancelarOperacionNormal() {
-    String cod = servicio.traerEmpresaConRS(empresa).getCodigo();
+    String cod = servicio.traerEmpresaConRS(txtEmpresa.getText().trim()).getCodigo();
     empresa = cod;
 
     double montooriginal = 0;
@@ -487,16 +514,28 @@ public class ReimpresionController {
         break;
     }
 
-    String Result = (opcion != 2)
-            ? servicio.pa_CancelarOperacion(opcion, usuario, Integer.parseInt(socio),
-            Integer.parseInt(txtID.getText().trim()), montoExtraido, empresa, turno, "")
-            : servicio.pa_CancelarAbonoCredito(
-            parseMoneda(capital_pagado), parseMoneda(interes_pagado),
-            parseMoneda(mora_pagada), parseMoneda(iva_pagado),
-            parseMoneda(bonif_aplicada), parseMoneda(saldo_credito),
-            parseMoneda(monto), tipo_credito,
-            Integer.parseInt(txtID.getText().trim()), empresa, turno,
-            fecha, hora, Integer.parseInt(cuota_afectada), usuario, "");
+
+    String Result = "";
+    ModelTransaccion cancelacionCredito = null;
+    if(opcion == 2){
+      cancelacionCredito = servicio.cancelarCredito(Integer.parseInt(txtID.getText()));
+
+      if (cancelacionCredito == null) {
+        mostrarAlerta(Alert.AlertType.ERROR, "ERROR CANCELANDO LA OPERACIÓN",
+                "ERROR AL CANCELAR EL ABONO A CRÉDITO",
+                "EXISTE UNA OPERACIÓN MÁS RECIENTE PARA ESTE CRÉDITO, CANCELE ESA PRIMERO.");
+        return;
+      }
+
+      if(!cancelacionCredito.getStatus()) {
+        Result = "CORRECTO";
+      }
+
+    } else {
+      Result = servicio.pa_CancelarOperacion(opcion, usuario, Integer.parseInt(socio),
+              Integer.parseInt(txtID.getText().trim()), montoExtraido, empresa, turno, "");
+    }
+
 
     if (!Result.equals("CORRECTO")) {
       mostrarAlerta(Alert.AlertType.ERROR, "ERROR CANCELANDO LA OPERACIÓN",
@@ -534,17 +573,17 @@ public class ReimpresionController {
         break;
       }
       case 2: {
-        List<ModelCapitalSocial> cs2 = servicio.traerCuentasCS(Integer.parseInt(socio));
-        String psmut1 = formatoMoneda.format(cs2.getFirst().getMonto_cubierto());
-        String psngu1 = cs2.size() > 1 ? formatoMoneda.format(cs2.get(1).getMonto_cubierto()) : "";
-        String interessinbonif = formatoMoneda.format(parseMoneda(txtInteres.getText()) + parseMoneda(txtBonif.getText()));
-        String saldoactual     = formatoMoneda.format(parseMoneda(saldo_credito) + parseMoneda(txtCapital.getText()));
+
+
         printer = impresora.imprimirCancelacionAbonoACredito(datosEmp[0], datosEmp[1], datosEmp[2],
-                socio, idoperacion, fechaTicket, horaFormateada, nombre,
-                LoginController.usuarioLoggeado, txtCapital.getText(), moneyAsWords,
-                montoTxt, tipo_credito, txtMora.getText(), txtInteres.getText(),
-                txtBonif.getText(), txtIva.getText(), psngu1, psmut1,
-                saldoactual, interessinbonif);
+                socio, cancelacionCredito.getId().toString(), fechaTicket, horaFormateada, nombre,
+                LoginController.usuarioLoggeado, formatoMoneda.format(cancelacionCredito.getCapitalCreditoPagado()), enPalabras(cancelacionCredito.getSaldo().doubleValue()),
+                formatoMoneda.format(cancelacionCredito.getSaldo().doubleValue()), cancelacionCredito.getTipoCredito(),
+                formatoMoneda.format(cancelacionCredito.getMoraCreditoPagado()),
+              formatoMoneda.format(cancelacionCredito.getInteresesCreditoPagado()),
+                formatoMoneda.format(cancelacionCredito.getBonifCreditoPagado()),
+               formatoMoneda.format(cancelacionCredito.getIvaCreditoPagado())
+                ,formatoMoneda.format(cancelacionCredito.getSaldoCredito().doubleValue() + cancelacionCredito.getCapitalCreditoPagado().doubleValue()), formatoMoneda.format(cancelacionCredito.getInteresesCreditoPagado().doubleValue() + cancelacionCredito.getBonifCreditoPagado().doubleValue()));
         break;
       }
       case 3: {
@@ -688,18 +727,18 @@ public class ReimpresionController {
         break;
       }
       case 2: {
-        abono = parseMoneda(monto);
-        double bonifrestar = parseMoneda(bonif_aplicada);
-        double interes     = parseMoneda(txtInteres.getText()) + bonifrestar;
-        List<ModelCapitalSocial> cs2 = servicio.traerCuentasCS(Integer.parseInt(socio));
-        double psmut2 = cs2.getFirst().getMonto_cubierto();
-        double psngu2 = cs2.size() > 1 ? cs2.get(1).getMonto_cubierto() : 0;
-        printer = impresora.imprimirAbonoACredito(datosEmp[0], datosEmp[1], datosEmp[2],
-                socio, id, nombre, fecha, hora, LoginController.usuarioLoggeado,
-                capital_pagado, enPalabras(abono), monto, tipo_credito, mora_pagada,
-                interes_pagado, bonif_aplicada, iva_pagado,
-                formatoMoneda.format(psngu2), formatoMoneda.format(psmut2),
-                saldo_credito, formatoMoneda.format(interes));
+//        abono = parseMoneda(monto);
+//        double bonifrestar = parseMoneda(bonif_aplicada);
+//        double interes     = parseMoneda(txtInteres.getText()) + bonifrestar;
+//        List<ModelCapitalSocial> cs2 = servicio.traerCuentasCS(Integer.parseInt(socio));
+//        double psmut2 = cs2.getFirst().getMonto_cubierto();
+//        double psngu2 = cs2.size() > 1 ? cs2.get(1).getMonto_cubierto() : 0;
+//        printer = impresora.imprimirAbonoACredito(datosEmp[0], datosEmp[1], datosEmp[2],
+//                socio, id, nombre, fecha, hora, LoginController.usuarioLoggeado,
+//                capital_pagado, enPalabras(abono), monto, tipo_credito, mora_pagada,
+//                interes_pagado, bonif_aplicada, iva_pagado,
+//                formatoMoneda.format(psngu2), formatoMoneda.format(psmut2),
+//                saldo_credito, formatoMoneda.format(interes));
         break;
       }
       case 3: {

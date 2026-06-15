@@ -27,4 +27,14 @@ public class PagoCuotaDTO {
     private LocalDate fechaTerminoPago;
     private BigDecimal interesesAcumulados;
     private BigDecimal moraAcumulados;
+    private Boolean isCondonado;
+
+
+
+    public PagoCuotaDTO(Integer numCuota, LocalDate fechaAnterior, LocalDate fechaTerminoPago) {
+        this.numCuota = numCuota;
+        this.fechaAnterior = fechaAnterior;
+        this.fechaTerminoPago = fechaTerminoPago;
+    }
+
 }

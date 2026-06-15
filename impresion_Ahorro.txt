@@ -2,8 +2,8 @@
  NUEVA GENERACION DE UMAN, AC.                              
  RFC: NGU081125HL9                                          
  CALLE 23 No. 100-B ENTRE 18 Y 20 COL. CENTRO               
- FECHA: 15/05/2026                                          
- SOCIO: 8995                  FOLIO: 4                      
+ FECHA: 30/06/2026                                          
+ SOCIO: 8995                  FOLIO: 2                      
  NOMBRE: JOSE YAEL MEX MONTERO                              
  No. CUENTA: 00200188995                                    
  TIPO DE CUENTA: AHORRO   -   ABONO AHORRO                  
@@ -15,8 +15,8 @@
  NOMBRE: JOSE YAEL MEX MONTERO                              
  LA NO OBJECION A ESTE COMPROBANTE                          
  IMPLICA SU ACEPTACION                                      
- HORA: 09:07:35 USUARIO: JMEX                               
- AHORRO: $12,850.00                                         
+ HORA: 11:24:52 USUARIO: JMEX                               
+ AHORRO: $50,100.00                                         
                                                             
                                                             
                                                             

@@ -41,14 +41,14 @@ public class Main extends Application {
 		LocalDate fechaCompu = LocalDate.now();
 		
 
-		if (!fechaCompu.isEqual(fechaSistema)) {
-			Alert alert = new Alert(Alert.AlertType.ERROR);
-			alert.setTitle("ERROR");
-			alert.setHeaderText("ERROR AL INICIAR LA APLICACIÓN");
-			alert.setContentText("LA FECHA DE SU COMPUTADORA NO COINCIDE CON LA FECHA DEL SISTEMA, CORRIJA.");
-			alert.showAndWait();
-			System.exit(0);
-		}
+//		if (!fechaCompu.isEqual(fechaSistema)) {
+//			Alert alert = new Alert(Alert.AlertType.ERROR);
+//			alert.setTitle("ERROR");
+//			alert.setHeaderText("ERROR AL INICIAR LA APLICACIÓN");
+//			alert.setContentText("LA FECHA DE SU COMPUTADORA NO COINCIDE CON LA FECHA DEL SISTEMA, CORRIJA.");
+//			alert.showAndWait();
+//			System.exit(0);
+//		}
 
 		// Carga FXML con controlador Spring
 		FXMLLoader fxml = new FXMLLoader(getClass().getResource("/com/java/fx/login.fxml"));

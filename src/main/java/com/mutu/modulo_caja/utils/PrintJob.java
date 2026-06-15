@@ -226,8 +226,6 @@ public class PrintJob {
           String interesenviar,
           String bonifenviar,
           String ivaenviar,
-          String psnguenviar,
-          String psmutenviar,
           String saldoenviar,
           String interessinbonif) {
     int numchar = moneyAsWords.length();
@@ -277,12 +275,7 @@ public class PrintJob {
       printer.printTextWrap(16, 17, 1, 60, descripcion1);
       printer.printTextWrap(17, 18, 1, 60, descripcion2);
       printer.printTextWrap(18, 19, 1, 60, creditosaldo);
-      if (empresa.equals("NUEVA GENERACION DE UMAN AC")) {
-        printer.printTextWrap(19, 20, 1, 60, "PS NGU: " + psnguenviar);
-      } else {
-        printer.printTextWrap(19, 20, 1, 60,  "PS MUT: " + psmutenviar + " PS NGU: " + psnguenviar);
 
-      }
 
     } else {
       String primeralinea = "";
@@ -299,12 +292,7 @@ public class PrintJob {
       printer.printTextWrap(17, 18, 1, 60, descripcion1);
       printer.printTextWrap(18, 19, 1, 60, descripcion2);
       printer.printTextWrap(19, 20, 1, 60, creditosaldo);
-      if (empresa.equals("NUEVA GENERACION DE UMAN AC")) {
-        printer.printTextWrap(20, 21, 1, 60, "PS NGU: " + psnguenviar);
-      } else {
-        printer.printTextWrap(20, 21, 1, 60, "PS MUT: " + psmutenviar + " PS NGU: " + psnguenviar);
 
-      }
 
     }
     return printer;
@@ -328,8 +316,6 @@ public class PrintJob {
       String interesenviar,
       String bonifenviar,
       String ivaenviar,
-      String psnguenviar,
-      String psmutenviar,
       String saldoenviar,
       String interessinbonif) {
     int numchar = moneyAsWords.length();
@@ -379,12 +365,6 @@ public class PrintJob {
       printer.printTextWrap(16, 17, 1, 60, descripcion1);
       printer.printTextWrap(17, 18, 1, 60, descripcion2);
       printer.printTextWrap(18, 19, 1, 60, creditosaldo);
-      if (empresa.equals("NUEVA GENERACION DE UMAN AC")) {
-        printer.printTextWrap(19, 20, 1, 60, "PS NGU: " + psnguenviar);
-      } else {
-        printer.printTextWrap(19, 20, 1, 60,  "PS MUT: " + psmutenviar + " PS NGU: " + psnguenviar);
-
-      }
 
     } else {
       String primeralinea = "";
@@ -401,12 +381,7 @@ public class PrintJob {
       printer.printTextWrap(17, 18, 1, 60, descripcion1);
       printer.printTextWrap(18, 19, 1, 60, descripcion2);
       printer.printTextWrap(19, 20, 1, 60, creditosaldo);
-      if (empresa.equals("NUEVA GENERACION DE UMAN AC")) {
-        printer.printTextWrap(20, 21, 1, 60, "PS NGU: " + psnguenviar);
-      } else {
-        printer.printTextWrap(20, 21, 1, 60, "PS MUT: " + psmutenviar + " PS NGU: " + psnguenviar);
 
-      }
 
     }
     return printer;

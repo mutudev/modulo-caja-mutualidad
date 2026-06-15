@@ -2,21 +2,21 @@
  NUEVA GENERACION DE UMAN, AC.                              
  RFC: NGU081125HL9                                          
  CALLE 23 No. 100-B ENTRE 18 Y 20 COL. CENTRO               
- FECHA: 15/05/2026                                          
- SOCIO: 8995                  FOLIO: 5                      
- NOMBRE: JOSE YAEL MEX MONTERO                              
- TIPO DE CUENTA: CAPITAL SOCIAL - ABONO A CS                
-                                                            
- ABONO: $1,000.00                                           
- MIL CON 00/100 MXN                                         
-                                                            
+ FECHA: 30/06/2026 16:58:24 FOLIO: 4                        
+ SOCIO 8995 JOSE YAEL MEX MONTERO                           
+ ABONO A CREDITO TIPO: CT1                                  
+ CAPITAL: $1,666.68 INTERES: $0.00                          
+              BONIF: $0.00                                  
+ INTERES BONIFICADO: $0.00                                  
+               MORA: $0.00                                  
+          IVA. NETO: $0.00                                  
+       TOTAL PAGADO: $1,666.68                              
+ MIL SEISCIENTOS SESENTA Y SEIS                             
+ CON 68/100 MXN                                             
  ___________________________________                        
  NOMBRE: JOSE YAEL MEX MONTERO                              
  LA NO OBJECION A ESTE COMPROBANTE                          
  IMPLICA SU ACEPTACION                                      
- HORA: 09:07:55 USUARIO: JMEX                               
- PS NGU: $1,000.00                                          
-                                                            
-                                                            
+ CREDITO $8,333.32 CAPITAL DE CREDITO MAS INTERESES         
                                                             
                                                             

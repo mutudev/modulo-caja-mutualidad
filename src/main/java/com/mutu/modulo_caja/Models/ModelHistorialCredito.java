@@ -47,4 +47,20 @@ public class ModelHistorialCredito {
 
     @Column(name = "OPERACION_ID", nullable = false)
     private Integer operacionId;
+
+    @Column(name = "ESTADO", nullable = false)
+    private Boolean estado;
+
+    @Column(name = "FECHA_P_ANTERIOR")
+    private LocalDate fechaPagoAnterior;
+
+    @Column(name = "FECHA_P_FINALIZADO")
+    private LocalDate fechaPagoFinalizado;
+
+    @Column(name = "CREDITO_ID", nullable = false)
+    private Integer creditoId;
+
+    @Column(name = "BONIF_PAGADO", nullable = false)
+    private BigDecimal bonifPagada;
+
 }

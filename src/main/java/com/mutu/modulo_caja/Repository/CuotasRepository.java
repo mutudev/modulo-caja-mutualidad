@@ -20,6 +20,8 @@ public interface CuotasRepository extends JpaRepository<ModelCuotas, Integer> {
     ModelCuotas
     findFirstByCreditoIdAndFechaPRealizadaIsNotNullOrderByNumCuotaDesc(Integer creditoId);
 
+    List<ModelCuotas> findByCreditoId(int creditoId);
+
     @Transactional
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @QueryHints({
@@ -37,7 +39,6 @@ public interface CuotasRepository extends JpaRepository<ModelCuotas, Integer> {
             LocalDate fechaDesembolso
     );
 
-
-
+    ModelCuotas findByNumCuotaAndCreditoId(int numCuota, int creditoId);
 
 }

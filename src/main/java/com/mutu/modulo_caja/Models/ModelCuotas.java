@@ -105,11 +105,6 @@ public class ModelCuotas {
     @Column(name = "MORA_ACUMULADO", precision = 18, scale = 2)
     private BigDecimal moraAcumulado;
 
-    @Column(name = "IVA_ACUMULADO", precision = 18, scale = 2)
-    private BigDecimal ivaAcumulado;
-
-    @Column(name = "BONIF_PAGO", precision = 18, scale = 2)
-    private BigDecimal bonifPago;
 
     @Column(name = "IS_CONDONADO")
     private Boolean isCondonado;
